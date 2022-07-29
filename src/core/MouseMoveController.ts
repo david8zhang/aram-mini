@@ -24,7 +24,7 @@ export class MouseMoveController {
     this.game.input.mouse.disableContextMenu()
     this.game.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       if (pointer.rightButtonDown()) {
-        this.setMoveTarget(Math.round(pointer.x), Math.round(pointer.y))
+        this.setMoveTarget(Math.round(pointer.worldX), Math.round(pointer.worldY))
       }
     })
   }
