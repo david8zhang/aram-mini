@@ -1,5 +1,5 @@
 import { Game } from '~/scenes/Game'
-import { Champion, ChampionConfig } from './Champion'
+import { Champion, ChampionConfig } from './champion/Champion'
 import { MouseMoveController } from './MouseMoveController'
 
 export interface PlayerConfig {

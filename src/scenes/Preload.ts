@@ -8,6 +8,8 @@ export class Preload extends Scene {
   preload() {
     this.load.image('warrior', 'warrior.png')
     this.load.image('wizard', 'wizard.png')
+    this.load.image('minion_blue', 'minion_blue.png')
+    this.load.image('minion_red', 'minion_red.png')
     this.load.image('tilemap_packed', 'tilemap_packed.png')
     this.load.tilemapTiledJSON('map', 'map.json')
   }
