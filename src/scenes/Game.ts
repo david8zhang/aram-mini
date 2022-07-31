@@ -1,15 +1,17 @@
 import Phaser from 'phaser'
 import { MinionSpawner } from '~/core/minion/MinionSpawner'
 import { Player } from '~/core/Player'
+import { Projectile } from '~/core/Projectile'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 
 export class Game extends Phaser.Scene {
   public player!: Player
-  public updateHooks: Function[] = []
   public leftMinionSpawner!: MinionSpawner
   public rightMinionSpawner!: MinionSpawner
+  public projectileGroup!: Phaser.GameObjects.Group
   public graphics!: Phaser.GameObjects.Graphics
+  public isDebug: boolean = false
 
   constructor() {
     super('game')
@@ -27,6 +29,7 @@ export class Game extends Phaser.Scene {
         alpha: 1,
       },
     })
+    this.projectileGroup = this.add.group()
   }
 
   initCamera() {
@@ -50,6 +53,9 @@ export class Game extends Phaser.Scene {
         texture: 'minion_red',
       },
     })
+    this.physics.add.collider(this.leftMinionSpawner.minions, this.rightMinionSpawner.minions)
+    this.physics.add.collider(this.leftMinionSpawner.minions, this.leftMinionSpawner.minions)
+    this.physics.add.collider(this.rightMinionSpawner.minions, this.rightMinionSpawner.minions)
     this.rightMinionSpawner.startSpawning()
     this.leftMinionSpawner.startSpawning()
   }
@@ -78,8 +84,12 @@ export class Game extends Phaser.Scene {
 
   update() {
     this.graphics.clear()
-    this.updateHooks.forEach((fn) => {
-      fn()
+    this.player.update()
+    this.leftMinionSpawner.update()
+    this.rightMinionSpawner.update()
+    this.projectileGroup.children.entries.forEach((entry) => {
+      const projectile = entry.getData('ref') as Projectile
+      projectile.update()
     })
     this.graphics.lineStyle(1, 0x00ff00, 1)
   }

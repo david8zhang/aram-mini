@@ -15,9 +15,6 @@ export class MouseMoveController {
     this.game = config.game
     this.sprite = config.sprite
     this.setupMouseClickListener()
-    this.game.updateHooks.push(() => {
-      this.update()
-    })
   }
 
   setupMouseClickListener() {

@@ -32,11 +32,12 @@ export class MinionSpawner {
     this.targetPosition = config.targetPosition
     this.minionConfig = config.minionConfig
     this.spawnEvent = this.game.time.addEvent({
-      delay: 5000,
+      delay: 15000,
       repeat: -1,
       callback: () => {
         this.spawnMinions(3)
       },
+      startAt: 15000,
       paused: true,
     })
     this.side = config.side
@@ -51,7 +52,7 @@ export class MinionSpawner {
     if (numMinions === 0) {
       return
     }
-    this.game.time.delayedCall(500, () => {
+    this.game.time.delayedCall(750, () => {
       const minion = new Minion(this.game, {
         position: {
           x: this.spawnPosition.x,
@@ -63,6 +64,13 @@ export class MinionSpawner {
       })
       this.minions.add(minion.sprite)
       this.spawnMinions(numMinions - 1)
+    })
+  }
+
+  update() {
+    this.minions.children.entries.forEach((entry) => {
+      const minion = entry.getData('ref') as Minion
+      minion.update()
     })
   }
 }

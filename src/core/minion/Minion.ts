@@ -1,10 +1,13 @@
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
+import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
+import { HealthBar } from '../ui/Healthbar'
 import { AttackState } from './states/AttackState'
 import { MinionStates } from './states/MinionStates'
 import { MoveState } from './states/MoveState'
+import { VisionCone } from './VisionCone'
 
 export interface MinionConfig {
   texture: string
@@ -27,13 +30,16 @@ export class Minion {
   public side: Side
 
   // Detectors
-  public markerRectangle!: Phaser.Geom.Rectangle
-  public visionRay!: Phaser.Geom.Line
+  public visionCone?: VisionCone
+  public markerRectangle?: Phaser.Geom.Rectangle
+
+  public healthBar: HealthBar
 
   constructor(game: Game, config: MinionConfig) {
     this.game = game
     this.side = config.side
     this.sprite = this.game.physics.add.sprite(config.position.x, config.position.y, config.texture)
+    this.sprite.setData('ref', this)
     this.stateMachine = new StateMachine(
       MinionStates.MOVE,
       {
@@ -42,76 +48,135 @@ export class Minion {
       },
       [this]
     )
-    this.game.updateHooks.push(() => {
-      this.update()
+    this.healthBar = new HealthBar(this.game, {
+      x: this.sprite.x,
+      y: this.sprite.y,
+      maxValue: 50,
+      height: 3,
+      width: 20,
+      borderWidth: 1,
     })
     this.moveTarget = config.moveTarget
+    this.setupRectangleMarker()
     this.setupVisionDetectors()
   }
 
-  setupVisionDetectors() {
+  setupRectangleMarker() {
     this.markerRectangle = new Phaser.Geom.Rectangle(
       this.sprite.x - this.sprite.body.width / 2,
       this.sprite.y - this.sprite.body.height / 2,
       this.sprite.body.width,
       this.sprite.body.height
     )
-    this.visionRay = new Phaser.Geom.Line()
-    const length = 20
-    const angleToGoal = Phaser.Math.Angle.BetweenPoints(
-      {
+  }
+
+  setupVisionDetectors() {
+    this.visionCone = new VisionCone(this.game, {
+      entityToTrack: this,
+      angleDiff: 20,
+      rayLength: 50,
+    })
+  }
+
+  getHealth() {
+    return this.healthBar.currValue
+  }
+
+  takeDamage(damage: number) {
+    this.healthBar.decrease(damage)
+  }
+
+  attack(minion: Minion) {
+    const color = this.side === Side.LEFT ? 'blue' : 'red'
+    const projectile = new Projectile(this.game, {
+      position: {
         x: this.sprite.x,
         y: this.sprite.y,
       },
-      {
-        x: this.moveTarget.x,
-        y: this.moveTarget.y,
-      }
-    )
-    Phaser.Geom.Line.SetToAngle(this.visionRay, this.sprite.x, this.sprite.y, angleToGoal, length)
-    this.game.graphics.strokeLineShape(this.visionRay)
-  }
-
-  updateVisionDetector() {
-    if (this.sprite.active) {
-      const length = 20
-      const angleToGoal = Phaser.Math.Angle.BetweenPoints(
-        {
-          x: this.sprite.x,
-          y: this.sprite.y,
-        },
-        {
-          x: this.moveTarget.x,
-          y: this.moveTarget.y,
-        }
-      )
-      Phaser.Geom.Line.SetToAngle(this.visionRay, this.sprite.x, this.sprite.y, angleToGoal, length)
-      this.game.graphics.strokeLineShape(this.visionRay)
+      target: minion,
+      speed: 200,
+      texture: `projectile_${color}`,
+    })
+    projectile.destroyCallback = () => {
+      minion.takeDamage(10)
     }
-  }
-
-  updateMarkerRectangle() {
-    if (this.sprite.active) {
-      this.markerRectangle.setPosition(
-        this.sprite.x - this.sprite.body.width / 2,
-        this.sprite.y - this.sprite.body.height / 2
-      )
-      this.game.graphics.strokeRectShape(this.markerRectangle)
-    }
+    this.game.projectileGroup.add(projectile.sprite)
   }
 
   update() {
     this.stateMachine.step()
-    this.updateVisionDetector()
-    this.updateMarkerRectangle()
+    if (this.visionCone) {
+      this.visionCone.updateRayPositions()
+    }
+    if (this.markerRectangle) {
+      this.markerRectangle.setPosition(
+        this.sprite.x - this.sprite.body.width / 2,
+        this.sprite.y - this.sprite.body.height / 2
+      )
+      if (this.game.isDebug) {
+        this.game.graphics.strokeRectShape(this.markerRectangle)
+      }
+    }
+    this.healthBar.x = this.sprite.x - this.sprite.body.height / 2
+    this.healthBar.y = this.sprite.y - this.sprite.body.height
+    this.healthBar.draw()
   }
 
-  detectFriendlyStoppedInFront() {}
+  detectFriendlyStoppedInFront() {
+    if (this.visionCone) {
+      const friendlyList =
+        this.side === Side.LEFT
+          ? this.game.leftMinionSpawner.minions
+          : this.game.rightMinionSpawner.minions
+      const minions: Minion[] = friendlyList.children.entries.map(
+        (obj) => obj.getData('ref') as Minion
+      )
+      const detectedEntities = this.visionCone.getDetectedEntities(minions)
+      return detectedEntities.length > 0
+    }
+    return false
+  }
 
-  detectEnemyInFront() {}
+  getDetectedEnemies() {
+    if (!this.visionCone) {
+      return []
+    }
+    const enemyList =
+      this.side === Side.LEFT
+        ? this.game.rightMinionSpawner.minions
+        : this.game.leftMinionSpawner.minions
+    const minions: Minion[] = enemyList.children.entries.map((obj) => obj.getData('ref') as Minion)
+    const detectedEntities = this.visionCone.getDetectedEntities(minions)
+    return detectedEntities
+  }
+
+  detectEnemyInFront() {
+    if (this.visionCone) {
+      const enemyList =
+        this.side === Side.LEFT
+          ? this.game.rightMinionSpawner.minions
+          : this.game.leftMinionSpawner.minions
+      const minions: Minion[] = enemyList.children.entries.map(
+        (obj) => obj.getData('ref') as Minion
+      )
+      const detectedEntities = this.visionCone.getDetectedEntities(minions)
+      return detectedEntities.length > 0
+    }
+    return false
+  }
 
   destroy() {
     this.sprite.destroy()
+    this.healthBar.destroy()
+
+    if (this.visionCone) {
+      this.visionCone.destroy()
+      this.visionCone = undefined
+    }
+
+    if (this.markerRectangle) {
+      this.markerRectangle = undefined
+    }
   }
 
   setMoveTarget(moveTarget: { x: number; y: number }) {

@@ -20,4 +20,8 @@ export class Player {
       sprite: this.champion.sprite,
     })
   }
+
+  update() {
+    this.mouseMoveController.update()
+  }
 }
