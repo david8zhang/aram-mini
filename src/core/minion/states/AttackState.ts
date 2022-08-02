@@ -14,8 +14,7 @@ export class AttackState extends State {
   execute(minion: Minion) {
     minion.stop()
     if (this.attackTarget) {
-      if (this.attackTarget.getHealth() === 0) {
-        this.attackTarget.destroy()
+      if (!this.attackTarget.sprite.active || this.attackTarget.getHealth() === 0) {
         this.attackTarget = null
       } else {
         const currTimestamp = Date.now()

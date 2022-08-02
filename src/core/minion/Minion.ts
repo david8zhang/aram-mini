@@ -33,7 +33,7 @@ export class Minion {
   public visionCone?: VisionCone
   public markerRectangle?: Phaser.Geom.Rectangle
 
-  public healthBar: HealthBar
+  public healthBar: HealthBar | undefined
 
   constructor(game: Game, config: MinionConfig) {
     this.game = game
@@ -79,14 +79,22 @@ export class Minion {
   }
 
   getHealth() {
-    return this.healthBar.currValue
+    if (this.healthBar) {
+      return this.healthBar.currValue
+    }
+    return 0
   }
 
   takeDamage(damage: number) {
-    this.healthBar.decrease(damage)
+    if (this.healthBar) {
+      this.healthBar.decrease(damage)
+    }
   }
 
   attack(minion: Minion) {
+    if (!minion.sprite.active || minion.getHealth() === 0) {
+      return
+    }
     const color = this.side === Side.LEFT ? 'blue' : 'red'
     const projectile = new Projectile(this.game, {
       position: {
@@ -99,6 +107,9 @@ export class Minion {
     })
     projectile.destroyCallback = () => {
       minion.takeDamage(10)
+      if (minion.getHealth() === 0) {
+        minion.destroy()
+      }
     }
     this.game.projectileGroup.add(projectile.sprite)
   }
@@ -117,9 +128,11 @@ export class Minion {
         this.game.graphics.strokeRectShape(this.markerRectangle)
       }
     }
-    this.healthBar.x = this.sprite.x - this.sprite.body.height / 2
-    this.healthBar.y = this.sprite.y - this.sprite.body.height
-    this.healthBar.draw()
+    if (this.healthBar) {
+      this.healthBar.x = this.sprite.x - this.sprite.body.height / 2
+      this.healthBar.y = this.sprite.y - this.sprite.body.height
+      this.healthBar.draw()
+    }
   }
 
   detectFriendlyStoppedInFront() {
@@ -167,15 +180,16 @@ export class Minion {
 
   destroy() {
     this.sprite.destroy()
-    this.healthBar.destroy()
-
     if (this.visionCone) {
       this.visionCone.destroy()
       this.visionCone = undefined
     }
-
     if (this.markerRectangle) {
       this.markerRectangle = undefined
+    }
+    if (this.healthBar) {
+      this.healthBar.destroy()
+      this.healthBar = undefined
     }
   }
 
