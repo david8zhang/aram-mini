@@ -1,7 +1,9 @@
 import Phaser from 'phaser'
+import { Debug } from '~/core/Debug'
 import { MinionSpawner } from '~/core/minion/MinionSpawner'
 import { Player } from '~/core/Player'
 import { Projectile } from '~/core/Projectile'
+import { Tower } from '~/core/Tower'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 
@@ -12,16 +14,19 @@ export class Game extends Phaser.Scene {
   public projectileGroup!: Phaser.GameObjects.Group
   public graphics!: Phaser.GameObjects.Graphics
   public isDebug: boolean = false
+  public debug!: Debug
 
   constructor() {
     super('game')
   }
 
   create() {
+    this.debug = new Debug(this)
     this.initCamera()
     this.initTilemap()
     this.initPlayer()
     this.initMinionSpawners()
+    this.initTowers()
     this.graphics = this.add.graphics({
       lineStyle: {
         width: 1,
@@ -59,6 +64,25 @@ export class Game extends Phaser.Scene {
 
     this.rightMinionSpawner.startSpawning()
     this.leftMinionSpawner.startSpawning()
+  }
+
+  initTowers() {
+    new Tower(this, {
+      position: {
+        x: 220,
+        y: 580,
+      },
+      texture: 'tower',
+      scale: 2,
+    })
+    new Tower(this, {
+      position: {
+        x: 580,
+        y: 220,
+      },
+      texture: 'tower',
+      scale: 2,
+    })
   }
 
   initPlayer() {
