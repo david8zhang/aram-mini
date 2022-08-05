@@ -9,24 +9,24 @@ import { Side } from '~/utils/Side'
 
 export class Game extends Phaser.Scene {
   public player!: Player
-  public leftMinionSpawner!: MinionSpawner
-  public rightMinionSpawner!: MinionSpawner
   public projectileGroup!: Phaser.GameObjects.Group
   public graphics!: Phaser.GameObjects.Graphics
   public isDebug: boolean = false
   public debug!: Debug
+
+  // Spawners
+  public leftMinionSpawner!: MinionSpawner
+  public rightMinionSpawner!: MinionSpawner
+
+  // Towers
+  public rightTowers: Tower[] = []
+  public leftTowers: Tower[] = []
 
   constructor() {
     super('game')
   }
 
   create() {
-    this.debug = new Debug(this)
-    this.initCamera()
-    this.initTilemap()
-    this.initPlayer()
-    this.initMinionSpawners()
-    this.initTowers()
     this.graphics = this.add.graphics({
       lineStyle: {
         width: 1,
@@ -34,6 +34,12 @@ export class Game extends Phaser.Scene {
         alpha: 1,
       },
     })
+    this.debug = new Debug(this)
+    this.initCamera()
+    this.initTilemap()
+    this.initPlayer()
+    this.initMinionSpawners()
+    this.initTowers()
     this.projectileGroup = this.add.group()
   }
 
@@ -67,22 +73,26 @@ export class Game extends Phaser.Scene {
   }
 
   initTowers() {
-    new Tower(this, {
+    const leftTower = new Tower(this, {
       position: {
         x: 220,
         y: 580,
       },
       texture: 'tower',
       scale: 2,
+      side: Side.LEFT,
     })
-    new Tower(this, {
+    const rightTower = new Tower(this, {
       position: {
         x: 580,
         y: 220,
       },
       texture: 'tower',
       scale: 2,
+      side: Side.RIGHT,
     })
+    this.leftTowers.push(leftTower)
+    this.rightTowers.push(rightTower)
   }
 
   initPlayer() {
@@ -116,6 +126,8 @@ export class Game extends Phaser.Scene {
       const projectile = entry.getData('ref') as Projectile
       projectile.update()
     })
+    this.leftTowers.forEach((t) => t.update())
+    this.rightTowers.forEach((t) => t.update())
     this.graphics.lineStyle(1, 0x00ff00, 1)
   }
 }

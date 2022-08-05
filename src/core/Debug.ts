@@ -37,7 +37,6 @@ export class Debug {
     for (let i = 0; i < gridWidth; i++) {
       position.x = 20
       for (let j = 0; j < gridHeight; j++) {
-        console.log(position.x, position.y, i, j)
         const zoneRect = this.game.add
           .rectangle(
             position.x,

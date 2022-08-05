@@ -6,6 +6,10 @@ export interface TrackableEntity {
   markerRectangle?: Phaser.Geom.Rectangle
 }
 
+export interface TargetableEntity {
+  markerRectangle?: Phaser.Geom.Rectangle
+}
+
 export interface VisionConeConfig {
   entityToTrack: TrackableEntity
   angleDiff: number
@@ -78,8 +82,8 @@ export class VisionCone {
     })
   }
 
-  getDetectedEntities(entityList: TrackableEntity[]) {
-    const detectedEntities: TrackableEntity[] = []
+  getDetectedEntities(entityList: TargetableEntity[]): TargetableEntity[] {
+    const detectedEntities: TargetableEntity[] = []
     for (let i = 0; i < this.rays.length; i++) {
       const ray = this.rays[i]
       for (let j = 0; j < entityList.length; j++) {

@@ -3,6 +3,7 @@ import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
+import { Tower } from '../Tower'
 import { HealthBar } from '../ui/Healthbar'
 import { AttackState } from './states/AttackState'
 import { MinionStates } from './states/MinionStates'
@@ -91,8 +92,8 @@ export class Minion {
     }
   }
 
-  attack(minion: Minion) {
-    if (!minion.sprite.active || minion.getHealth() === 0) {
+  attack(target: Minion | Tower) {
+    if (!target.sprite.active || target.getHealth() === 0) {
       return
     }
     const color = this.side === Side.LEFT ? 'blue' : 'red'
@@ -101,14 +102,14 @@ export class Minion {
         x: this.sprite.x,
         y: this.sprite.y,
       },
-      target: minion,
+      target: target,
       speed: 200,
       texture: `projectile_${color}`,
     })
     projectile.destroyCallback = () => {
-      minion.takeDamage(10)
-      if (minion.getHealth() === 0) {
-        minion.destroy()
+      target.takeDamage(10)
+      if (target.getHealth() === 0) {
+        target.destroy()
       }
     }
     this.game.projectileGroup.add(projectile.sprite)
@@ -163,6 +164,15 @@ export class Minion {
     return detectedEntities
   }
 
+  getDetectedTowers() {
+    if (!this.visionCone) {
+      return []
+    }
+    const towerList = this.side === Side.LEFT ? this.game.rightTowers : this.game.leftTowers
+    const detectedTowers = this.visionCone.getDetectedEntities(towerList)
+    return detectedTowers
+  }
+
   detectEnemyInFront() {
     if (this.visionCone) {
       const enemyList =
@@ -173,6 +183,15 @@ export class Minion {
         (obj) => obj.getData('ref') as Minion
       )
       const detectedEntities = this.visionCone.getDetectedEntities(minions)
+      return detectedEntities.length > 0
+    }
+    return false
+  }
+
+  detectTowerInFront() {
+    if (this.visionCone) {
+      const towersList = this.side === Side.LEFT ? this.game.rightTowers : this.game.leftTowers
+      const detectedEntities = this.visionCone.getDetectedEntities(towersList)
       return detectedEntities.length > 0
     }
     return false

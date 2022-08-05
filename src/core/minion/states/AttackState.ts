@@ -1,14 +1,26 @@
 import { State } from '~/core/StateMachine'
+import { Tower } from '~/core/Tower'
 import { Minion } from '../Minion'
 import { MinionStates } from './MinionStates'
 
 export class AttackState extends State {
-  public attackTarget: Minion | null = null
+  public attackTarget: Minion | Tower | null = null
   public lastAttackedTimestamp: number = 0
 
   enter(minion: Minion) {
     const detectedEntities = minion.getDetectedEnemies()
-    this.attackTarget = detectedEntities[Phaser.Math.Between(0, detectedEntities.length)] as Minion
+    const detectedTowers = minion.getDetectedTowers().filter((entity) => {
+      const tower = entity as Tower
+      return tower.getHealth() > 0
+    })
+
+    if (detectedTowers.length > 0) {
+      this.attackTarget = detectedTowers[0] as Tower
+    } else if (detectedEntities.length > 0) {
+      this.attackTarget = detectedEntities[
+        Phaser.Math.Between(0, detectedEntities.length)
+      ] as Minion
+    }
   }
 
   execute(minion: Minion) {
