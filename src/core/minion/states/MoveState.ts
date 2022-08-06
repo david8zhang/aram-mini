@@ -7,7 +7,7 @@ export class MoveState extends State {
     if (minion.isAtMoveTarget()) {
       minion.destroy()
     } else {
-      if (minion.detectEnemyInFront()) {
+      if (minion.detectEnemyInFront() || minion.detectTowerInFront()) {
         minion.stateMachine.transition(MinionStates.ATTACK)
       } else {
         minion.moveToTarget()

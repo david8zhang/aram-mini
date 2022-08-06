@@ -1,5 +1,5 @@
 import { State } from '~/core/StateMachine'
-import { Tower } from '~/core/Tower'
+import { Tower } from '~/core/tower/Tower'
 import { Minion } from '../Minion'
 import { MinionStates } from './MinionStates'
 

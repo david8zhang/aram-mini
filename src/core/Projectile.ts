@@ -12,6 +12,7 @@ export interface ProjectileConfig {
   texture: string
   target: Entity
   speed: number
+  scale?: number
 }
 
 export class Projectile {
@@ -24,6 +25,7 @@ export class Projectile {
   constructor(game: Game, config: ProjectileConfig) {
     this.game = game
     this.sprite = this.game.physics.add.sprite(config.position.x, config.position.y, config.texture)
+    this.sprite.setScale(config.scale ? config.scale : 1)
     this.sprite.setData('ref', this)
     this.target = config.target
     this.speed = config.speed

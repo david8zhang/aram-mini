@@ -3,7 +3,7 @@ import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
-import { Tower } from '../Tower'
+import { Tower } from '../tower/Tower'
 import { HealthBar } from '../ui/Healthbar'
 import { AttackState } from './states/AttackState'
 import { MinionStates } from './states/MinionStates'
@@ -107,7 +107,7 @@ export class Minion {
       texture: `projectile_${color}`,
     })
     projectile.destroyCallback = () => {
-      target.takeDamage(10)
+      target.takeDamage(Constants.MINION_DAMAGE)
       if (target.getHealth() === 0) {
         target.destroy()
       }
@@ -192,7 +192,12 @@ export class Minion {
     if (this.visionCone) {
       const towersList = this.side === Side.LEFT ? this.game.rightTowers : this.game.leftTowers
       const detectedEntities = this.visionCone.getDetectedEntities(towersList)
-      return detectedEntities.length > 0
+      return (
+        detectedEntities.filter((entity) => {
+          const tower = entity as Tower
+          return tower.sprite.active
+        }).length > 0
+      )
     }
     return false
   }

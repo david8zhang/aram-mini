@@ -1,9 +1,10 @@
 import Phaser from 'phaser'
+import { Champion } from '~/core/champion/Champion'
 import { Debug } from '~/core/Debug'
 import { MinionSpawner } from '~/core/minion/MinionSpawner'
 import { Player } from '~/core/Player'
 import { Projectile } from '~/core/Projectile'
-import { Tower } from '~/core/Tower'
+import { Tower } from '~/core/tower/Tower'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 
@@ -21,6 +22,10 @@ export class Game extends Phaser.Scene {
   // Towers
   public rightTowers: Tower[] = []
   public leftTowers: Tower[] = []
+
+  // Champions
+  public leftChampions: Champion[] = []
+  public rightChampions: Champion[] = []
 
   constructor() {
     super('game')
@@ -69,7 +74,7 @@ export class Game extends Phaser.Scene {
     this.physics.add.collider(this.rightMinionSpawner.minions, this.rightMinionSpawner.minions)
 
     this.rightMinionSpawner.startSpawning()
-    this.leftMinionSpawner.startSpawning()
+    // this.leftMinionSpawner.startSpawning()
   }
 
   initTowers() {

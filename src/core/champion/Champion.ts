@@ -25,6 +25,7 @@ export class Champion {
   public moveMarker: Phaser.GameObjects.Arc | null = null
 
   public attackTarget: Champion | Minion | null = null
+  public markerRectangle: Phaser.Geom.Rectangle
 
   constructor(game: Game, config: ChampionConfig) {
     this.game = game
@@ -37,6 +38,12 @@ export class Champion {
         [ChampionStates.ATTACK]: new AttackState(),
       },
       [this]
+    )
+    this.markerRectangle = new Phaser.Geom.Rectangle(
+      this.sprite.x - this.sprite.displayWidth / 2,
+      this.sprite.y - this.sprite.displayHeight / 2,
+      this.sprite.displayWidth,
+      this.sprite.displayHeight
     )
   }
 
@@ -70,12 +77,18 @@ export class Champion {
     return 0
   }
 
-  destroy() {}
+  destroy() {
+    this.sprite.destroy()
+  }
 
   takeDamage(damage: number) {}
 
   update() {
     this.stateMachine.step()
+    this.markerRectangle.setPosition(
+      this.sprite.x - this.sprite.displayWidth / 2,
+      this.sprite.y - this.sprite.displayWidth / 2
+    )
   }
 
   isAtMoveTarget() {

@@ -1,4 +1,4 @@
 export enum MinionStates {
-  ATTACK = 'ATTACK',
-  MOVE = 'MOVE',
+  ATTACK = 'Attack',
+  MOVE = 'Move',
 }

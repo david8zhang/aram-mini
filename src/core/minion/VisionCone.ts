@@ -35,8 +35,8 @@ export class VisionCone {
         y: entityToTrack.sprite.y,
       },
       {
-        x: entityToTrack.moveTarget.x,
-        y: entityToTrack.moveTarget.y,
+        x: entityToTrack.moveTarget!.x,
+        y: entityToTrack.moveTarget!.y,
       }
     )
     const angles: number[] = []
@@ -63,6 +63,9 @@ export class VisionCone {
   }
 
   public updateRayPositions() {
+    if (!this.config.entityToTrack.markerRectangle) {
+      return
+    }
     const { entityToTrack, rayLength } = this.config
     const angles = this.getAngles(this.config)
     angles.forEach((angle, index) => {
