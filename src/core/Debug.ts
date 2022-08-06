@@ -8,10 +8,12 @@ export class Debug {
   public static FIELD_ZONE_WIDTH = 40
   public static FIELD_ZONE_HEIGHT = 40
 
+  public onDebugToggleHooks: Function[] = []
+
   constructor(game: Game) {
     this.game = game
     this.objects = this.game.add.group()
-    this.debugFieldGrid()
+    // this.debugFieldGrid()
     this.handleDebugToggleInput()
   }
 
@@ -20,6 +22,9 @@ export class Debug {
       switch (e.code) {
         case 'Backquote': {
           this.setVisible(!this.isVisible)
+          this.onDebugToggleHooks.forEach((fn) => {
+            fn()
+          })
           break
         }
       }

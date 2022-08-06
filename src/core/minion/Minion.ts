@@ -81,6 +81,13 @@ export class Minion {
     })
   }
 
+  public get attackRange() {
+    if (this.visionCone) {
+      return this.visionCone.attackRange + 10
+    }
+    return 0
+  }
+
   getHealth() {
     if (this.healthBar) {
       return this.healthBar.currValue
@@ -98,6 +105,7 @@ export class Minion {
     if (!target.sprite.active || target.getHealth() === 0) {
       return
     }
+    console.log('Went here!')
     const color = this.side === Side.LEFT ? 'blue' : 'red'
     const projectile = new Projectile(this.game, {
       position: {
@@ -160,7 +168,7 @@ export class Minion {
     const towerList = this.side === Side.LEFT ? this.game.rightTowers : this.game.leftTowers
     const detectedTowers = this.visionCone.getDetectedEntities(towerList).filter((entity) => {
       const tower = entity as Tower
-      return tower.sprite.active && tower.getHealth() > 0
+      return !tower.isDead
     })
     return detectedTowers
   }

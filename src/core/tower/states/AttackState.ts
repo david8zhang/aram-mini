@@ -1,3 +1,5 @@
+import { Champion } from '~/core/champion/Champion'
+import { Minion } from '~/core/minion/Minion'
 import { State } from '~/core/StateMachine'
 import { Tower } from '../Tower'
 import { TowerStates } from './TowerStates'
@@ -7,7 +9,7 @@ export class AttackState extends State {
 
   execute(tower: Tower) {
     const attackTarget = tower.attackTarget!
-    if (!attackTarget.sprite.active || attackTarget.getHealth() === 0) {
+    if (!this.isTargetAttackable(tower, attackTarget)) {
       tower.attackTarget = null
       tower.stateMachine.transition(TowerStates.IDLE)
     } else {
@@ -17,5 +19,16 @@ export class AttackState extends State {
         tower.attack(attackTarget)
       }
     }
+  }
+
+  isTargetAttackable(tower: Tower, attackTarget: Minion | Champion) {
+    const distToTarget = Phaser.Math.Distance.Between(
+      tower.sprite.x,
+      tower.sprite.y,
+      attackTarget.sprite.x,
+      attackTarget.sprite.y
+    )
+    const isWithinRange = distToTarget <= tower.attackRange
+    return attackTarget.sprite.active && attackTarget.getHealth() > 0 && isWithinRange
   }
 }

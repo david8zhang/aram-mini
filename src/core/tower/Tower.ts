@@ -2,9 +2,7 @@ import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Champion } from '../champion/Champion'
-import { ChampionStates } from '../champion/states/ChampionStates'
 import { Minion } from '../minion/Minion'
-import { VisionCone } from '../minion/VisionCone'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
 import { HealthBar } from '../ui/Healthbar'
@@ -29,9 +27,11 @@ export class Tower {
   public side: Side
   public markerRectangle: Phaser.Geom.Rectangle
   public healthBar: HealthBar
-  public visionCone: VisionCone
   public attackTarget: Minion | Champion | null = null
   public stateMachine: StateMachine
+
+  public attackRadius: number = Constants.TOWER_ATTACK_RADIUS
+  public attackCircle: Phaser.GameObjects.Arc
 
   constructor(game: Game, config: TowerConfig) {
     this.game = game
@@ -56,15 +56,6 @@ export class Tower {
       width: this.sprite.displayWidth,
       borderWidth: 1,
     })
-    this.visionCone = new VisionCone(this.game, {
-      entityToTrack: {
-        sprite: this.sprite,
-        markerRectangle: this.markerRectangle,
-        moveTarget: this.side === Side.LEFT ? Constants.RIGHT_SPAWN : Constants.LEFT_SPAWN,
-      },
-      angleDiff: 20,
-      rayLength: 75,
-    })
     this.stateMachine = new StateMachine(
       TowerStates.IDLE,
       {
@@ -74,6 +65,12 @@ export class Tower {
       },
       [this]
     )
+    this.attackCircle = this.game.add
+      .circle(this.sprite.x, this.sprite.y, this.attackRadius, 0xff0000, 0.5)
+      .setVisible(false)
+    this.game.debug.onDebugToggleHooks.push(() => {
+      this.attackCircle.setVisible(!this.attackCircle.visible)
+    })
   }
 
   getDetectedEnemyMinions() {
@@ -84,25 +81,43 @@ export class Tower {
     const minions: Minion[] = entitiesToDetect.children.entries.map(
       (obj) => obj.getData('ref') as Minion
     )
-    const detectedMinions = this.visionCone.getDetectedEntities(minions)
-    return detectedMinions.filter((entity) => {
+    return minions.filter((entity) => {
       const m = entity as Minion
-      return m.sprite.active && m.getHealth() > 0
+      const distanceToTower = Phaser.Math.Distance.Between(
+        m.sprite.x,
+        m.sprite.y,
+        this.sprite.x,
+        this.sprite.y
+      )
+      return distanceToTower <= this.attackRadius && m.sprite.active && m.getHealth() > 0
     })
   }
 
   getDetectedEnemyChampions() {
     const championsToDetect =
       this.side === Side.LEFT ? this.game.rightChampions : this.game.leftChampions
-    const detectedChampions = this.visionCone.getDetectedEntities(championsToDetect)
-    return detectedChampions.filter((entity) => {
-      const m = entity as Champion
-      return !m.isDead
+    return championsToDetect.filter((entity) => {
+      const c = entity as Champion
+      const distanceToTower = Phaser.Math.Distance.Between(
+        c.sprite.x,
+        c.sprite.y,
+        this.sprite.x,
+        this.sprite.y
+      )
+      return !c.isDead && distanceToTower <= this.attackRadius
     })
   }
 
+  public get attackRange() {
+    return this.attackRadius
+  }
+
+  public get isDead() {
+    return this.stateMachine.getState() === TowerStates.DEAD
+  }
+
   attack(target: Minion | Champion) {
-    if (!target.sprite.active || target.getHealth() === 0) {
+    if (this.isDead || !target.sprite.active || target.getHealth() === 0) {
       return
     }
     const color = this.side === Side.LEFT ? 'blue' : 'red'
@@ -148,8 +163,8 @@ export class Tower {
   }
 
   destroy() {
-    this.sprite.destroy()
-    this.healthBar.destroy()
+    this.sprite.setVisible(false)
+    this.healthBar.setVisible(false)
     this.stateMachine.transition(TowerStates.DEAD)
   }
 }

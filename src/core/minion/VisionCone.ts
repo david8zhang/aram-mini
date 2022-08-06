@@ -20,10 +20,12 @@ export class VisionCone {
   private game: Game
   private rays: Phaser.Geom.Line[] = []
   private config: VisionConeConfig
+  public attackRange: number = 0
 
   constructor(game: Game, config: VisionConeConfig) {
     this.game = game
     this.config = config
+    this.attackRange = config.rayLength || 20
     this.createVisionRays()
   }
 

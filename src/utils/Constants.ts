@@ -8,6 +8,7 @@ export class Constants {
 
   public static readonly TOWER_DAMAGE = 40
   public static readonly TOWER_HEALTH = 500
+  public static readonly TOWER_ATTACK_RADIUS = 75
 
   public static readonly GAME_HEIGHT = 800
   public static readonly GAME_WIDTH = 800
