@@ -105,7 +105,6 @@ export class Minion {
     if (!target.sprite.active || target.getHealth() === 0) {
       return
     }
-    console.log('Went here!')
     const color = this.side === Side.LEFT ? 'blue' : 'red'
     const projectile = new Projectile(this.game, {
       position: {

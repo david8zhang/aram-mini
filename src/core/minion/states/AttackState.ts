@@ -9,7 +9,6 @@ export class AttackState extends State {
   execute(minion: Minion) {
     minion.stop()
     if (!this.isTargetAttackable(minion, minion.attackTarget!)) {
-      console.log('no target to attack!')
       minion.attackTarget = null
       minion.stateMachine.transition(MinionStates.MOVE)
     } else {
