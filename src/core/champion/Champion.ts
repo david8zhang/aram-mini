@@ -1,10 +1,13 @@
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
+import { Side } from '~/utils/Side'
 import { Minion } from '../minion/Minion'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
+import { HealthBar } from '../ui/Healthbar'
 import { AttackState } from './states/AttackState'
 import { ChampionStates } from './states/ChampionStates'
+import { DeadState } from './states/DeadState'
 import { IdleState } from './states/IdleState'
 import { MoveState } from './states/MoveState'
 
@@ -14,18 +17,21 @@ export interface ChampionConfig {
     x: number
     y: number
   }
+  side: Side
 }
 
 export class Champion {
-  private game: Game
+  public game: Game
   public sprite: Phaser.Physics.Arcade.Sprite
   public stateMachine: StateMachine
+  public side: Side
 
   public moveTarget: { x: number; y: number } | null = null
   public moveMarker: Phaser.GameObjects.Arc | null = null
 
   public attackTarget: Champion | Minion | null = null
   public markerRectangle: Phaser.Geom.Rectangle
+  public healthBar: HealthBar
 
   constructor(game: Game, config: ChampionConfig) {
     this.game = game
@@ -36,6 +42,7 @@ export class Champion {
         [ChampionStates.IDLE]: new IdleState(),
         [ChampionStates.MOVE]: new MoveState(),
         [ChampionStates.ATTACK]: new AttackState(),
+        [ChampionStates.DEAD]: new DeadState(),
       },
       [this]
     )
@@ -45,13 +52,30 @@ export class Champion {
       this.sprite.displayWidth,
       this.sprite.displayHeight
     )
+    this.healthBar = new HealthBar(this.game, {
+      x: this.sprite.x - 15,
+      y: this.sprite.y - this.sprite.body.height,
+      maxValue: Constants.CHAMPION_HEALTH,
+      height: 4,
+      width: 30,
+      borderWidth: 1,
+    })
+    this.side = config.side
+  }
+
+  public get isDead() {
+    return this.stateMachine.getState() === ChampionStates.DEAD
   }
 
   attack() {
+    if (this.isDead) {
+      return
+    }
     if (this.attackTarget) {
       if (!this.attackTarget.sprite.active || this.attackTarget.getHealth() === 0) {
         return
       }
+      const projectileColor = this.side === Side.LEFT ? 'blue' : 'red'
       const projectile = new Projectile(this.game, {
         position: {
           x: this.sprite.x,
@@ -59,7 +83,7 @@ export class Champion {
         },
         target: this.attackTarget,
         speed: 200,
-        texture: `projectile_blue`,
+        texture: `projectile_${projectileColor}`,
       })
       projectile.destroyCallback = () => {
         if (this.attackTarget) {
@@ -74,14 +98,31 @@ export class Champion {
   }
 
   getHealth() {
+    if (this.healthBar) {
+      return this.healthBar.currValue
+    }
     return 0
   }
 
-  destroy() {
-    this.sprite.destroy()
+  respawn() {
+    const spawnPosition = this.side === Side.LEFT ? Constants.LEFT_SPAWN : Constants.RIGHT_SPAWN
+    this.sprite.setPosition(spawnPosition.x, spawnPosition.y)
+    this.game.cameras.main.startFollow(this.sprite, true)
+    this.healthBar.setCurrHealth(Constants.CHAMPION_HEALTH)
+    this.healthBar.setVisible(true)
+    this.sprite.setVisible(true)
   }
 
-  takeDamage(damage: number) {}
+  destroy() {
+    this.sprite.setVisible(false)
+    this.healthBar.setVisible(false)
+    this.moveTarget = null
+    this.stateMachine.transition(ChampionStates.DEAD)
+  }
+
+  takeDamage(damage: number) {
+    this.healthBar.decrease(damage)
+  }
 
   update() {
     this.stateMachine.step()
@@ -89,6 +130,11 @@ export class Champion {
       this.sprite.x - this.sprite.displayWidth / 2,
       this.sprite.y - this.sprite.displayWidth / 2
     )
+    if (this.healthBar) {
+      this.healthBar.x = this.sprite.x - 15
+      this.healthBar.y = this.sprite.y - this.sprite.body.height
+      this.healthBar.draw()
+    }
   }
 
   isAtMoveTarget() {
@@ -102,6 +148,9 @@ export class Champion {
   }
 
   handleMovementToPoint() {
+    if (this.isDead) {
+      return
+    }
     if (this.moveTarget && !this.isAtMoveTarget()) {
       let angle = Phaser.Math.Angle.BetweenPoints(
         {
@@ -122,6 +171,9 @@ export class Champion {
   }
 
   setMoveTarget(x: number, y: number) {
+    if (this.isDead) {
+      return
+    }
     this.moveTarget = new Phaser.Math.Vector2(x, y)
     if (!this.moveMarker) {
       this.moveMarker = this.game.add.circle(x, y, 1, 0x00ff00)

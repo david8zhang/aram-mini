@@ -46,12 +46,16 @@ export class Player {
   }
 
   moveChampionToPosition(pointer: Phaser.Input.Pointer) {
-    this.champion.setMoveTarget(Math.round(pointer.worldX), Math.round(pointer.worldY))
-    this.champion.stateMachine.transition(ChampionStates.MOVE)
+    if (!this.champion.isDead) {
+      this.champion.setMoveTarget(Math.round(pointer.worldX), Math.round(pointer.worldY))
+      this.champion.stateMachine.transition(ChampionStates.MOVE)
+    }
   }
 
   setChampionAttackTarget(target: Minion | Champion) {
-    this.champion.attackTarget = target
-    this.champion.stateMachine.transition(ChampionStates.ATTACK)
+    if (!this.champion.isDead) {
+      this.champion.attackTarget = target
+      this.champion.stateMachine.transition(ChampionStates.ATTACK)
+    }
   }
 }

@@ -109,9 +109,11 @@ export class Game extends Phaser.Scene {
           x: Constants.LEFT_SPAWN.x,
           y: Constants.LEFT_SPAWN.y,
         },
+        side: Side.LEFT,
       },
     })
     this.cameras.main.startFollow(this.player.champion.sprite, true)
+    this.leftChampions.push(this.player.champion)
   }
 
   initTilemap() {

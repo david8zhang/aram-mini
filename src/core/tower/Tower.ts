@@ -2,12 +2,14 @@ import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Champion } from '../champion/Champion'
+import { ChampionStates } from '../champion/states/ChampionStates'
 import { Minion } from '../minion/Minion'
 import { VisionCone } from '../minion/VisionCone'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
 import { HealthBar } from '../ui/Healthbar'
 import { AttackState } from './states/AttackState'
+import { DeadState } from './states/DeadState'
 import { IdleState } from './states/IdleState'
 import { TowerStates } from './states/TowerStates'
 
@@ -49,7 +51,7 @@ export class Tower {
     this.healthBar = new HealthBar(this.game, {
       x: this.sprite.x - this.sprite.displayWidth / 2,
       y: this.sprite.y - this.sprite.displayHeight / 2 - 5,
-      maxValue: 500,
+      maxValue: Constants.TOWER_HEALTH,
       height: 4,
       width: this.sprite.displayWidth,
       borderWidth: 1,
@@ -68,6 +70,7 @@ export class Tower {
       {
         [TowerStates.IDLE]: new IdleState(),
         [TowerStates.ATTACK]: new AttackState(),
+        [TowerStates.DEAD]: new DeadState(),
       },
       [this]
     )
@@ -81,7 +84,21 @@ export class Tower {
     const minions: Minion[] = entitiesToDetect.children.entries.map(
       (obj) => obj.getData('ref') as Minion
     )
-    return this.visionCone.getDetectedEntities(minions)
+    const detectedMinions = this.visionCone.getDetectedEntities(minions)
+    return detectedMinions.filter((entity) => {
+      const m = entity as Minion
+      return m.sprite.active && m.getHealth() > 0
+    })
+  }
+
+  getDetectedEnemyChampions() {
+    const championsToDetect =
+      this.side === Side.LEFT ? this.game.rightChampions : this.game.leftChampions
+    const detectedChampions = this.visionCone.getDetectedEntities(championsToDetect)
+    return detectedChampions.filter((entity) => {
+      const m = entity as Champion
+      return !m.isDead
+    })
   }
 
   attack(target: Minion | Champion) {
@@ -108,8 +125,6 @@ export class Tower {
     this.game.projectileGroup.add(projectile.sprite)
   }
 
-  getDetectedEnemyChampions() {}
-
   update() {
     this.stateMachine.step()
     if (this.healthBar) {
@@ -135,5 +150,6 @@ export class Tower {
   destroy() {
     this.sprite.destroy()
     this.healthBar.destroy()
+    this.stateMachine.transition(TowerStates.DEAD)
   }
 }

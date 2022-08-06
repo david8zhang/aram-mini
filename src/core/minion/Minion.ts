@@ -1,6 +1,7 @@
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
+import { Champion } from '../champion/Champion'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
 import { Tower } from '../tower/Tower'
@@ -35,6 +36,7 @@ export class Minion {
   public markerRectangle?: Phaser.Geom.Rectangle
 
   public healthBar: HealthBar | undefined
+  public attackTarget: Minion | Tower | Champion | null = null
 
   constructor(game: Game, config: MinionConfig) {
     this.game = game
@@ -92,7 +94,7 @@ export class Minion {
     }
   }
 
-  attack(target: Minion | Tower) {
+  attack(target: Minion | Tower | Champion) {
     if (!target.sprite.active || target.getHealth() === 0) {
       return
     }
@@ -130,27 +132,11 @@ export class Minion {
       }
     }
     if (this.healthBar) {
-      this.healthBar.x = this.sprite.x - this.sprite.body.height / 2
+      this.healthBar.x = this.sprite.x - 10
       this.healthBar.y = this.sprite.y - this.sprite.body.height
       this.healthBar.draw()
     }
   }
-
-  detectFriendlyStoppedInFront() {
-    if (this.visionCone) {
-      const friendlyList =
-        this.side === Side.LEFT
-          ? this.game.leftMinionSpawner.minions
-          : this.game.rightMinionSpawner.minions
-      const minions: Minion[] = friendlyList.children.entries.map(
-        (obj) => obj.getData('ref') as Minion
-      )
-      const detectedEntities = this.visionCone.getDetectedEntities(minions)
-      return detectedEntities.length > 0
-    }
-    return false
-  }
-
   getDetectedEnemies() {
     if (!this.visionCone) {
       return []
@@ -161,7 +147,10 @@ export class Minion {
         : this.game.leftMinionSpawner.minions
     const minions: Minion[] = enemyList.children.entries.map((obj) => obj.getData('ref') as Minion)
     const detectedEntities = this.visionCone.getDetectedEntities(minions)
-    return detectedEntities
+    return detectedEntities.filter((entity) => {
+      const m = entity as Minion
+      return m.sprite.active && m.getHealth() > 0
+    })
   }
 
   getDetectedTowers() {
@@ -169,37 +158,24 @@ export class Minion {
       return []
     }
     const towerList = this.side === Side.LEFT ? this.game.rightTowers : this.game.leftTowers
-    const detectedTowers = this.visionCone.getDetectedEntities(towerList)
+    const detectedTowers = this.visionCone.getDetectedEntities(towerList).filter((entity) => {
+      const tower = entity as Tower
+      return tower.sprite.active && tower.getHealth() > 0
+    })
     return detectedTowers
   }
 
-  detectEnemyInFront() {
-    if (this.visionCone) {
-      const enemyList =
-        this.side === Side.LEFT
-          ? this.game.rightMinionSpawner.minions
-          : this.game.leftMinionSpawner.minions
-      const minions: Minion[] = enemyList.children.entries.map(
-        (obj) => obj.getData('ref') as Minion
-      )
-      const detectedEntities = this.visionCone.getDetectedEntities(minions)
-      return detectedEntities.length > 0
+  getDetectedChampions() {
+    if (!this.visionCone) {
+      return []
     }
-    return false
-  }
-
-  detectTowerInFront() {
-    if (this.visionCone) {
-      const towersList = this.side === Side.LEFT ? this.game.rightTowers : this.game.leftTowers
-      const detectedEntities = this.visionCone.getDetectedEntities(towersList)
-      return (
-        detectedEntities.filter((entity) => {
-          const tower = entity as Tower
-          return tower.sprite.active
-        }).length > 0
-      )
-    }
-    return false
+    const championList =
+      this.side === Side.LEFT ? this.game.rightChampions : this.game.leftChampions
+    const detectedChampions = this.visionCone.getDetectedEntities(championList)
+    return detectedChampions.filter((entity) => {
+      const champion = entity as Champion
+      return !champion.isDead
+    })
   }
 
   destroy() {
