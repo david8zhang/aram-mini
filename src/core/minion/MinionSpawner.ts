@@ -67,18 +67,6 @@ export class MinionSpawner {
     })
   }
 
-  getMinionAtPosition(x: number, y: number, range: number) {
-    return this.minions.children.entries.find((child) => {
-      const sprite = child as Phaser.Physics.Arcade.Sprite
-      return (
-        sprite.x >= x - range &&
-        sprite.x <= x + range &&
-        sprite.y >= y - range &&
-        sprite.y <= y + range
-      )
-    })
-  }
-
   update() {
     this.minions.children.entries.forEach((entry) => {
       const minion = entry.getData('ref') as Minion

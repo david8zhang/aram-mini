@@ -15,6 +15,10 @@ export class Game extends Phaser.Scene {
   public isDebug: boolean = false
   public debug!: Debug
 
+  // Tilemaps
+  public tileMap!: Phaser.Tilemaps.Tilemap
+  public layerMappings: { [key: string]: Phaser.Tilemaps.TilemapLayer } = {}
+
   // Spawners
   public leftMinionSpawner!: MinionSpawner
   public rightMinionSpawner!: MinionSpawner
@@ -24,14 +28,14 @@ export class Game extends Phaser.Scene {
   public leftTowers: Tower[] = []
 
   // Champions
-  public leftChampions: Champion[] = []
-  public rightChampions: Champion[] = []
+  public leftChampionsGroup!: Phaser.GameObjects.Group
+  public rightChampionsGroup!: Phaser.GameObjects.Group
 
   constructor() {
     super('game')
   }
 
-  create() {
+  preload() {
     this.graphics = this.add.graphics({
       lineStyle: {
         width: 1,
@@ -39,13 +43,30 @@ export class Game extends Phaser.Scene {
         alpha: 1,
       },
     })
+    this.projectileGroup = this.add.group()
+    this.leftChampionsGroup = this.add.group()
+    this.rightChampionsGroup = this.add.group()
+  }
+
+  create() {
     this.debug = new Debug(this)
     this.initCamera()
     this.initTilemap()
     this.initPlayer()
     this.initMinionSpawners()
     this.initTowers()
-    this.projectileGroup = this.add.group()
+  }
+
+  public get leftChampions() {
+    return this.leftChampionsGroup.children.entries.map((entry) => {
+      return entry.getData('ref') as Champion
+    })
+  }
+
+  public get rightChampions() {
+    return this.rightChampionsGroup.children.entries.map((entry) => {
+      return entry.getData('ref') as Champion
+    })
   }
 
   initCamera() {
@@ -74,30 +95,30 @@ export class Game extends Phaser.Scene {
     this.physics.add.collider(this.rightMinionSpawner.minions, this.rightMinionSpawner.minions)
 
     this.rightMinionSpawner.startSpawning()
-    // this.leftMinionSpawner.startSpawning()
+    this.leftMinionSpawner.startSpawning()
   }
 
   initTowers() {
-    const leftTower = new Tower(this, {
-      position: {
-        x: 220,
-        y: 580,
-      },
-      texture: 'tower',
-      scale: 2,
-      side: Side.LEFT,
+    Constants.LEFT_TOWER_CONFIGS.forEach((config) => {
+      this.leftTowers.push(
+        new Tower(this, {
+          position: config.position,
+          texture: 'tower_blue',
+          scale: 2,
+          side: Side.LEFT,
+        })
+      )
     })
-    const rightTower = new Tower(this, {
-      position: {
-        x: 580,
-        y: 220,
-      },
-      texture: 'tower',
-      scale: 2,
-      side: Side.RIGHT,
+    Constants.RIGHT_TOWER_CONFIGS.forEach((config) => {
+      this.rightTowers.push(
+        new Tower(this, {
+          position: config.position,
+          texture: 'tower_red',
+          scale: 2,
+          side: Side.RIGHT,
+        })
+      )
     })
-    this.leftTowers.push(leftTower)
-    this.rightTowers.push(rightTower)
   }
 
   initPlayer() {
@@ -113,15 +134,50 @@ export class Game extends Phaser.Scene {
       },
     })
     this.cameras.main.startFollow(this.player.champion.sprite, true)
-    this.leftChampions.push(this.player.champion)
+    this.leftChampionsGroup.add(this.player.champion.sprite)
+  }
+
+  getMinionAtPosition(side: Side, x: number, y: number, range: number) {
+    const minionsGroup =
+      side === Side.LEFT ? this.leftMinionSpawner.minions : this.rightMinionSpawner.minions
+    return minionsGroup.children.entries.find((child) => {
+      const sprite = child as Phaser.Physics.Arcade.Sprite
+      return (
+        sprite.x >= x - range &&
+        sprite.x <= x + range &&
+        sprite.y >= y - range &&
+        sprite.y <= y + range
+      )
+    })
+  }
+
+  getTowerAtPosition(side: Side, x: number, y: number, range: number) {
+    const towersList = side === Side.LEFT ? this.leftTowers : this.rightTowers
+    return towersList.find((tower) => {
+      return (
+        tower.sprite.x >= x - range &&
+        tower.sprite.x <= x + range &&
+        tower.sprite.y >= y - range &&
+        tower.sprite.y <= y + range
+      )
+    })
   }
 
   initTilemap() {
-    const tileMap = this.make.tilemap({
+    this.tileMap = this.make.tilemap({
       key: 'map',
     })
-    const tileset = tileMap.addTilesetImage('tilemap_packed', 'tilemap_packed')
-    tileMap.createLayer('default', tileset)
+    const tileset = this.tileMap.addTilesetImage('tilemap_packed', 'tilemap_packed')
+    this.createLayer('wall', tileset)
+    this.createLayer('ground', tileset)
+    this.physics.add.collider(this.leftChampionsGroup, this.layerMappings['wall'])
+    this.physics.add.collider(this.rightChampionsGroup, this.layerMappings['wall'])
+  }
+
+  createLayer(layerName: string, tileset: Phaser.Tilemaps.Tileset) {
+    const newLayer = this.tileMap.createLayer(layerName, tileset)
+    newLayer.setCollisionByExclusion([-1])
+    this.layerMappings[layerName] = newLayer
   }
 
   update() {

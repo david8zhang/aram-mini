@@ -68,8 +68,8 @@ export class Tower {
     this.attackCircle = this.game.add
       .circle(this.sprite.x, this.sprite.y, this.attackRadius, 0xff0000, 0.2)
       .setVisible(false)
-    this.game.debug.onDebugToggleHooks.push(() => {
-      this.attackCircle.setVisible(!this.attackCircle.visible)
+    this.game.debug.onDebugToggleHooks.push((isVisible: boolean) => {
+      this.attackCircle.setVisible(isVisible)
     })
   }
 

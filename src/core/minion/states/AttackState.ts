@@ -1,6 +1,7 @@
 import { Champion } from '~/core/champion/Champion'
 import { State } from '~/core/StateMachine'
 import { Tower } from '~/core/tower/Tower'
+import { Constants } from '~/utils/Constants'
 import { Minion } from '../Minion'
 import { MinionStates } from './MinionStates'
 
@@ -13,7 +14,7 @@ export class AttackState extends State {
       minion.stateMachine.transition(MinionStates.MOVE)
     } else {
       const currTimestamp = Date.now()
-      if (currTimestamp - this.lastAttackedTimestamp > 1000) {
+      if (currTimestamp - this.lastAttackedTimestamp > Constants.MINION_ATTACK_DELAY) {
         this.lastAttackedTimestamp = currTimestamp
         minion.attack(minion.attackTarget!)
       }

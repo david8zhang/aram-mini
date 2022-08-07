@@ -13,7 +13,8 @@ export class Preload extends Scene {
     this.load.image('projectile_blue', 'projectile-blue.png')
     this.load.image('projectile_red', 'projectile-red.png')
     this.load.image('tilemap_packed', 'tilemap_packed.png')
-    this.load.image('tower', 'tower.png')
+    this.load.image('tower_red', 'tower-red.png')
+    this.load.image('tower_blue', 'tower-blue.png')
     this.load.tilemapTiledJSON('map', 'map.json')
   }
 

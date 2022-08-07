@@ -15,10 +15,10 @@ export class IdleState extends State {
   }
 
   selectAttackTarget(tower: Tower, minions: Minion[], champions: Champion[]) {
-    if (champions.length > 0) {
-      tower.attackTarget = champions[Phaser.Math.Between(0, champions.length - 1)]
-    } else if (minions.length > 0) {
+    if (minions.length > 0) {
       tower.attackTarget = minions[Phaser.Math.Between(0, minions.length - 1)]
+    } else if (champions.length > 0) {
+      tower.attackTarget = champions[Phaser.Math.Between(0, champions.length - 1)]
     }
   }
 }

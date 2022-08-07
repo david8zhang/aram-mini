@@ -3,6 +3,7 @@ import { Side } from '~/utils/Side'
 import { Champion, ChampionConfig } from './champion/Champion'
 import { ChampionStates } from './champion/states/ChampionStates'
 import { Minion } from './minion/Minion'
+import { Tower } from './tower/Tower'
 
 export interface PlayerConfig {
   game: Game
@@ -31,12 +32,11 @@ export class Player {
     this.game.input.mouse.disableContextMenu()
     this.game.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
       if (pointer.rightButtonDown()) {
-        const minion = this.game.rightMinionSpawner.getMinionAtPosition(
-          pointer.worldX,
-          pointer.worldY,
-          15
-        )
-        if (minion) {
+        const minion = this.game.getMinionAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
+        const tower = this.game.getTowerAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
+        if (tower) {
+          this.setChampionAttackTarget(tower)
+        } else if (minion) {
           this.setChampionAttackTarget(minion.getData('ref') as Minion)
         } else {
           this.moveChampionToPosition(pointer)
@@ -52,7 +52,7 @@ export class Player {
     }
   }
 
-  setChampionAttackTarget(target: Minion | Champion) {
+  setChampionAttackTarget(target: Minion | Champion | Tower) {
     if (!this.champion.isDead) {
       this.champion.attackTarget = target
       this.champion.stateMachine.transition(ChampionStates.ATTACK)

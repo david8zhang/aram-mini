@@ -11,7 +11,7 @@ export class AttackState extends State {
     } else {
       const currTime = Date.now()
       champion.sprite.setVelocity(0, 0)
-      if (currTime - this.lastAttackedTimestamp > 1000) {
+      if (currTime - this.lastAttackedTimestamp > Constants.CHAMPION_ATTACK_DELAY) {
         this.lastAttackedTimestamp = currTime
         champion.attack()
       }

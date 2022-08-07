@@ -13,7 +13,7 @@ export class Debug {
   constructor(game: Game) {
     this.game = game
     this.objects = this.game.add.group()
-    // this.debugFieldGrid()
+    this.debugFieldGrid()
     this.handleDebugToggleInput()
   }
 
@@ -23,7 +23,7 @@ export class Debug {
         case 'Backquote': {
           this.setVisible(!this.isVisible)
           this.onDebugToggleHooks.forEach((fn) => {
-            fn()
+            fn(this.isVisible)
           })
           break
         }

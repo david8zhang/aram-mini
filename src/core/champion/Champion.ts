@@ -4,6 +4,7 @@ import { Side } from '~/utils/Side'
 import { Minion } from '../minion/Minion'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
+import { Tower } from '../tower/Tower'
 import { HealthBar } from '../ui/Healthbar'
 import { AttackState } from './states/AttackState'
 import { ChampionStates } from './states/ChampionStates'
@@ -29,7 +30,7 @@ export class Champion {
   public moveTarget: { x: number; y: number } | null = null
   public moveMarker: Phaser.GameObjects.Arc | null = null
 
-  public attackTarget: Champion | Minion | null = null
+  public attackTarget: Champion | Minion | Tower | null = null
   public markerRectangle: Phaser.Geom.Rectangle
   public healthBar: HealthBar
 
@@ -38,6 +39,8 @@ export class Champion {
   constructor(game: Game, config: ChampionConfig) {
     this.game = game
     this.sprite = this.game.physics.add.sprite(config.position.x, config.position.y, config.texture)
+    this.sprite.setData('ref', this)
+    this.game.physics.world.enableBody(this.sprite, Phaser.Physics.Arcade.DYNAMIC_BODY)
     this.stateMachine = new StateMachine(
       ChampionStates.IDLE,
       {
