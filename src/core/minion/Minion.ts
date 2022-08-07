@@ -9,7 +9,6 @@ import { HealthBar } from '../ui/Healthbar'
 import { AttackState } from './states/AttackState'
 import { MinionStates } from './states/MinionStates'
 import { MoveState } from './states/MoveState'
-import { VisionCone } from './VisionCone'
 
 export interface MinionConfig {
   texture: string
@@ -32,8 +31,8 @@ export class Minion {
   public side: Side
 
   // Detectors
-  public visionCone?: VisionCone
-  public markerRectangle?: Phaser.Geom.Rectangle
+  public attackRadius: number = Constants.MINION_ATTACK_RANGE
+  public attackCircle: Phaser.GameObjects.Arc
 
   public healthBar: HealthBar | undefined
   public attackTarget: Minion | Tower | Champion | null = null
@@ -60,32 +59,16 @@ export class Minion {
       borderWidth: 1,
     })
     this.moveTarget = config.moveTarget
-    this.setupRectangleMarker()
-    this.setupVisionDetectors()
-  }
-
-  setupRectangleMarker() {
-    this.markerRectangle = new Phaser.Geom.Rectangle(
-      this.sprite.x - this.sprite.body.width / 2,
-      this.sprite.y - this.sprite.body.height / 2,
-      this.sprite.body.width,
-      this.sprite.body.height
-    )
-  }
-
-  setupVisionDetectors() {
-    this.visionCone = new VisionCone(this.game, {
-      entityToTrack: this,
-      angleDiff: 20,
-      rayLength: 50,
+    this.attackCircle = this.game.add
+      .circle(this.sprite.x, this.sprite.y, this.attackRadius, 0xff0000, 0.2)
+      .setVisible(false)
+    this.game.debug.onDebugToggleHooks.push(() => {
+      this.attackCircle.setVisible(!this.attackCircle.visible)
     })
   }
 
   public get attackRange() {
-    if (this.visionCone) {
-      return this.visionCone.attackRange + 10
-    }
-    return 0
+    return this.attackRadius
   }
 
   getHealth() {
@@ -126,78 +109,66 @@ export class Minion {
 
   update() {
     this.stateMachine.step()
-    if (this.visionCone) {
-      this.visionCone.updateRayPositions()
-    }
-    if (this.markerRectangle) {
-      this.markerRectangle.setPosition(
-        this.sprite.x - this.sprite.body.width / 2,
-        this.sprite.y - this.sprite.body.height / 2
-      )
-      if (this.game.isDebug) {
-        this.game.graphics.strokeRectShape(this.markerRectangle)
-      }
-    }
     if (this.healthBar) {
       this.healthBar.x = this.sprite.x - 10
       this.healthBar.y = this.sprite.y - this.sprite.body.height
       this.healthBar.draw()
     }
+    this.attackCircle.setPosition(this.sprite.x, this.sprite.y)
   }
   getDetectedEnemies() {
-    if (!this.visionCone) {
-      return []
-    }
     const enemyList =
       this.side === Side.LEFT
         ? this.game.rightMinionSpawner.minions
         : this.game.leftMinionSpawner.minions
-    const minions: Minion[] = enemyList.children.entries.map((obj) => obj.getData('ref') as Minion)
-    const detectedEntities = this.visionCone.getDetectedEntities(minions)
-    return detectedEntities.filter((entity) => {
-      const m = entity as Minion
-      return m.sprite.active && m.getHealth() > 0
-    })
+    const minions: Minion[] = enemyList.children.entries
+      .map((obj) => obj.getData('ref') as Minion)
+      .filter((minion) => {
+        const distance = Phaser.Math.Distance.Between(
+          this.sprite.x,
+          this.sprite.y,
+          minion.sprite.x,
+          minion.sprite.y
+        )
+        return distance <= this.attackRadius && minion.sprite.active && minion.getHealth() > 0
+      })
+    return minions
   }
 
   getDetectedTowers() {
-    if (!this.visionCone) {
-      return []
-    }
     const towerList = this.side === Side.LEFT ? this.game.rightTowers : this.game.leftTowers
-    const detectedTowers = this.visionCone.getDetectedEntities(towerList).filter((entity) => {
-      const tower = entity as Tower
-      return !tower.isDead
+    return towerList.filter((tower: Tower) => {
+      const distance = Phaser.Math.Distance.Between(
+        this.sprite.x,
+        this.sprite.y,
+        tower.sprite.x,
+        tower.sprite.y
+      )
+      return distance <= this.attackRadius && !tower.isDead
     })
-    return detectedTowers
   }
 
   getDetectedChampions() {
-    if (!this.visionCone) {
-      return []
-    }
     const championList =
       this.side === Side.LEFT ? this.game.rightChampions : this.game.leftChampions
-    const detectedChampions = this.visionCone.getDetectedEntities(championList)
-    return detectedChampions.filter((entity) => {
-      const champion = entity as Champion
-      return !champion.isDead
+    return championList.filter((champion: Champion) => {
+      const distance = Phaser.Math.Distance.Between(
+        this.sprite.x,
+        this.sprite.y,
+        champion.sprite.x,
+        champion.sprite.y
+      )
+      return distance <= this.attackRadius && !champion.isDead
     })
   }
 
   destroy() {
     this.sprite.destroy()
-    if (this.visionCone) {
-      this.visionCone.destroy()
-      this.visionCone = undefined
-    }
-    if (this.markerRectangle) {
-      this.markerRectangle = undefined
-    }
     if (this.healthBar) {
       this.healthBar.destroy()
       this.healthBar = undefined
     }
+    this.attackCircle.destroy()
   }
 
   setMoveTarget(moveTarget: { x: number; y: number }) {

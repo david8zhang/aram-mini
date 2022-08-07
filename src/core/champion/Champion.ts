@@ -33,6 +33,8 @@ export class Champion {
   public markerRectangle: Phaser.Geom.Rectangle
   public healthBar: HealthBar
 
+  public attackRange: number = Constants.CHAMPION_ATTACK_RANGE
+
   constructor(game: Game, config: ChampionConfig) {
     this.game = game
     this.sprite = this.game.physics.add.sprite(config.position.x, config.position.y, config.texture)
@@ -137,29 +139,29 @@ export class Champion {
     }
   }
 
-  isAtMoveTarget() {
+  isAtMoveTarget(moveTarget: { x: number; y: number }) {
     const distance = Phaser.Math.Distance.Between(
       this.sprite.x,
       this.sprite.y,
-      this.moveTarget!.x,
-      this.moveTarget!.y
+      moveTarget!.x,
+      moveTarget!.y
     )
     return distance <= 5
   }
 
-  handleMovementToPoint() {
+  handleMovementToPoint(moveTarget: { x: number; y: number }) {
     if (this.isDead) {
       return
     }
-    if (this.moveTarget && !this.isAtMoveTarget()) {
+    if (moveTarget && !this.isAtMoveTarget(moveTarget)) {
       let angle = Phaser.Math.Angle.BetweenPoints(
         {
           x: this.sprite.x,
           y: this.sprite.y,
         },
         {
-          x: this.moveTarget.x,
-          y: this.moveTarget.y,
+          x: moveTarget.x,
+          y: moveTarget.y,
         }
       )
       const velocityVector = new Phaser.Math.Vector2()
