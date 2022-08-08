@@ -80,14 +80,7 @@ export class HealthBar {
     )
 
     const percentage = this.currValue / this.maxValue
-
-    if (percentage <= 0.25) {
-      this.bar.fillStyle(0xff0000)
-    } else if (percentage <= 0.5) {
-      this.bar.fillStyle(0xf1c40f)
-    } else {
-      this.bar.fillStyle(this.fillColor)
-    }
+    this.bar.fillStyle(this.fillColor)
 
     const length = Math.floor(percentage * this.width)
     this.bar.fillRect(this.x, this.y, length, this.height)

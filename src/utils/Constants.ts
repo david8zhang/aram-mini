@@ -18,6 +18,9 @@ export class Constants {
   public static readonly GAME_HEIGHT = 800
   public static readonly GAME_WIDTH = 800
 
+  public static LEFT_COLOR = 0x25956a
+  public static RIGHT_COLOR = 0xff0000
+
   public static readonly LEFT_SPAWN = {
     x: 45,
     y: 750,

@@ -16,6 +16,7 @@ export class Preload extends Scene {
     this.load.image('tower_red', 'tower-red.png')
     this.load.image('tower_blue', 'tower-blue.png')
     this.load.tilemapTiledJSON('map', 'map.json')
+    this.load.image('attack-cursor', 'attack-cursor.png')
   }
 
   create() {

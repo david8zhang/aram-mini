@@ -55,6 +55,7 @@ export class Tower {
       height: 4,
       width: this.sprite.displayWidth,
       borderWidth: 1,
+      fillColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
     })
     this.stateMachine = new StateMachine(
       TowerStates.IDLE,

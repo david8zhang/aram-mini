@@ -57,6 +57,7 @@ export class Minion {
       height: 3,
       width: 20,
       borderWidth: 1,
+      fillColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
     })
     this.moveTarget = config.moveTarget
     this.attackCircle = this.game.add

@@ -28,6 +28,9 @@ export class StateMachine {
   }
 
   transition(newState: any, ...enterArgs: any[]) {
+    if (this.state && this.state.exit) {
+      this.state.exit(...this.stateArgs)
+    }
     this.state = newState
     this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs)
   }
