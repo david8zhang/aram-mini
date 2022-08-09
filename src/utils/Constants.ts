@@ -6,7 +6,7 @@ export class Constants {
 
   public static readonly CHAMPION_MOVE_SPEED = 100
   public static readonly CHAMPION_ATTACK_DELAY = 1000
-  public static readonly CHAMPION_DAMAGE = 15
+  public static readonly CHAMPION_DAMAGE = 1000
   public static readonly CHAMPION_HEALTH = 500
   public static readonly CHAMPION_ATTACK_RANGE = 75
 
@@ -14,6 +14,8 @@ export class Constants {
   public static readonly TOWER_ATTACK_DELAY = 2500
   public static readonly TOWER_HEALTH = 500
   public static readonly TOWER_ATTACK_RADIUS = 75
+
+  public static readonly NEXUS_HEALTH = 500
 
   public static readonly GAME_HEIGHT = 800
   public static readonly GAME_WIDTH = 800

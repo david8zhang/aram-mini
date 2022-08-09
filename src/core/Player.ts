@@ -3,6 +3,7 @@ import { Side } from '~/utils/Side'
 import { Champion, ChampionConfig } from './champion/Champion'
 import { ChampionStates } from './champion/states/ChampionStates'
 import { Minion } from './minion/Minion'
+import { Nexus } from './Nexus'
 import { Tower } from './tower/Tower'
 
 export interface PlayerConfig {
@@ -47,10 +48,13 @@ export class Player {
       if (pointer.rightButtonDown()) {
         const minion = this.game.getMinionAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
         const tower = this.game.getTowerAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
+        const nexus = this.game.getNexusAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
         if (tower) {
           this.setChampionAttackTarget(tower)
         } else if (minion) {
           this.setChampionAttackTarget(minion.getData('ref') as Minion)
+        } else if (nexus) {
+          this.setChampionAttackTarget(nexus)
         } else {
           this.moveChampionToPosition(pointer)
         }
@@ -63,10 +67,13 @@ export class Player {
             15
           )
           const tower = this.game.getTowerAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
+          const nexus = this.game.getNexusAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
           if (tower) {
             this.setChampionAttackTarget(tower)
           } else if (minion) {
             this.setChampionAttackTarget(minion.getData('ref') as Minion)
+          } else if (nexus) {
+            this.setChampionAttackTarget(nexus)
           }
         }
       }
@@ -115,7 +122,7 @@ export class Player {
     }
   }
 
-  setChampionAttackTarget(target: Minion | Champion | Tower) {
+  setChampionAttackTarget(target: Minion | Champion | Tower | Nexus) {
     if (!this.champion.isDead) {
       this.champion.attackTarget = target
       this.champion.stateMachine.transition(ChampionStates.ATTACK)

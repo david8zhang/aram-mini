@@ -2,6 +2,7 @@ import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Minion } from '../minion/Minion'
+import { Nexus } from '../Nexus'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
 import { Tower } from '../tower/Tower'
@@ -30,7 +31,7 @@ export class Champion {
   public moveTarget: { x: number; y: number } | null = null
   public moveMarker: Phaser.GameObjects.Arc | null = null
 
-  public attackTarget: Champion | Minion | Tower | null = null
+  public attackTarget: Champion | Minion | Tower | Nexus | null = null
   public markerRectangle: Phaser.Geom.Rectangle
   public healthBar: HealthBar
 
@@ -92,7 +93,7 @@ export class Champion {
       })
       projectile.destroyCallback = () => {
         if (this.attackTarget) {
-          this.attackTarget.takeDamage(10)
+          this.attackTarget.takeDamage(Constants.CHAMPION_DAMAGE)
           if (this.attackTarget.getHealth() === 0) {
             this.attackTarget.destroy()
           }

@@ -1,4 +1,5 @@
 import { Champion } from '~/core/champion/Champion'
+import { Nexus } from '~/core/Nexus'
 import { State } from '~/core/StateMachine'
 import { Tower } from '~/core/tower/Tower'
 import { Constants } from '~/utils/Constants'
@@ -21,7 +22,7 @@ export class AttackState extends State {
     }
   }
 
-  isTargetAttackable(minion: Minion, attackTarget: Minion | Champion | Tower) {
+  isTargetAttackable(minion: Minion, attackTarget: Minion | Champion | Tower | Nexus) {
     const isWithinRange =
       Phaser.Math.Distance.Between(
         minion.sprite.x,

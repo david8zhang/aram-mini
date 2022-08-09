@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { Champion } from '~/core/champion/Champion'
 import { Debug } from '~/core/Debug'
 import { MinionSpawner } from '~/core/minion/MinionSpawner'
+import { Nexus } from '~/core/Nexus'
 import { Player } from '~/core/Player'
 import { Projectile } from '~/core/Projectile'
 import { Tower } from '~/core/tower/Tower'
@@ -31,6 +32,10 @@ export class Game extends Phaser.Scene {
   public leftChampionsGroup!: Phaser.GameObjects.Group
   public rightChampionsGroup!: Phaser.GameObjects.Group
 
+  // Nexuses
+  public leftNexus!: Nexus
+  public rightNexus!: Nexus
+
   constructor() {
     super('game')
   }
@@ -55,6 +60,7 @@ export class Game extends Phaser.Scene {
     this.initPlayer()
     this.initMinionSpawners()
     this.initTowers()
+    this.initNexuses()
   }
 
   public get leftChampions() {
@@ -96,6 +102,23 @@ export class Game extends Phaser.Scene {
 
     this.rightMinionSpawner.startSpawning()
     this.leftMinionSpawner.startSpawning()
+  }
+
+  initNexuses() {
+    this.leftNexus = new Nexus(this, {
+      position: Constants.LEFT_SPAWN,
+      texture: 'nexus_blue',
+      scale: 3,
+      onDestroyCallback: () => {},
+      side: Side.LEFT,
+    })
+    this.rightNexus = new Nexus(this, {
+      position: Constants.RIGHT_SPAWN,
+      texture: 'nexus_red',
+      scale: 3,
+      onDestroyCallback: () => {},
+      side: Side.RIGHT,
+    })
   }
 
   initTowers() {
@@ -161,6 +184,16 @@ export class Game extends Phaser.Scene {
         tower.sprite.y <= y + range
       )
     })
+  }
+
+  getNexusAtPosition(side: Side, x: number, y: number, range: number) {
+    const nexus = side === Side.LEFT ? this.leftNexus : this.rightNexus
+    const isWithinRange =
+      nexus.sprite.x >= x - range &&
+      nexus.sprite.x <= x + range &&
+      nexus.sprite.y >= y - range &&
+      nexus.sprite.y <= y + range
+    return isWithinRange && nexus.isTargetable ? nexus : null
   }
 
   initTilemap() {

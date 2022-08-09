@@ -2,6 +2,7 @@ import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Champion } from '../champion/Champion'
+import { Nexus } from '../Nexus'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
 import { Tower } from '../tower/Tower'
@@ -35,7 +36,7 @@ export class Minion {
   public attackCircle: Phaser.GameObjects.Arc
 
   public healthBar: HealthBar | undefined
-  public attackTarget: Minion | Tower | Champion | null = null
+  public attackTarget: Minion | Tower | Champion | Nexus | null = null
 
   constructor(game: Game, config: MinionConfig) {
     this.game = game
@@ -85,7 +86,7 @@ export class Minion {
     }
   }
 
-  attack(target: Minion | Tower | Champion) {
+  attack(target: Minion | Tower | Champion | Nexus) {
     if (!target.sprite.active || target.getHealth() === 0) {
       return
     }
@@ -117,6 +118,22 @@ export class Minion {
     }
     this.attackCircle.setPosition(this.sprite.x, this.sprite.y)
   }
+
+  getEnemyNexus() {
+    const enemyNexus = this.side === Side.LEFT ? this.game.rightNexus : this.game.leftNexus
+    const distance = Phaser.Math.Distance.Between(
+      enemyNexus.sprite.x,
+      enemyNexus.sprite.y,
+      this.sprite.x,
+      this.sprite.y
+    )
+    const withinRange = distance <= this.attackRadius
+    if (enemyNexus.isTargetable && withinRange) {
+      return enemyNexus
+    }
+    return null
+  }
+
   getDetectedEnemies() {
     const enemyList =
       this.side === Side.LEFT

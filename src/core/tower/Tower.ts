@@ -167,5 +167,15 @@ export class Tower {
     this.sprite.setVisible(false)
     this.healthBar.setVisible(false)
     this.stateMachine.transition(TowerStates.DEAD)
+    this.checkNexusTargetable()
+  }
+
+  checkNexusTargetable() {
+    const towersList = this.side === Side.LEFT ? this.game.leftTowers : this.game.rightTowers
+    const nonDestroyedTowers = towersList.filter((tower) => !tower.isDead)
+    if (nonDestroyedTowers.length === 0) {
+      const nexus = this.side === Side.LEFT ? this.game.leftNexus : this.game.rightNexus
+      nexus.setIsTargetable(true)
+    }
   }
 }
