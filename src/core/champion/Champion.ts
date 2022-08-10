@@ -39,6 +39,7 @@ export class Champion {
 
   constructor(game: Game, config: ChampionConfig) {
     this.game = game
+    this.side = config.side
     this.sprite = this.game.physics.add.sprite(config.position.x, config.position.y, config.texture)
     this.sprite.setData('ref', this)
     this.game.physics.world.enableBody(this.sprite, Phaser.Physics.Arcade.DYNAMIC_BODY)
@@ -65,8 +66,8 @@ export class Champion {
       height: 4,
       width: 30,
       borderWidth: 1,
+      fillColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
     })
-    this.side = config.side
   }
 
   public get isDead() {
@@ -113,10 +114,12 @@ export class Champion {
   respawn() {
     const spawnPosition = this.side === Side.LEFT ? Constants.LEFT_SPAWN : Constants.RIGHT_SPAWN
     this.sprite.setPosition(spawnPosition.x, spawnPosition.y)
-    this.game.cameras.main.startFollow(this.sprite, true)
     this.healthBar.setCurrHealth(Constants.CHAMPION_HEALTH)
     this.healthBar.setVisible(true)
     this.sprite.setVisible(true)
+    if (this.side === Side.LEFT) {
+      this.game.cameras.main.startFollow(this.sprite, true)
+    }
   }
 
   destroy() {

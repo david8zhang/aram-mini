@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { Champion } from '~/core/champion/Champion'
+import { CPU } from '~/core/cpu/CPU'
 import { Debug } from '~/core/Debug'
 import { MinionSpawner } from '~/core/minion/MinionSpawner'
 import { Nexus } from '~/core/Nexus'
@@ -15,6 +16,7 @@ export class Game extends Phaser.Scene {
   public graphics!: Phaser.GameObjects.Graphics
   public isDebug: boolean = false
   public debug!: Debug
+  public cpu!: CPU
 
   // Tilemaps
   public tileMap!: Phaser.Tilemaps.Tilemap
@@ -58,6 +60,7 @@ export class Game extends Phaser.Scene {
     this.initCamera()
     this.initTilemap()
     this.initPlayer()
+    this.initCPU()
     this.initMinionSpawners()
     this.initTowers()
     this.initNexuses()
@@ -144,18 +147,13 @@ export class Game extends Phaser.Scene {
     })
   }
 
+  initCPU() {
+    this.cpu = new CPU(this)
+    this.rightChampionsGroup.add(this.cpu.champion.sprite)
+  }
+
   initPlayer() {
-    this.player = new Player({
-      game: this,
-      championConfig: {
-        texture: 'wizard',
-        position: {
-          x: Constants.LEFT_SPAWN.x,
-          y: Constants.LEFT_SPAWN.y,
-        },
-        side: Side.LEFT,
-      },
-    })
+    this.player = new Player(this)
     this.cameras.main.startFollow(this.player.champion.sprite, true)
     this.leftChampionsGroup.add(this.player.champion.sprite)
   }
@@ -216,6 +214,7 @@ export class Game extends Phaser.Scene {
   update() {
     this.graphics.clear()
     this.player.update()
+    this.cpu.update()
     this.leftMinionSpawner.update()
     this.rightMinionSpawner.update()
     this.projectileGroup.children.entries.forEach((entry) => {

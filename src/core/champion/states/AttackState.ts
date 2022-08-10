@@ -1,19 +1,24 @@
 import { State } from '~/core/StateMachine'
 import { Constants } from '~/utils/Constants'
 import { Champion } from '../Champion'
+import { ChampionStates } from './ChampionStates'
 
 export class AttackState extends State {
   public lastAttackedTimestamp: number = 0
 
   execute(champion: Champion) {
-    if (this.isAttackTargetOutOfRange(champion)) {
-      champion.handleMovementToPoint(champion.attackTarget!.sprite)
+    if (!champion.attackTarget) {
+      champion.stateMachine.transition(ChampionStates.IDLE)
     } else {
-      const currTime = Date.now()
-      champion.sprite.setVelocity(0, 0)
-      if (currTime - this.lastAttackedTimestamp > Constants.CHAMPION_ATTACK_DELAY) {
-        this.lastAttackedTimestamp = currTime
-        champion.attack()
+      if (this.isAttackTargetOutOfRange(champion)) {
+        champion.handleMovementToPoint(champion.attackTarget!.sprite)
+      } else {
+        const currTime = Date.now()
+        champion.sprite.setVelocity(0, 0)
+        if (currTime - this.lastAttackedTimestamp > Constants.CHAMPION_ATTACK_DELAY) {
+          this.lastAttackedTimestamp = currTime
+          champion.attack()
+        }
       }
     }
   }

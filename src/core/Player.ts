@@ -1,4 +1,5 @@
 import { Game } from '~/scenes/Game'
+import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Champion, ChampionConfig } from './champion/Champion'
 import { ChampionStates } from './champion/states/ChampionStates'
@@ -6,30 +7,36 @@ import { Minion } from './minion/Minion'
 import { Nexus } from './Nexus'
 import { Tower } from './tower/Tower'
 
-export interface PlayerConfig {
-  game: Game
-  championConfig: ChampionConfig
-}
-
 export class Player {
   public game: Game
   public champion: Champion
   public moveTargetMarker?: Phaser.GameObjects.Arc
   public side: Side = Side.LEFT
   public inAttackTargetingMode: boolean = false
-  public clickBox: Phaser.Physics.Arcade.Sprite
   public attackCursorImage: Phaser.GameObjects.Image
+  public attackRangeCircle: Phaser.GameObjects.Arc
 
-  constructor(config: PlayerConfig) {
-    this.game = config.game
-    this.champion = new Champion(this.game, config.championConfig)
+  constructor(game: Game) {
+    this.game = game
+    this.champion = new Champion(this.game, {
+      texture: 'wizard',
+      position: {
+        x: Constants.LEFT_SPAWN.x,
+        y: Constants.LEFT_SPAWN.y,
+      },
+      side: Side.LEFT,
+    })
     this.setupMouseClickListener()
     this.setupKeyboardListener()
-    this.clickBox = this.game.physics.add.sprite(0, 0, '').setSize(10, 10).setVisible(false)
     this.attackCursorImage = this.game.add
       .image(0, 0, 'attack-cursor')
       .setVisible(false)
       .setDepth(100)
+    this.attackRangeCircle = this.game.add
+      .circle(this.champion.sprite.x, this.champion.sprite.y, Constants.CHAMPION_ATTACK_RANGE)
+      .setVisible(false)
+      .setFillStyle(0xadd8e6, 0.2)
+      .setStrokeStyle(2, 0xadd8e6)
   }
 
   update() {
@@ -39,6 +46,7 @@ export class Player {
         this.game.input.mousePointer.worldX,
         this.game.input.mousePointer.worldY
       )
+      this.attackRangeCircle.setPosition(this.champion.sprite.x, this.champion.sprite.y)
     }
   }
 
@@ -60,25 +68,54 @@ export class Player {
         }
       } else if (pointer.leftButtonDown()) {
         if (this.inAttackTargetingMode) {
-          const minion = this.game.getMinionAtPosition(
-            Side.RIGHT,
-            pointer.worldX,
-            pointer.worldY,
-            15
-          )
-          const tower = this.game.getTowerAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
-          const nexus = this.game.getNexusAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
-          if (tower) {
-            this.setChampionAttackTarget(tower)
-          } else if (minion) {
-            this.setChampionAttackTarget(minion.getData('ref') as Minion)
-          } else if (nexus) {
-            this.setChampionAttackTarget(nexus)
+          const target = this.getNearestTargetToCursor(pointer.worldX, pointer.worldY)
+          if (target) {
+            this.setChampionAttackTarget(target)
           }
         }
       }
       this.disableAttackTargeting()
     })
+  }
+
+  getNearestTargetToCursor(pointerX: number, pointerY: number) {
+    let minDistance = Number.MAX_SAFE_INTEGER
+    let closestTarget: Minion | Nexus | Tower | null = null
+    const minionGroup = this.game.rightMinionSpawner.minions
+    minionGroup.children.entries.forEach((child) => {
+      const sprite = child as Phaser.Physics.Arcade.Sprite
+      const distance = Phaser.Math.Distance.Between(pointerX, pointerY, sprite.x, sprite.y)
+      if (distance <= minDistance) {
+        closestTarget = child.getData('ref') as Minion
+        minDistance = distance
+      }
+    })
+
+    this.game.rightTowers.forEach((tower) => {
+      const distance = Phaser.Math.Distance.Between(
+        pointerX,
+        pointerY,
+        tower.sprite.x,
+        tower.sprite.y
+      )
+      if (distance <= minDistance && !tower.isDead) {
+        closestTarget = tower
+        minDistance = distance
+      }
+    })
+    const distanceToNexus = Phaser.Math.Distance.Between(
+      pointerX,
+      pointerY,
+      this.game.rightNexus.sprite.x,
+      this.game.rightNexus.sprite.y
+    )
+    if (distanceToNexus <= minDistance && this.game.rightNexus.isTargetable) {
+      closestTarget = this.game.rightNexus
+      minDistance = distanceToNexus
+    }
+    if (minDistance <= 50) {
+      return closestTarget
+    }
   }
 
   setupKeyboardListener() {
@@ -99,12 +136,14 @@ export class Player {
   enableAttackTargeting() {
     document.getElementById('phaser')?.setAttribute('style', 'cursor:none;')
     this.attackCursorImage.setVisible(true)
+    this.attackRangeCircle.setVisible(true)
     this.inAttackTargetingMode = true
   }
 
   disableAttackTargeting() {
     document.getElementById('phaser')?.setAttribute('style', 'cursor:default;')
     this.attackCursorImage.setVisible(false)
+    this.attackRangeCircle.setVisible(false)
     this.inAttackTargetingMode = false
   }
 
