@@ -1,10 +1,11 @@
 import { BehaviorStatus } from './BehaviorStatus'
 import { BehaviorTreeNode } from './BehaviorTreeNode'
+import { Blackboard } from './Blackboard'
 
 export class SequenceNode extends BehaviorTreeNode {
   public nodes: BehaviorTreeNode[]
-  constructor(name: string, nodes: BehaviorTreeNode[]) {
-    super(name)
+  constructor(name: string, blackboard: Blackboard, nodes: BehaviorTreeNode[]) {
+    super(name, blackboard)
     this.nodes = nodes
   }
 
