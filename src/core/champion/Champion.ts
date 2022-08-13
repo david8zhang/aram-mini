@@ -111,6 +111,13 @@ export class Champion {
     return 0
   }
 
+  getTotalHealth() {
+    if (this.healthBar) {
+      return this.healthBar.maxValue
+    }
+    return 0
+  }
+
   respawn() {
     const spawnPosition = this.side === Side.LEFT ? Constants.LEFT_SPAWN : Constants.RIGHT_SPAWN
     this.sprite.setPosition(spawnPosition.x, spawnPosition.y)

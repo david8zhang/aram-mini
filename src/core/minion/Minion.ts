@@ -31,6 +31,9 @@ export class Minion {
   public stateMachine: StateMachine
   public side: Side
 
+  private static HEALTH_BAR_WIDTH = 24
+  private static HEALTH_BAR_HEIGHT = 2
+
   // Detectors
   public attackRadius: number = Constants.MINION_ATTACK_RANGE
   public attackCircle: Phaser.GameObjects.Arc
@@ -54,9 +57,9 @@ export class Minion {
     this.healthBar = new HealthBar(this.game, {
       x: this.sprite.x,
       y: this.sprite.y,
-      maxValue: 50,
-      height: 3,
-      width: 20,
+      maxValue: Constants.MINION_HEALTH,
+      height: Minion.HEALTH_BAR_HEIGHT,
+      width: Minion.HEALTH_BAR_WIDTH,
       borderWidth: 1,
       fillColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
     })
@@ -112,8 +115,8 @@ export class Minion {
   update() {
     this.stateMachine.step()
     if (this.healthBar) {
-      this.healthBar.x = this.sprite.x - 10
-      this.healthBar.y = this.sprite.y - this.sprite.body.height
+      this.healthBar.x = this.sprite.x - Minion.HEALTH_BAR_WIDTH / 2
+      this.healthBar.y = this.sprite.y - (this.sprite.body.height / 2 + 5)
       this.healthBar.draw()
     }
     this.attackCircle.setPosition(this.sprite.x, this.sprite.y)

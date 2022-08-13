@@ -84,16 +84,16 @@ export class Game extends Phaser.Scene {
 
   initMinionSpawners() {
     this.leftMinionSpawner = new MinionSpawner(this, {
-      spawnPosition: Constants.LEFT_SPAWN,
-      targetPosition: Constants.RIGHT_SPAWN,
+      spawnPosition: Constants.LEFT_NEXUS_SPAWN,
+      targetPosition: Constants.RIGHT_NEXUS_SPAWN,
       side: Side.LEFT,
       minionConfig: {
         texture: 'minion_blue',
       },
     })
     this.rightMinionSpawner = new MinionSpawner(this, {
-      spawnPosition: Constants.RIGHT_SPAWN,
-      targetPosition: Constants.LEFT_SPAWN,
+      spawnPosition: Constants.RIGHT_NEXUS_SPAWN,
+      targetPosition: Constants.LEFT_NEXUS_SPAWN,
       side: Side.RIGHT,
       minionConfig: {
         texture: 'minion_red',
@@ -109,14 +109,14 @@ export class Game extends Phaser.Scene {
 
   initNexuses() {
     this.leftNexus = new Nexus(this, {
-      position: Constants.LEFT_SPAWN,
+      position: Constants.LEFT_NEXUS_SPAWN,
       texture: 'nexus_blue',
       scale: 3,
       onDestroyCallback: () => {},
       side: Side.LEFT,
     })
     this.rightNexus = new Nexus(this, {
-      position: Constants.RIGHT_SPAWN,
+      position: Constants.RIGHT_NEXUS_SPAWN,
       texture: 'nexus_red',
       scale: 3,
       onDestroyCallback: () => {},

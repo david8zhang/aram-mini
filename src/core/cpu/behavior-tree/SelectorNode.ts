@@ -17,9 +17,9 @@ export class SelectorNode extends BehaviorTreeNode {
   }
 
   public process(): BehaviorStatus {
-    const status = this.optionA.process()
+    const status = this.optionA.tick()
     if (status === BehaviorStatus.FAILURE) {
-      return this.optionB.process()
+      return this.optionB.tick()
     }
     return status
   }

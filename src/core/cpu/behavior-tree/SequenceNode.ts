@@ -12,7 +12,7 @@ export class SequenceNode extends BehaviorTreeNode {
   public process(): BehaviorStatus {
     for (let i = 0; i < this.nodes.length; i++) {
       const node = this.nodes[i]
-      const status = node.process()
+      const status = node.tick()
       if (status !== BehaviorStatus.SUCCESS) {
         return status
       }

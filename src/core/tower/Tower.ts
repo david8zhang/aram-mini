@@ -133,7 +133,7 @@ export class Tower {
       scale: 1.5,
     })
     projectile.destroyCallback = () => {
-      target.takeDamage(Constants.TOWER_DAMAGE)
+      target.takeDamage(Constants.TOWER_DAMAGE_MAPPING[target.constructor.name])
       if (target.getHealth() === 0) {
         target.destroy()
       }
