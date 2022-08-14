@@ -15,7 +15,7 @@ export class Constants {
     Minion: 40,
     Champion: 160,
   }
-  public static readonly TOWER_ATTACK_DELAY = 2500
+  public static readonly TOWER_ATTACK_DELAY = 2000
   public static readonly TOWER_HEALTH = 500
   public static readonly TOWER_ATTACK_RADIUS = 75
 

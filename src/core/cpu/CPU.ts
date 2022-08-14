@@ -12,6 +12,8 @@ import { CheckPlayerLowHealth } from './behaviors/attack-player/CheckPlayerLowHe
 import { CheckPlayerVulnerable } from './behaviors/attack-player/CheckPlayerVulnerable'
 import { SetTargetCandidates } from './behaviors/attack-player/SetTargetCandidates'
 import { TargetPlayer } from './behaviors/attack-player/TargetPlayer'
+import { AttackMinion } from './behaviors/farm-minions/AttackMinion'
+import { TargetMinion } from './behaviors/farm-minions/TargetMinion'
 import { PopulateBlackboard } from './behaviors/PopulateBlackboard'
 import { Idle } from './behaviors/retreat/Idle'
 import { IsInDanger } from './behaviors/retreat/IsInDanger'
@@ -60,6 +62,22 @@ export class CPU {
       attackPlayer,
     ])
 
+    // Farm Minion Behaviors
+    const targetMinion = new TargetMinion('TargetMinion', blackboard)
+    const attackMinion = new AttackMinion('AttackMinion', blackboard)
+    const farmMinionSequence = new SequenceNode('FarmMinionSequence', blackboard, [
+      targetMinion,
+      attackMinion,
+    ])
+
+    // Select between Attack Behaviors
+    const attackBehaviorSelector = new SelectorNode(
+      'AttackSelector',
+      blackboard,
+      attackPlayerSequence,
+      farmMinionSequence
+    )
+
     // Retreat behaviors
     const isInDanger = new IsInDanger('IsInDanger', blackboard)
     const moveTowardsBase = new MoveTowardsBase('MoveTowardsBase', blackboard)
@@ -79,7 +97,7 @@ export class CPU {
     const topLevelSelector = new SelectorNode(
       'TopLevel',
       blackboard,
-      attackPlayerSequence,
+      attackBehaviorSelector,
       retreatBehaviorSelector
     )
 

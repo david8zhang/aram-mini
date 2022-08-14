@@ -1,11 +1,11 @@
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
-import { Champion, ChampionConfig } from './champion/Champion'
-import { ChampionStates } from './champion/states/ChampionStates'
-import { Minion } from './minion/Minion'
-import { Nexus } from './Nexus'
-import { Tower } from './tower/Tower'
+import { Champion, ChampionConfig } from '../champion/Champion'
+import { ChampionStates } from '../champion/states/ChampionStates'
+import { Minion } from '../minion/Minion'
+import { Nexus } from '../Nexus'
+import { Tower } from '../tower/Tower'
 
 export class Player {
   public game: Game

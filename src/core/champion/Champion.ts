@@ -95,9 +95,6 @@ export class Champion {
       projectile.destroyCallback = () => {
         if (this.attackTarget) {
           this.attackTarget.takeDamage(Constants.CHAMPION_DAMAGE)
-          if (this.attackTarget.getHealth() === 0) {
-            this.attackTarget.destroy()
-          }
         }
       }
       this.game.projectileGroup.add(projectile.sprite)
@@ -129,6 +126,12 @@ export class Champion {
     }
   }
 
+  stop() {
+    this.moveTarget = null
+    this.attackTarget = null
+    this.sprite.setVelocity(0, 0)
+  }
+
   destroy() {
     this.sprite.setVisible(false)
     this.healthBar.setVisible(false)
@@ -138,6 +141,9 @@ export class Champion {
 
   takeDamage(damage: number) {
     this.healthBar.decrease(damage)
+    if (this.healthBar.currValue == 0) {
+      this.destroy()
+    }
   }
 
   update() {

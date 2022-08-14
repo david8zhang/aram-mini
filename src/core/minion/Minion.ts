@@ -86,6 +86,9 @@ export class Minion {
   takeDamage(damage: number) {
     if (this.healthBar) {
       this.healthBar.decrease(damage)
+      if (this.healthBar.currValue == 0) {
+        this.destroy()
+      }
     }
   }
 
@@ -100,14 +103,12 @@ export class Minion {
         y: this.sprite.y,
       },
       target: target,
-      speed: 200,
+      scale: 0.5,
+      speed: 100,
       texture: `projectile_${color}`,
     })
     projectile.destroyCallback = () => {
       target.takeDamage(Constants.MINION_DAMAGE)
-      if (target.getHealth() === 0) {
-        target.destroy()
-      }
     }
     this.game.projectileGroup.add(projectile.sprite)
   }

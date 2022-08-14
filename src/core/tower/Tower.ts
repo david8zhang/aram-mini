@@ -128,15 +128,12 @@ export class Tower {
         y: this.sprite.y,
       },
       target: target,
-      speed: 200,
+      speed: 150,
       texture: `projectile_${color}`,
       scale: 1.5,
     })
     projectile.destroyCallback = () => {
       target.takeDamage(Constants.TOWER_DAMAGE_MAPPING[target.constructor.name])
-      if (target.getHealth() === 0) {
-        target.destroy()
-      }
     }
     this.game.projectileGroup.add(projectile.sprite)
   }
@@ -153,6 +150,9 @@ export class Tower {
   takeDamage(damage: number) {
     if (this.healthBar) {
       this.healthBar.decrease(damage)
+      if (this.healthBar.currValue == 0) {
+        this.destroy()
+      }
     }
   }
 
