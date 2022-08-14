@@ -6,6 +6,8 @@ import { BehaviorTreeNode } from './behavior-tree/BehaviorTreeNode'
 import { Blackboard } from './behavior-tree/Blackboard'
 import { SelectorNode } from './behavior-tree/SelectorNode'
 import { SequenceNode } from './behavior-tree/SequenceNode'
+import { AttackNexus } from './behaviors/attack-nexus/AttackNexus'
+import { CheckNexusTargetable } from './behaviors/attack-nexus/CheckNexusTargetable'
 import { AttackPlayer } from './behaviors/attack-player/AttackPlayer'
 import { CheckPlayerAttackable } from './behaviors/attack-player/CheckPlayerAttackable'
 import { CheckPlayerLowHealth } from './behaviors/attack-player/CheckPlayerLowHealth'
@@ -74,11 +76,27 @@ export class CPU {
       checkTowerVulnerable,
       attackTower,
     ])
+
+    // Attack Nexus Behavior
+    const checkNexusTargetable = new CheckNexusTargetable('CheckNexusTargetable', blackboard)
+    const attackNexus = new AttackNexus('AttackNexus', blackboard)
+    const attackNexusSequence = new SequenceNode('AttackNexusSequence', blackboard, [
+      checkNexusTargetable,
+      attackNexus,
+    ])
+
+    const attackObjectivesSelector = new SelectorNode(
+      'AttackObjectivesSelector',
+      blackboard,
+      attackTowerSequence,
+      attackNexusSequence
+    )
+
     const pushLaneSelector = new SelectorNode(
       'PushLaneSelector',
       blackboard,
       attackPlayerSequence,
-      attackTowerSequence
+      attackObjectivesSelector
     )
 
     // Farm Minion Behaviors

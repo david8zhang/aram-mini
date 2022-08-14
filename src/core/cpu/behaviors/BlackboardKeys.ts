@@ -5,6 +5,7 @@ export enum BlackboardKeys {
   TARGET_CHAMPION = 'targetChampion',
   TARGET_TOWER = 'targetTower',
   NEXUS = 'nexus',
+  ENEMY_NEXUS = 'enemyNexus',
   ENEMY_MINIONS = 'enemyMinions',
   FRIENDLY_MINIONS = 'friendlyMinions',
   TARGET_MINION = 'targetMinion',
