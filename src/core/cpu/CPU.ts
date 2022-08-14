@@ -12,6 +12,9 @@ import { CheckPlayerLowHealth } from './behaviors/attack-player/CheckPlayerLowHe
 import { CheckPlayerVulnerable } from './behaviors/attack-player/CheckPlayerVulnerable'
 import { SetTargetCandidates } from './behaviors/attack-player/SetTargetCandidates'
 import { TargetPlayer } from './behaviors/attack-player/TargetPlayer'
+import { AttackTower } from './behaviors/attack-tower/AttackTower'
+import { CheckTowerVulnerable } from './behaviors/attack-tower/CheckTowerVulnerable'
+import { SetTargetTower } from './behaviors/attack-tower/SetTargetTower'
 import { AttackMinion } from './behaviors/farm-minions/AttackMinion'
 import { TargetMinion } from './behaviors/farm-minions/TargetMinion'
 import { PopulateBlackboard } from './behaviors/PopulateBlackboard'
@@ -62,6 +65,22 @@ export class CPU {
       attackPlayer,
     ])
 
+    // Attack Turret Behaviors
+    const setTargetTower = new SetTargetTower('SetTargetTower', blackboard)
+    const checkTowerVulnerable = new CheckTowerVulnerable('CheckTowerVulnerable', blackboard)
+    const attackTower = new AttackTower('AttackTower', blackboard)
+    const attackTowerSequence = new SequenceNode('AttackTowerSequence', blackboard, [
+      setTargetTower,
+      checkTowerVulnerable,
+      attackTower,
+    ])
+    const pushLaneSelector = new SelectorNode(
+      'PushLaneSelector',
+      blackboard,
+      attackPlayerSequence,
+      attackTowerSequence
+    )
+
     // Farm Minion Behaviors
     const targetMinion = new TargetMinion('TargetMinion', blackboard)
     const attackMinion = new AttackMinion('AttackMinion', blackboard)
@@ -74,7 +93,7 @@ export class CPU {
     const attackBehaviorSelector = new SelectorNode(
       'AttackSelector',
       blackboard,
-      attackPlayerSequence,
+      pushLaneSelector,
       farmMinionSequence
     )
 

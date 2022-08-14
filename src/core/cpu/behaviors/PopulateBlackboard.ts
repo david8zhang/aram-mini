@@ -25,6 +25,7 @@ export class PopulateBlackboard extends BehaviorTreeNode {
       this.cpu.side === Side.RIGHT
         ? game.rightMinionSpawner.minions
         : game.leftMinionSpawner.minions
+    const nexus = this.cpu.side === Side.RIGHT ? game.rightNexus : game.leftNexus
 
     const champion = this.cpu.champion
     this.blackboard.setData(BlackboardKeys.ENEMY_MINIONS, this.parseMinions(enemyMinions))
@@ -33,6 +34,7 @@ export class PopulateBlackboard extends BehaviorTreeNode {
     this.blackboard.setData(BlackboardKeys.ENEMY_TOWERS, enemyTowers)
     this.blackboard.setData(BlackboardKeys.CHAMPION, champion)
     this.blackboard.setData(BlackboardKeys.SIDE, this.cpu.side)
+    this.blackboard.setData(BlackboardKeys.NEXUS, nexus)
     return BehaviorStatus.SUCCESS
   }
 

@@ -1,4 +1,5 @@
 import { Champion } from '~/core/champion/Champion'
+import { Minion } from '~/core/minion/Minion'
 import { Tower } from '~/core/tower/Tower'
 import { BehaviorStatus } from '../../behavior-tree/BehaviorStatus'
 import { BehaviorTreeNode } from '../../behavior-tree/BehaviorTreeNode'
@@ -13,7 +14,9 @@ export class IsInDanger extends BehaviorTreeNode {
   }
 
   public process(): BehaviorStatus {
-    return this.isInRangeOfEnemyChampion() || this.isInRangeOfEnemyTower()
+    return this.isInRangeOfEnemyChampion() ||
+      this.isInRangeOfEnemyTower() ||
+      this.isInRangeOfEnemyMinions()
       ? BehaviorStatus.SUCCESS
       : BehaviorStatus.FAILURE
   }
@@ -35,6 +38,18 @@ export class IsInDanger extends BehaviorTreeNode {
             return true
           }
         }
+      }
+    }
+    return false
+  }
+
+  isInRangeOfEnemyMinions(): boolean {
+    const champion = this.blackboard.getData(BlackboardKeys.CHAMPION) as Champion
+    const enemyMinions = this.blackboard.getData(BlackboardKeys.ENEMY_MINIONS) as Minion[]
+    for (let i = 0; i < enemyMinions.length; i++) {
+      const minion = enemyMinions[i]
+      if (minion.attackTarget == champion) {
+        return true
       }
     }
     return false

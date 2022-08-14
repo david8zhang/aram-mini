@@ -1,5 +1,4 @@
 import { Minion } from '~/core/minion/Minion'
-import { Tower } from '~/core/tower/Tower'
 import { Constants } from '~/utils/Constants'
 import { BehaviorStatus } from '../../behavior-tree/BehaviorStatus'
 import { BehaviorTreeNode } from '../../behavior-tree/BehaviorTreeNode'
