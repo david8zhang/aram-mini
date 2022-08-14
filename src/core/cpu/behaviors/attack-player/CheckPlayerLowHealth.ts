@@ -7,8 +7,8 @@ import { BlackboardKeys } from '../BlackboardKeys'
 export class CheckPlayerLowHealth extends BehaviorTreeNode {
   public static LOW_HEALTH_THRESHOLD = 0.5
 
-  constructor(name: string, blackboard: Blackboard) {
-    super(name, blackboard)
+  constructor(blackboard: Blackboard) {
+    super('CheckPlayerLowHealth', blackboard)
   }
 
   public process(): BehaviorStatus {

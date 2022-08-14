@@ -6,8 +6,8 @@ import { Blackboard } from '../../behavior-tree/Blackboard'
 import { BlackboardKeys } from '../BlackboardKeys'
 
 export class Idle extends BehaviorTreeNode {
-  constructor(name: string, blackboard: Blackboard) {
-    super(name, blackboard)
+  constructor(blackboard: Blackboard) {
+    super('Idle', blackboard)
   }
   public process(): BehaviorStatus {
     const champion = this.blackboard.getData(BlackboardKeys.CHAMPION) as Champion

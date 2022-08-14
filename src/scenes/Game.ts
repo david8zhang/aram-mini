@@ -194,6 +194,18 @@ export class Game extends Phaser.Scene {
     return isWithinRange && nexus.isTargetable ? nexus : null
   }
 
+  getChampionAtPosition(side: Side, x: number, y: number, range: number) {
+    const championsList = side === Side.LEFT ? this.leftChampions : this.rightChampions
+    return championsList.find((c) => {
+      return (
+        c.sprite.x >= x - range &&
+        c.sprite.x <= x + range &&
+        c.sprite.y >= y - range &&
+        c.sprite.y <= y + range
+      )
+    })
+  }
+
   initTilemap() {
     this.tileMap = this.make.tilemap({
       key: 'map',

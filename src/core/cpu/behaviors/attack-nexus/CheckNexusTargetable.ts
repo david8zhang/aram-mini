@@ -1,13 +1,12 @@
 import { Nexus } from '~/core/Nexus'
-import { Tower } from '~/core/tower/Tower'
 import { BehaviorStatus } from '../../behavior-tree/BehaviorStatus'
 import { BehaviorTreeNode } from '../../behavior-tree/BehaviorTreeNode'
 import { Blackboard } from '../../behavior-tree/Blackboard'
 import { BlackboardKeys } from '../BlackboardKeys'
 
 export class CheckNexusTargetable extends BehaviorTreeNode {
-  constructor(name: string, blackboard: Blackboard) {
-    super(name, blackboard)
+  constructor(blackboard: Blackboard) {
+    super('CheckNexusTargetable', blackboard)
   }
 
   public process(): BehaviorStatus {

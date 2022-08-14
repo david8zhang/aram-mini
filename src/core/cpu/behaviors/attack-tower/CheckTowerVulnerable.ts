@@ -11,8 +11,8 @@ export class CheckTowerVulnerable extends BehaviorTreeNode {
   private static FRIENDLY_MINIONS_ATTACKING_THRESHOLD = 2
   private static LOWER_TOWER_HEALTH_THRESHOLD = Constants.CHAMPION_DAMAGE * 3
 
-  constructor(name: string, blackboard: Blackboard) {
-    super(name, blackboard)
+  constructor(blackboard: Blackboard) {
+    super('CheckTowerVulnerable', blackboard)
   }
   public process(): BehaviorStatus {
     const targetTower = this.blackboard.getData(BlackboardKeys.TARGET_TOWER) as Tower

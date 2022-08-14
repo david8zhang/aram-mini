@@ -7,8 +7,8 @@ import { BlackboardKeys } from './BlackboardKeys'
 export class HasEnoughHealth extends BehaviorTreeNode {
   public static HEALTH_THRESHOLD = 0.5
 
-  constructor(name: string, blackboard: Blackboard) {
-    super(name, blackboard)
+  constructor(blackboard: Blackboard) {
+    super('HasEnoughHealth', blackboard)
   }
 
   public process(): BehaviorStatus {

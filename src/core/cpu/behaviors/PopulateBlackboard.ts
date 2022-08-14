@@ -8,8 +8,8 @@ import { BlackboardKeys } from './BlackboardKeys'
 
 export class PopulateBlackboard extends BehaviorTreeNode {
   private cpu: CPU
-  constructor(name: string, blackboard: Blackboard, cpu: CPU) {
-    super(name, blackboard)
+  constructor(blackboard: Blackboard, cpu: CPU) {
+    super('PopulateBlackboard', blackboard)
     this.cpu = cpu
   }
 

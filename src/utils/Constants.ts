@@ -46,6 +46,16 @@ export class Constants {
     y: 15,
   }
 
+  public static readonly LEFT_STARTING_POSITION = {
+    x: 260,
+    y: 460,
+  }
+
+  public static readonly RIGHT_STARTING_POSITION = {
+    x: 460,
+    y: 260,
+  }
+
   public static LEFT_TOWER_CONFIGS = [
     {
       position: {

@@ -9,8 +9,8 @@ import { BlackboardKeys } from '../BlackboardKeys'
 export class IsInDanger extends BehaviorTreeNode {
   public static ATTACK_RANGE_BUFFER = 50
 
-  constructor(name: string, blackboard: Blackboard) {
-    super(name, blackboard)
+  constructor(blackboard: Blackboard) {
+    super('IsInDanger', blackboard)
   }
 
   public process(): BehaviorStatus {

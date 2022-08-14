@@ -7,8 +7,8 @@ import { Blackboard } from '../../behavior-tree/Blackboard'
 import { BlackboardKeys } from '../BlackboardKeys'
 
 export class AttackMinion extends BehaviorTreeNode {
-  constructor(name: string, blackboard: Blackboard) {
-    super(name, blackboard)
+  constructor(blackboard: Blackboard) {
+    super('AttackMinion', blackboard)
   }
 
   public process(): BehaviorStatus {

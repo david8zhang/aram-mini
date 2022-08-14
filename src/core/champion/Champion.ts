@@ -36,6 +36,7 @@ export class Champion {
   public healthBar: HealthBar
 
   public attackRange: number = Constants.CHAMPION_ATTACK_RANGE
+  public onDestroyedCallbacks: Function[] = []
 
   constructor(game: Game, config: ChampionConfig) {
     this.game = game
@@ -136,6 +137,7 @@ export class Champion {
     this.sprite.setVisible(false)
     this.healthBar.setVisible(false)
     this.moveTarget = null
+    this.onDestroyedCallbacks.forEach((cb) => cb())
     this.stateMachine.transition(ChampionStates.DEAD)
   }
 

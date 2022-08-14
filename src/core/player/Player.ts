@@ -57,7 +57,15 @@ export class Player {
         const minion = this.game.getMinionAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
         const tower = this.game.getTowerAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
         const nexus = this.game.getNexusAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
-        if (tower) {
+        const champion = this.game.getChampionAtPosition(
+          Side.RIGHT,
+          pointer.worldX,
+          pointer.worldY,
+          15
+        )
+        if (champion) {
+          this.setChampionAttackTarget(champion)
+        } else if (tower) {
           this.setChampionAttackTarget(tower)
         } else if (minion) {
           this.setChampionAttackTarget(minion.getData('ref') as Minion)
@@ -80,7 +88,17 @@ export class Player {
 
   getNearestTargetToCursor(pointerX: number, pointerY: number) {
     let minDistance = Number.MAX_SAFE_INTEGER
-    let closestTarget: Minion | Nexus | Tower | null = null
+    let closestTarget: Minion | Nexus | Tower | Champion | null = null
+
+    const enemyChampion = this.game.rightChampions
+    enemyChampion.forEach((c) => {
+      const distance = Phaser.Math.Distance.Between(pointerX, pointerY, c.sprite.x, c.sprite.y)
+      if (distance <= minDistance) {
+        closestTarget = c
+        minDistance = distance
+      }
+    })
+
     const minionGroup = this.game.rightMinionSpawner.minions
     minionGroup.children.entries.forEach((child) => {
       const sprite = child as Phaser.Physics.Arcade.Sprite

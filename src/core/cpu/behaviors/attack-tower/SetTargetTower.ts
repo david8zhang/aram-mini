@@ -6,8 +6,8 @@ import { Blackboard } from '../../behavior-tree/Blackboard'
 import { BlackboardKeys } from '../BlackboardKeys'
 
 export class SetTargetTower extends BehaviorTreeNode {
-  constructor(name: string, blackboard: Blackboard) {
-    super(name, blackboard)
+  constructor(blackboard: Blackboard) {
+    super('SetTargetTower', blackboard)
   }
 
   public process(): BehaviorStatus {

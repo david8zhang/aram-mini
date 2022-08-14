@@ -5,8 +5,8 @@ import { Blackboard } from '../../behavior-tree/Blackboard'
 import { BlackboardKeys } from '../BlackboardKeys'
 
 export class CheckPlayerAttackable extends BehaviorTreeNode {
-  constructor(name: string, blackboard: Blackboard) {
-    super(name, blackboard)
+  constructor(blackboard: Blackboard) {
+    super('CheckPlayerAttackable', blackboard)
   }
 
   public process(): BehaviorStatus {

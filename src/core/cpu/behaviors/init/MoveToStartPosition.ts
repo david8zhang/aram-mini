@@ -7,28 +7,28 @@ import { BehaviorTreeNode } from '../../behavior-tree/BehaviorTreeNode'
 import { Blackboard } from '../../behavior-tree/Blackboard'
 import { BlackboardKeys } from '../BlackboardKeys'
 
-export class MoveTowardsBase extends BehaviorTreeNode {
+export class MoveToStartPosition extends BehaviorTreeNode {
   constructor(blackboard: Blackboard) {
-    super('MoveTowardsBase', blackboard)
+    super('MoveToStartPosition', blackboard)
   }
 
   public process(): BehaviorStatus {
     const champion = this.blackboard.getData(BlackboardKeys.CHAMPION) as Champion
-    const baseLocation =
-      this.blackboard.getData(BlackboardKeys.SIDE) == Side.LEFT
-        ? Constants.LEFT_NEXUS_SPAWN
-        : Constants.RIGHT_NEXUS_SPAWN
-    if (
-      champion.moveTarget &&
-      champion.moveTarget.x == baseLocation.x &&
-      champion.moveTarget.y == baseLocation.y &&
-      champion.stateMachine.getState() === ChampionStates.MOVE
-    ) {
-      return BehaviorStatus.RUNNING
+    const startPosition =
+      this.blackboard.getData(BlackboardKeys.SIDE) === Side.RIGHT
+        ? Constants.RIGHT_STARTING_POSITION
+        : Constants.LEFT_STARTING_POSITION
+    champion.setMoveTarget(startPosition.x, startPosition.y)
+    if (champion.stateMachine.getState() === ChampionStates.MOVE) {
+      if (!champion.isAtMoveTarget(startPosition)) {
+        return BehaviorStatus.RUNNING
+      } else {
+        champion.stop()
+        return BehaviorStatus.SUCCESS
+      }
     } else {
-      champion.setMoveTarget(baseLocation.x, baseLocation.y)
       champion.stateMachine.transition(ChampionStates.MOVE)
-      return BehaviorStatus.SUCCESS
+      return BehaviorStatus.RUNNING
     }
   }
 }
