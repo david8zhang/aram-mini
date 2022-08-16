@@ -6,7 +6,6 @@ Miniature version of ARAM in League of Legends
 
 ## Easy Wins
 
-- Handle champion death in CPU behavior tree
 - Add EXP system (exp bar, leveling, stat increases based on level)
 - Add last-hitting to gain exp
 - Add champion kill EXP
