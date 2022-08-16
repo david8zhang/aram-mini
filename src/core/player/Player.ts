@@ -26,7 +26,6 @@ export class Player {
       },
       side: Side.LEFT,
     })
-    this.champion.damage = 500
     this.setupMouseClickListener()
     this.setupKeyboardListener()
     this.attackCursorImage = this.game.add
