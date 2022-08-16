@@ -6,7 +6,9 @@ export class DeadState extends State {
   public deathTimestamp: number = 0
 
   enter(champion: Champion) {
-    champion.game.cameras.main.stopFollow()
+    if (champion.side === champion.game.player.side) {
+      champion.game.cameras.main.stopFollow()
+    }
     this.deathTimestamp = Date.now()
   }
 

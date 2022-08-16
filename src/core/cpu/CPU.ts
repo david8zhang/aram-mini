@@ -17,6 +17,8 @@ import { TargetPlayer } from './behaviors/attack-player/TargetPlayer'
 import { AttackTower } from './behaviors/attack-tower/AttackTower'
 import { CheckTowerVulnerable } from './behaviors/attack-tower/CheckTowerVulnerable'
 import { SetTargetTower } from './behaviors/attack-tower/SetTargetTower'
+import { CheckIsDead } from './behaviors/death/CheckIsDead'
+import { HandleDeath } from './behaviors/death/HandleDeath'
 import { AttackMinion } from './behaviors/farm-minions/AttackMinion'
 import { TargetMinion } from './behaviors/farm-minions/TargetMinion'
 import { CheckCompletedOncePerSpawn } from './behaviors/init/CheckCompletedOncePerSpawn'
@@ -141,8 +143,8 @@ export class CPU {
     const postInitializationSelector = new SelectorNode(
       'PostInitializeSelector',
       blackboard,
-      retreatBehaviorSelector,
-      attackBehaviorSelector
+      attackBehaviorSelector,
+      retreatBehaviorSelector
     )
 
     // Configure once per spawn behaviors
@@ -156,11 +158,25 @@ export class CPU {
     )
 
     // Configure selector between attack/retreat
-    const topLevelSelector = new SelectorNode(
-      'TopLevel',
+    const championBehaviorSelector = new SelectorNode(
+      'ChampionAliveSelector',
       blackboard,
       oncePerSpawnBehaviorSequence,
       postInitializationSelector
+    )
+
+    const checkIsDead = new CheckIsDead(blackboard)
+    const handleDeath = new HandleDeath(blackboard)
+    const handleDeathSequence = new SequenceNode('HandleDeathSequence', blackboard, [
+      checkIsDead,
+      handleDeath,
+    ])
+
+    const topLevelSelector = new SelectorNode(
+      'TopLevel',
+      blackboard,
+      handleDeathSequence,
+      championBehaviorSelector
     )
 
     // Populate blackboard before selecting between behaviors

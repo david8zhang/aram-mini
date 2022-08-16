@@ -37,6 +37,7 @@ export class Champion {
 
   public attackRange: number = Constants.CHAMPION_ATTACK_RANGE
   public onDestroyedCallbacks: Function[] = []
+  public damage: number = Constants.CHAMPION_DAMAGE
 
   constructor(game: Game, config: ChampionConfig) {
     this.game = game
@@ -95,7 +96,7 @@ export class Champion {
       })
       projectile.destroyCallback = () => {
         if (this.attackTarget) {
-          this.attackTarget.takeDamage(Constants.CHAMPION_DAMAGE)
+          this.attackTarget.takeDamage(this.damage)
         }
       }
       this.game.projectileGroup.add(projectile.sprite)
