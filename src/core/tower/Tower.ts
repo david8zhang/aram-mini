@@ -5,7 +5,7 @@ import { Champion } from '../champion/Champion'
 import { Minion } from '../minion/Minion'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
-import { HealthBar } from '../ui/Healthbar'
+import { UIValueBar } from '../ui/UIValueBar'
 import { AttackState } from './states/AttackState'
 import { DeadState } from './states/DeadState'
 import { IdleState } from './states/IdleState'
@@ -26,7 +26,7 @@ export class Tower {
   public sprite: Phaser.Physics.Arcade.Sprite
   public side: Side
   public markerRectangle: Phaser.Geom.Rectangle
-  public healthBar: HealthBar
+  public healthBar: UIValueBar
   public attackTarget: Minion | Champion | null = null
   public stateMachine: StateMachine
 
@@ -48,7 +48,7 @@ export class Tower {
       this.sprite.displayHeight
     )
 
-    this.healthBar = new HealthBar(this.game, {
+    this.healthBar = new UIValueBar(this.game, {
       x: this.sprite.x - this.sprite.displayWidth / 2,
       y: this.sprite.y - this.sprite.displayHeight / 2 - 5,
       maxValue: Constants.TOWER_HEALTH,

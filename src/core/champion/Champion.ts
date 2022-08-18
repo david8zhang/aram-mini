@@ -6,7 +6,7 @@ import { Nexus } from '../Nexus'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
 import { Tower } from '../tower/Tower'
-import { HealthBar } from '../ui/Healthbar'
+import { UIValueBar } from '../ui/UIValueBar'
 import { AttackState } from './states/AttackState'
 import { ChampionStates } from './states/ChampionStates'
 import { DeadState } from './states/DeadState'
@@ -33,11 +33,15 @@ export class Champion {
 
   public attackTarget: Champion | Minion | Tower | Nexus | null = null
   public markerRectangle: Phaser.Geom.Rectangle
-  public healthBar: HealthBar
+  public healthBar: UIValueBar
+
+  public totalExp: number = 0
+  public level: number = 1
 
   public attackRange: number = Constants.CHAMPION_ATTACK_RANGE
   public onDestroyedCallbacks: Function[] = []
-  public damage: number = Constants.CHAMPION_DAMAGE
+
+  private _damageOverride: number = -1
 
   constructor(game: Game, config: ChampionConfig) {
     this.game = game
@@ -61,7 +65,7 @@ export class Champion {
       this.sprite.displayWidth,
       this.sprite.displayHeight
     )
-    this.healthBar = new HealthBar(this.game, {
+    this.healthBar = new UIValueBar(this.game, {
       x: this.sprite.x - 15,
       y: this.sprite.y - this.sprite.body.height,
       maxValue: Constants.CHAMPION_HEALTH,
@@ -95,12 +99,67 @@ export class Champion {
         texture: `projectile_${projectileColor}`,
       })
       projectile.destroyCallback = () => {
-        if (this.attackTarget) {
+        if (this.attackTarget && this.attackTarget.getHealth() > 0) {
+          // If this hit is a last-hit
+          if (this.attackTarget.getHealth() - this.damage <= 0) {
+            if (this.attackTarget.constructor.name == 'Champion') {
+              const expForNextLevel = this.getExpForNextLevel()
+              this.addExp(
+                Math.round(
+                  0.75 *
+                    expForNextLevel *
+                    Constants.getLevelDiffExpAdjuster(
+                      this.level,
+                      (this.attackTarget as Champion).level
+                    )
+                )
+              )
+            }
+          }
           this.attackTarget.takeDamage(this.damage)
         }
       }
       this.game.projectileGroup.add(projectile.sprite)
     }
+  }
+
+  public addExp(exp: number) {
+    this.totalExp += exp
+    this.level = this.getLevelForTotalExp(this.totalExp)
+  }
+
+  set damageOverride(newDamage: number) {
+    this._damageOverride = newDamage
+  }
+
+  get damage(): number {
+    if (this._damageOverride != -1) {
+      return this._damageOverride
+    }
+    return this.level * Constants.CHAMPION_DAMAGE
+  }
+
+  getLevelForTotalExp(totalExp: number) {
+    const levelRanges = Constants.EXP_TO_LEVEL_RANGES
+    const maxExp = levelRanges[levelRanges.length - 1][1]
+    if (totalExp === 0) {
+      return 1
+    }
+    if (totalExp >= maxExp) {
+      return levelRanges.length
+    }
+    for (let i = 0; i < levelRanges.length; i++) {
+      const currRange = levelRanges[i]
+      if (totalExp >= currRange[0] && totalExp < currRange[1]) {
+        return i + 1
+      }
+    }
+    return levelRanges.length
+  }
+
+  getExpForNextLevel() {
+    const currRange = Constants.EXP_TO_LEVEL_RANGES[this.level - 1]
+    return currRange[1] - this.totalExp
   }
 
   getHealth() {
@@ -120,7 +179,7 @@ export class Champion {
   respawn() {
     const spawnPosition = this.side === Side.LEFT ? Constants.LEFT_SPAWN : Constants.RIGHT_SPAWN
     this.sprite.setPosition(spawnPosition.x, spawnPosition.y)
-    this.healthBar.setCurrHealth(Constants.CHAMPION_HEALTH)
+    this.healthBar.setCurrValue(Constants.CHAMPION_HEALTH)
     this.healthBar.setVisible(true)
     this.sprite.setVisible(true)
     if (this.side === Side.LEFT) {

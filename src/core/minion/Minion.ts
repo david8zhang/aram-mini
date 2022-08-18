@@ -6,7 +6,7 @@ import { Nexus } from '../Nexus'
 import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
 import { Tower } from '../tower/Tower'
-import { HealthBar } from '../ui/Healthbar'
+import { UIValueBar } from '../ui/UIValueBar'
 import { AttackState } from './states/AttackState'
 import { MinionStates } from './states/MinionStates'
 import { MoveState } from './states/MoveState'
@@ -38,7 +38,7 @@ export class Minion {
   public attackRadius: number = Constants.MINION_ATTACK_RANGE
   public attackCircle: Phaser.GameObjects.Arc
 
-  public healthBar: HealthBar | undefined
+  public healthBar: UIValueBar | undefined
   public attackTarget: Minion | Tower | Champion | Nexus | null = null
 
   constructor(game: Game, config: MinionConfig) {
@@ -54,7 +54,7 @@ export class Minion {
       },
       [this]
     )
-    this.healthBar = new HealthBar(this.game, {
+    this.healthBar = new UIValueBar(this.game, {
       x: this.sprite.x,
       y: this.sprite.y,
       maxValue: Constants.MINION_HEALTH,
@@ -185,12 +185,29 @@ export class Minion {
   }
 
   destroy() {
+    this.addEXPToChampsInRange()
     this.sprite.destroy()
     if (this.healthBar) {
       this.healthBar.destroy()
       this.healthBar = undefined
     }
     this.attackCircle.destroy()
+  }
+
+  addEXPToChampsInRange() {
+    const enemyChampions =
+      this.side === Side.LEFT ? this.game.rightChampions : this.game.leftChampions
+    enemyChampions.forEach((c) => {
+      const distanceToChampion = Phaser.Math.Distance.Between(
+        c.sprite.x,
+        c.sprite.y,
+        this.sprite.x,
+        this.sprite.y
+      )
+      if (distanceToChampion <= Constants.CHAMPION_ATTACK_RANGE * 2) {
+        c.addExp(Constants.MINION_KILL_EXP)
+      }
+    })
   }
 
   setMoveTarget(moveTarget: { x: number; y: number }) {

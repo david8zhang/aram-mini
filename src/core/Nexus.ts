@@ -1,7 +1,7 @@
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
-import { HealthBar } from './ui/Healthbar'
+import { UIValueBar } from './ui/UIValueBar'
 
 export interface NexusConfig {
   side: Side
@@ -18,7 +18,7 @@ export class Nexus {
   private game: Game
   public side: Side
   public sprite: Phaser.Physics.Arcade.Sprite
-  public healthBar: HealthBar
+  public healthBar: UIValueBar
   public _isTargetable: boolean = false
   public onDestroyCallback: Function = () => {}
 
@@ -30,7 +30,7 @@ export class Nexus {
     const { position, texture, scale } = config
     this.sprite = this.game.physics.add.sprite(position.x, position.y, texture)
     this.sprite.setScale(scale ? scale : 1)
-    this.healthBar = new HealthBar(this.game, {
+    this.healthBar = new UIValueBar(this.game, {
       x: this.sprite.x - this.sprite.displayWidth / 2,
       y: this.sprite.y - this.sprite.displayHeight / 2 - 5,
       maxValue: Constants.NEXUS_HEALTH,

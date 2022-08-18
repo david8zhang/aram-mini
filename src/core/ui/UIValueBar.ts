@@ -1,4 +1,4 @@
-interface HealthBarConfig {
+interface UIValueBarConfig {
   x: number
   y: number
   maxValue: number
@@ -9,7 +9,7 @@ interface HealthBarConfig {
   showBorder?: boolean
 }
 
-export class HealthBar {
+export class UIValueBar {
   bar: Phaser.GameObjects.Graphics
   x: number
   y: number
@@ -22,9 +22,9 @@ export class HealthBar {
   showBorder: boolean
   borderWidth: number
 
-  constructor(scene: Phaser.Scene, healthBarConfig: HealthBarConfig) {
+  constructor(scene: Phaser.Scene, config: UIValueBarConfig) {
     this.bar = new Phaser.GameObjects.Graphics(scene)
-    const { x, y, maxValue, width, height, fillColor, showBorder, borderWidth } = healthBarConfig
+    const { x, y, maxValue, width, height, fillColor, showBorder, borderWidth } = config
     this.x = x
     this.y = y
     this.maxValue = maxValue
@@ -56,13 +56,13 @@ export class HealthBar {
     return this.currValue === this.maxValue
   }
 
-  setMaxHealth(maxHealth: number) {
-    this.maxValue = maxHealth
+  setMaxValue(maxValue: number) {
+    this.maxValue = maxValue
     this.draw()
   }
 
-  setCurrHealth(currHealth: number) {
-    this.currValue = currHealth
+  setCurrValue(currValue: number) {
+    this.currValue = currValue
     this.draw()
   }
 
