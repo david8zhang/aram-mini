@@ -11,6 +11,7 @@ import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 
 export class Game extends Phaser.Scene {
+  private static _instance: Game
   public player!: Player
   public projectileGroup!: Phaser.GameObjects.Group
   public graphics!: Phaser.GameObjects.Graphics
@@ -40,6 +41,7 @@ export class Game extends Phaser.Scene {
 
   constructor() {
     super('game')
+    Game._instance = this
   }
 
   preload() {
@@ -76,6 +78,10 @@ export class Game extends Phaser.Scene {
     return this.rightChampionsGroup.children.entries.map((entry) => {
       return entry.getData('ref') as Champion
     })
+  }
+
+  public static get instance() {
+    return Game._instance
   }
 
   initCamera() {

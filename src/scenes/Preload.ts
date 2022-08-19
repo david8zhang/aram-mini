@@ -6,6 +6,9 @@ export class Preload extends Scene {
   }
 
   preload() {
+    // Bitmap font
+    this.load.bitmapFont('graphic-pixel', 'fonts/graphicpixel.png', 'fonts/graphicpixel.xml')
+
     // Champions
     this.load.image('warrior', 'warrior.png')
     this.load.image('wizard', 'wizard.png')
@@ -34,5 +37,6 @@ export class Preload extends Scene {
 
   create() {
     this.scene.start('game')
+    this.scene.start('ui')
   }
 }

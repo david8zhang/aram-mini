@@ -37,7 +37,7 @@ export class UIValueBar {
     this.showBorder = showBorder || false
     scene.add.existing(this.bar)
     this.draw()
-    this.bar.setDepth(1000)
+    this.bar.setDepth(100)
   }
 
   setVisible(visible: boolean) {

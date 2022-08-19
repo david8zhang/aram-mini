@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { Game } from './scenes/Game'
 import { Preload } from './scenes/Preload'
+import { UI } from './scenes/UI'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -19,10 +20,11 @@ const config: Phaser.Types.Core.GameConfig = {
   },
   pixelArt: true,
   scale: {
+    parent: 'parent',
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Preload, Game],
+  scene: [Preload, Game, UI],
 }
 
 export default new Phaser.Game(config)

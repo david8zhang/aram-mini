@@ -20,6 +20,7 @@ export class Constants {
   public static readonly TOWER_HEALTH = 500
   public static readonly TOWER_ATTACK_RADIUS = 75
 
+  public static readonly EXP_BAR_COLOR = 0x8e44ad
   public static readonly EXP_TO_LEVEL_RANGES = [
     [0, 280],
     [280, 660],
@@ -52,6 +53,8 @@ export class Constants {
 
   public static readonly NEXUS_HEALTH = 500
 
+  public static readonly WINDOW_HEIGHT = 320
+  public static readonly WINDOW_WIDTH = 480
   public static readonly GAME_HEIGHT = 800
   public static readonly GAME_WIDTH = 800
 
