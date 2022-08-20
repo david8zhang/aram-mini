@@ -11,7 +11,6 @@ Miniature version of ARAM in League of Legends
 
 ## Polish
 
-- Highlight the target you are attacking
 - Respawn timer
 - K/D/A and CS stats at the top
 - Visual feedback for last-hits

@@ -254,5 +254,23 @@ export class Game extends Phaser.Scene {
     this.leftTowers.forEach((t) => t.update())
     this.rightTowers.forEach((t) => t.update())
     this.graphics.lineStyle(1, 0x00ff00, 1)
+    this.depthSort()
+  }
+
+  depthSort() {
+    const sortedByY = this.sys.displayList
+      .getChildren()
+      .filter((child: any) => {
+        return child.y
+      })
+      .sort((a: any, b: any) => {
+        return a.y - b.y
+      })
+    let lowestLayer = 1
+    sortedByY.forEach((c: any, index: number) => {
+      if (c.setDepth) {
+        c.setDepth(lowestLayer + index)
+      }
+    })
   }
 }

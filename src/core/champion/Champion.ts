@@ -19,7 +19,11 @@ export interface ChampionConfig {
     x: number
     y: number
   }
+  isPlayerControlled?: boolean
   side: Side
+  abilities: {
+    [key: string]: any
+  }
 }
 
 export class Champion {
@@ -27,6 +31,7 @@ export class Champion {
   public sprite: Phaser.Physics.Arcade.Sprite
   public stateMachine: StateMachine
   public side: Side
+  public isPlayerControlled: boolean = false
 
   public moveTarget: { x: number; y: number } | null = null
   public moveMarker: Phaser.GameObjects.Arc | null = null
@@ -37,9 +42,13 @@ export class Champion {
 
   public totalExp: number = 0
   public level: number = 1
+  public csScore: number = 0
+  public numKills: number = 0
+  public numDeaths: number = 0
 
   public attackRange: number = Constants.CHAMPION_ATTACK_RANGE
   public onDestroyedCallbacks: Function[] = []
+  public abilities: any[] = []
 
   private _damageOverride: number = -1
   public shouldShowHoverOutline: boolean = true
@@ -47,6 +56,9 @@ export class Champion {
   constructor(game: Game, config: ChampionConfig) {
     this.game = game
     this.side = config.side
+    if (config.isPlayerControlled) {
+      this.isPlayerControlled = config.isPlayerControlled
+    }
     this.sprite = this.game.physics.add.sprite(config.position.x, config.position.y, config.texture)
     this.sprite
       .setData('ref', this)
@@ -91,6 +103,14 @@ export class Champion {
       borderWidth: 1,
       fillColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
     })
+    this.configureAbilities(config.abilities)
+  }
+
+  configureAbilities(abilityConfig: { [key: string]: any }) {
+    if (abilityConfig) {
+      const QAbilityClass = abilityConfig['Q']
+      this.abilities.push(new QAbilityClass(this.game, this))
+    }
   }
 
   public get isDead() {
@@ -117,26 +137,37 @@ export class Champion {
       })
       projectile.destroyCallback = () => {
         if (this.attackTarget && this.attackTarget.getHealth() > 0) {
-          // If this hit is a last-hit
           if (this.attackTarget.getHealth() - this.damage <= 0) {
-            if (this.attackTarget.constructor.name == 'Champion') {
-              const expForNextLevel = this.getExpForNextLevel()
-              this.addExp(
-                Math.round(
-                  0.75 *
-                    expForNextLevel *
-                    Constants.getLevelDiffExpAdjuster(
-                      this.level,
-                      (this.attackTarget as Champion).level
-                    )
-                )
-              )
-            }
+            this.handleLastHit()
           }
           this.attackTarget.takeDamage(this.damage)
         }
       }
       this.game.projectileGroup.add(projectile.sprite)
+    }
+  }
+
+  public handleLastHit() {
+    if (!this.attackTarget) {
+      return
+    }
+    switch (this.attackTarget.constructor.name) {
+      case 'Champion': {
+        const expForNextLevel = this.getExpForNextLevel()
+        this.addExp(
+          Math.round(
+            0.75 *
+              expForNextLevel *
+              Constants.getLevelDiffExpAdjuster(this.level, (this.attackTarget as Champion).level)
+          )
+        )
+        this.numKills++
+        break
+      }
+      case 'Minion': {
+        this.csScore++
+        break
+      }
     }
   }
 
@@ -215,6 +246,7 @@ export class Champion {
     this.healthBar.setVisible(false)
     this.moveTarget = null
     this.onDestroyedCallbacks.forEach((cb) => cb())
+    this.numDeaths++
     this.stateMachine.transition(ChampionStates.DEAD)
   }
 
@@ -236,6 +268,9 @@ export class Champion {
       this.healthBar.y = this.sprite.y - this.sprite.body.height
       this.healthBar.draw()
     }
+    this.abilities.forEach((ability) => {
+      ability.update()
+    })
   }
 
   isAtMoveTarget(moveTarget: { x: number; y: number }) {

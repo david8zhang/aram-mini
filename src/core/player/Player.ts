@@ -1,6 +1,7 @@
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
+import { Fireball } from '../champion/abilities/Fireball'
 import { Champion, ChampionConfig } from '../champion/Champion'
 import { ChampionStates } from '../champion/states/ChampionStates'
 import { Minion } from '../minion/Minion'
@@ -22,12 +23,17 @@ export class Player {
     this.game = game
     this.champion = new Champion(this.game, {
       texture: 'wizard',
+      isPlayerControlled: true,
       position: {
         x: Constants.LEFT_SPAWN.x,
         y: Constants.LEFT_SPAWN.y,
       },
       side: Side.LEFT,
+      abilities: {
+        Q: Fireball,
+      },
     })
+
     this.setupMouseClickListener()
     this.setupKeyboardListener()
     this.attackCursorImage = this.game.add

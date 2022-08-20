@@ -6,7 +6,12 @@ import { Game } from './Game'
 export class UI extends Phaser.Scene {
   private static _instance: UI
   public playerChampionExpBar!: UIValueBar
-  public playerText!: Phaser.GameObjects.Text
+  public playerLevelText!: Phaser.GameObjects.Text
+  public playerCSScoreText!: Phaser.GameObjects.Text
+  public playerKDAText!: Phaser.GameObjects.Text
+  public UIBackgroundRect!: Phaser.GameObjects.Rectangle
+
+  public static UPPER_MARGIN: number = 5
 
   constructor() {
     super('ui')
@@ -14,6 +19,46 @@ export class UI extends Phaser.Scene {
   }
 
   create() {
+    this.setupPlayerExpBar()
+    this.setupPlayerCSScore()
+    this.setupPlayerKDA()
+    this.setupStatBackgroundRect()
+  }
+
+  setupStatBackgroundRect() {
+    this.UIBackgroundRect = this.add.rectangle(
+      (this.playerKDAText.x + this.playerCSScoreText.x) / 2,
+      10,
+      this.playerKDAText.displayWidth + this.playerCSScoreText.displayWidth,
+      this.playerCSScoreText.displayHeight + 10,
+      0x000000,
+      0.5
+    )
+  }
+
+  setupPlayerKDA() {
+    this.playerKDAText = this.add
+      .text(0, 0, '0/0', {
+        fontSize: '10px',
+        color: '#ffffff',
+      })
+      .setDepth(1000)
+  }
+
+  setupPlayerCSScore() {
+    this.playerCSScoreText = this.add
+      .text(0, 0, 'CS: 0', {
+        fontSize: '10px',
+        color: '#ffffff',
+      })
+      .setDepth(1000)
+    this.playerCSScoreText.setPosition(
+      Constants.WINDOW_WIDTH - this.playerCSScoreText.displayWidth - 5,
+      5
+    )
+  }
+
+  setupPlayerExpBar() {
     this.playerChampionExpBar = new UIValueBar(this, {
       x: 20,
       y: Constants.WINDOW_HEIGHT - 20,
@@ -23,7 +68,7 @@ export class UI extends Phaser.Scene {
       borderWidth: 1,
       fillColor: Constants.EXP_BAR_COLOR,
     })
-    this.playerText = this.add
+    this.playerLevelText = this.add
       .text(this.playerChampionExpBar.x, this.playerChampionExpBar.y, '', {
         fontSize: '10px',
         color: '#ffffff',
@@ -33,6 +78,37 @@ export class UI extends Phaser.Scene {
 
   update() {
     this.updatePlayerChampionExpBar()
+    this.updatePlayerCSScore()
+    this.updatePlayerKDA()
+    this.updateUIBackgroundRect()
+  }
+
+  updateUIBackgroundRect() {
+    this.UIBackgroundRect.setPosition((this.playerCSScoreText.x + this.playerKDAText.x) / 2, 10)
+    this.UIBackgroundRect.width =
+      this.playerCSScoreText.displayWidth + this.playerCSScoreText.displayWidth + 25
+  }
+
+  updatePlayerKDA() {
+    const player = Game.instance ? Game.instance.player : null
+    if (player) {
+      this.playerKDAText.setText(`${player.champion.numKills}/${player.champion.numDeaths}`)
+      this.playerKDAText.setPosition(
+        this.playerCSScoreText.x - this.playerKDAText.displayWidth - 15,
+        UI.UPPER_MARGIN
+      )
+    }
+  }
+
+  updatePlayerCSScore() {
+    const player = Game.instance ? Game.instance.player : null
+    if (player) {
+      this.playerCSScoreText.setText(`CS:${player.champion.csScore}`)
+      this.playerCSScoreText.setPosition(
+        Constants.WINDOW_WIDTH - this.playerCSScoreText.displayWidth - 5,
+        UI.UPPER_MARGIN
+      )
+    }
   }
 
   updatePlayerChampionExpBar() {
@@ -46,14 +122,14 @@ export class UI extends Phaser.Scene {
       this.playerChampionExpBar.setCurrValue(currValue)
       this.playerChampionExpBar.draw()
 
-      this.playerText.setText(`Level: ${player.champion.level}`)
-      this.playerText.setPosition(
+      this.playerLevelText.setText(`Level: ${player.champion.level}`)
+      this.playerLevelText.setPosition(
         this.playerChampionExpBar.x +
           this.playerChampionExpBar.width / 2 -
-          this.playerText.displayWidth / 2,
+          this.playerLevelText.displayWidth / 2,
         this.playerChampionExpBar.y +
           this.playerChampionExpBar.height / 2 -
-          this.playerText.displayHeight / 2
+          this.playerLevelText.displayHeight / 2
       )
     }
   }
