@@ -32,6 +32,7 @@ export class Tower {
 
   public attackRadius: number = Constants.TOWER_ATTACK_RADIUS
   public attackCircle: Phaser.GameObjects.Arc
+  public shouldShowHoverOutline: boolean = true
 
   constructor(game: Game, config: TowerConfig) {
     this.game = game
@@ -40,6 +41,22 @@ export class Tower {
     this.sprite = this.game.physics.add
       .sprite(position.x, position.y, config.texture)
       .setScale(config.scale)
+
+    this.sprite
+      .setInteractive()
+      .on('pointerover', () => {
+        if (this.shouldShowHoverOutline) {
+          this.game.postFxPlugin.add(this.sprite, {
+            thickness: 2,
+            outlineColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
+          })
+        }
+      })
+      .on('pointerout', () => {
+        if (this.shouldShowHoverOutline) {
+          this.game.postFxPlugin.remove(this.sprite)
+        }
+      })
 
     this.markerRectangle = new Phaser.Geom.Rectangle(
       this.sprite.x - this.sprite.displayWidth / 2,

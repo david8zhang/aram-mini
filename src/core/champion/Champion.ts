@@ -42,12 +42,29 @@ export class Champion {
   public onDestroyedCallbacks: Function[] = []
 
   private _damageOverride: number = -1
+  public shouldShowHoverOutline: boolean = true
 
   constructor(game: Game, config: ChampionConfig) {
     this.game = game
     this.side = config.side
     this.sprite = this.game.physics.add.sprite(config.position.x, config.position.y, config.texture)
-    this.sprite.setData('ref', this)
+    this.sprite
+      .setData('ref', this)
+      .setInteractive()
+      .on('pointerover', () => {
+        if (this.shouldShowHoverOutline) {
+          this.game.postFxPlugin.add(this.sprite, {
+            thickness: 2,
+            outlineColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
+          })
+        }
+      })
+      .on('pointerout', () => {
+        if (this.shouldShowHoverOutline) {
+          this.game.postFxPlugin.remove(this.sprite)
+        }
+      })
+
     this.game.physics.world.enableBody(this.sprite, Phaser.Physics.Arcade.DYNAMIC_BODY)
     this.stateMachine = new StateMachine(
       ChampionStates.IDLE,

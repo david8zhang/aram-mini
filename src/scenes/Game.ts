@@ -10,6 +10,10 @@ import { Tower } from '~/core/tower/Tower'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 
+export enum IgnoreDepthSortName {
+  ON_MOUSE_HOVER = 'ON_MOUSE_HOVER',
+}
+
 export class Game extends Phaser.Scene {
   private static _instance: Game
   public player!: Player
@@ -18,6 +22,9 @@ export class Game extends Phaser.Scene {
   public isDebug: boolean = false
   public debug!: Debug
   public cpu!: CPU
+
+  public ignoreDepthSortNames = [IgnoreDepthSortName.ON_MOUSE_HOVER]
+  public postFxPlugin: any
 
   // Tilemaps
   public tileMap!: Phaser.Tilemaps.Tilemap
@@ -57,8 +64,13 @@ export class Game extends Phaser.Scene {
     this.rightChampionsGroup = this.add.group()
   }
 
+  initPlugins() {
+    this.postFxPlugin = this.plugins.get('rexOutlinePipeline')
+  }
+
   create() {
     this.debug = new Debug(this)
+    this.initPlugins()
     this.initCamera()
     this.initTilemap()
     this.initPlayer()
@@ -242,23 +254,5 @@ export class Game extends Phaser.Scene {
     this.leftTowers.forEach((t) => t.update())
     this.rightTowers.forEach((t) => t.update())
     this.graphics.lineStyle(1, 0x00ff00, 1)
-    this.depthSort()
-  }
-
-  depthSort() {
-    const sortedByY = this.sys.displayList
-      .getChildren()
-      .filter((child: any) => {
-        return child.y
-      })
-      .sort((a: any, b: any) => {
-        return a.y - b.y
-      })
-    let lowestLayer = 1
-    sortedByY.forEach((c: any, index: number) => {
-      if (c.setDepth) {
-        c.setDepth(lowestLayer + index)
-      }
-    })
   }
 }

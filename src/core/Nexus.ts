@@ -21,6 +21,7 @@ export class Nexus {
   public healthBar: UIValueBar
   public _isTargetable: boolean = false
   public onDestroyCallback: Function = () => {}
+  public shouldShowHoverOutline: boolean = true
 
   constructor(game: Game, config: NexusConfig) {
     this.game = game
@@ -30,6 +31,23 @@ export class Nexus {
     const { position, texture, scale } = config
     this.sprite = this.game.physics.add.sprite(position.x, position.y, texture)
     this.sprite.setScale(scale ? scale : 1)
+
+    this.sprite
+      .setInteractive()
+      .on('pointerover', () => {
+        if (this.shouldShowHoverOutline) {
+          this.game.postFxPlugin.add(this.sprite, {
+            thickness: 2,
+            outlineColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
+          })
+        }
+      })
+      .on('pointerout', () => {
+        if (this.shouldShowHoverOutline) {
+          this.game.postFxPlugin.remove(this.sprite)
+        }
+      })
+
     this.healthBar = new UIValueBar(this.game, {
       x: this.sprite.x - this.sprite.displayWidth / 2,
       y: this.sprite.y - this.sprite.displayHeight / 2 - 5,

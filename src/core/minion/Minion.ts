@@ -1,4 +1,4 @@
-import { Game } from '~/scenes/Game'
+import { Game, IgnoreDepthSortName } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Champion } from '../champion/Champion'
@@ -40,11 +40,29 @@ export class Minion {
 
   public healthBar: UIValueBar | undefined
   public attackTarget: Minion | Tower | Champion | Nexus | null = null
+  public shouldShowHoverOutline: boolean = true
 
   constructor(game: Game, config: MinionConfig) {
     this.game = game
     this.side = config.side
     this.sprite = this.game.physics.add.sprite(config.position.x, config.position.y, config.texture)
+
+    this.sprite
+      .setInteractive()
+      .on('pointerover', () => {
+        if (this.shouldShowHoverOutline) {
+          this.game.postFxPlugin.add(this.sprite, {
+            thickness: 2,
+            outlineColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
+          })
+        }
+      })
+      .on('pointerout', () => {
+        if (this.shouldShowHoverOutline) {
+          this.game.postFxPlugin.remove(this.sprite)
+        }
+      })
+
     this.sprite.setData('ref', this)
     this.stateMachine = new StateMachine(
       MinionStates.MOVE,
@@ -191,6 +209,7 @@ export class Minion {
       this.healthBar.destroy()
       this.healthBar = undefined
     }
+    this.game.postFxPlugin.remove(this.sprite)
     this.attackCircle.destroy()
   }
 

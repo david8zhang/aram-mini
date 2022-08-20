@@ -16,6 +16,8 @@ export class Player {
   public attackCursorImage: Phaser.GameObjects.Image
   public attackRangeCircle: Phaser.GameObjects.Arc
 
+  public targetToHighlight: Minion | Champion | Tower | Nexus | null = null
+
   constructor(game: Game) {
     this.game = game
     this.champion = new Champion(this.game, {
@@ -169,6 +171,7 @@ export class Player {
     if (!this.champion.isDead) {
       this.disableAttackTargeting()
       this.champion.stateMachine.transition(ChampionStates.IDLE)
+      this.deHighlightAttackTarget()
     }
   }
 
@@ -176,6 +179,7 @@ export class Player {
     if (!this.champion.isDead) {
       this.champion.setMoveTarget(Math.round(pointer.worldX), Math.round(pointer.worldY))
       this.champion.stateMachine.transition(ChampionStates.MOVE)
+      this.deHighlightAttackTarget()
     }
   }
 
@@ -183,6 +187,29 @@ export class Player {
     if (!this.champion.isDead) {
       this.champion.attackTarget = target
       this.champion.stateMachine.transition(ChampionStates.ATTACK)
+      this.highlightAttackTarget(target)
     }
+  }
+
+  deHighlightAttackTarget() {
+    if (this.targetToHighlight) {
+      this.game.postFxPlugin.remove(this.targetToHighlight.sprite)
+      this.targetToHighlight.shouldShowHoverOutline = true
+      this.targetToHighlight = null
+    }
+  }
+
+  highlightAttackTarget(target: Minion | Champion | Tower | Nexus) {
+    if (this.targetToHighlight && this.targetToHighlight.sprite.active) {
+      this.game.postFxPlugin.remove(this.targetToHighlight.sprite)
+    }
+
+    target.shouldShowHoverOutline = false
+    this.game.postFxPlugin.remove(target.sprite)
+    this.targetToHighlight = target
+    this.game.postFxPlugin.add(this.targetToHighlight.sprite, {
+      thickness: 2,
+      outlineColor: Constants.RIGHT_COLOR,
+    })
   }
 }
