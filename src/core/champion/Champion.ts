@@ -7,6 +7,8 @@ import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
 import { Tower } from '../tower/Tower'
 import { UIValueBar } from '../ui/UIValueBar'
+import { Ability } from './abilities/Ability'
+import { AbilityKeys } from './abilities/AbilityKeys'
 import { AttackState } from './states/AttackState'
 import { ChampionStates } from './states/ChampionStates'
 import { DeadState } from './states/DeadState'
@@ -22,7 +24,7 @@ export interface ChampionConfig {
   isPlayerControlled?: boolean
   side: Side
   abilities: {
-    [key: string]: any
+    [key in AbilityKeys]?: Class
   }
 }
 
@@ -48,7 +50,9 @@ export class Champion {
 
   public attackRange: number = Constants.CHAMPION_ATTACK_RANGE
   public onDestroyedCallbacks: Function[] = []
-  public abilities: any[] = []
+  public abilities: {
+    [key in AbilityKeys]?: Ability
+  } = {}
 
   private _damageOverride: number = -1
   public shouldShowHoverOutline: boolean = true
@@ -106,12 +110,16 @@ export class Champion {
     this.configureAbilities(config.abilities)
   }
 
-  configureAbilities(abilityConfig: { [key: string]: any }) {
+  configureAbilities(abilityConfig: { [key in AbilityKeys]?: Class }) {
     if (abilityConfig) {
-      const QAbilityClass = abilityConfig['Q']
-      this.abilities.push(new QAbilityClass(this.game, this))
+      Object.keys(abilityConfig).forEach((key) => {
+        const AbilityClass = abilityConfig[key]
+        this.abilities[key] = new AbilityClass(this.game, this)
+      })
     }
   }
+
+  public getAbility() {}
 
   public get isDead() {
     return this.stateMachine.getState() === ChampionStates.DEAD
@@ -161,7 +169,6 @@ export class Champion {
               Constants.getLevelDiffExpAdjuster(this.level, (attackTarget as Champion).level)
           )
         )
-        console.log('KILLED CHAMPION!')
         this.numKills++
         break
       }
@@ -269,8 +276,8 @@ export class Champion {
       this.healthBar.y = this.sprite.y - this.sprite.body.height
       this.healthBar.draw()
     }
-    this.abilities.forEach((ability) => {
-      ability.update()
+    Object.keys(this.abilities).forEach((abilityKey) => {
+      this.abilities[abilityKey].update()
     })
   }
 

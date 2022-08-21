@@ -3,17 +3,19 @@ import { Projectile } from '~/core/Projectile'
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Champion } from '../Champion'
+import { Ability } from './Ability'
 import { TargetingArrow } from './TargetingArrow'
 
-export class Fireball {
-  private game: Game
-  private champion: Champion
+export class Fireball implements Ability {
+  game: Game
+  champion: Champion
 
   public static readonly DAMAGE = 1000
   public isTargetingMode: boolean = false
   public key!: Phaser.Input.Keyboard.Key | null
   public attackRange = Constants.CHAMPION_ATTACK_RANGE + 25
   public targetingArrow: TargetingArrow
+  public iconTexture: string = 'fireball'
 
   constructor(game: Game, champion: Champion) {
     this.game = game

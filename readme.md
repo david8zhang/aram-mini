@@ -21,5 +21,5 @@ Miniature version of ARAM in League of Legends
 
 ## Harder Stuff
 
-- Have champion use abilities
+- Have CPU champion use abilities
 - Multiple champions on the team

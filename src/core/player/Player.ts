@@ -1,6 +1,7 @@
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
+import { AbilityKeys } from '../champion/abilities/AbilityKeys'
 import { Fireball } from '../champion/abilities/Fireball'
 import { Champion } from '../champion/Champion'
 import { ChampionStates } from '../champion/states/ChampionStates'
@@ -30,7 +31,7 @@ export class Player {
       },
       side: Side.LEFT,
       abilities: {
-        Q: Fireball,
+        [AbilityKeys.Q]: Fireball,
       },
     })
     this.champion.damageOverride = 1000
