@@ -2,7 +2,7 @@ import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Fireball } from '../champion/abilities/Fireball'
-import { Champion, ChampionConfig } from '../champion/Champion'
+import { Champion } from '../champion/Champion'
 import { ChampionStates } from '../champion/states/ChampionStates'
 import { Minion } from '../minion/Minion'
 import { Nexus } from '../Nexus'
@@ -33,6 +33,7 @@ export class Player {
         Q: Fireball,
       },
     })
+    this.champion.damageOverride = 1000
 
     this.setupMouseClickListener()
     this.setupKeyboardListener()
@@ -43,8 +44,8 @@ export class Player {
     this.attackRangeCircle = this.game.add
       .circle(this.champion.sprite.x, this.champion.sprite.y, Constants.CHAMPION_ATTACK_RANGE)
       .setVisible(false)
-      .setFillStyle(0xadd8e6, 0.2)
-      .setStrokeStyle(2, 0xadd8e6)
+      .setFillStyle(Constants.ATTACK_RANGE_COLOR, 0.2)
+      .setStrokeStyle(2, Constants.ATTACK_RANGE_COLOR)
   }
 
   update() {

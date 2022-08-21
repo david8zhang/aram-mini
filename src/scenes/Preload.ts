@@ -17,6 +17,7 @@ export class Preload extends Scene {
     // Projectiles
     this.load.image('projectile_blue', 'projectile-blue.png')
     this.load.image('projectile_red', 'projectile-red.png')
+    this.load.image('fireball', 'fireball.png')
 
     // Towers
     this.load.image('tower_red', 'tower-red.png')

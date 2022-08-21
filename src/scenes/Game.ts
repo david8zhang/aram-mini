@@ -78,6 +78,20 @@ export class Game extends Phaser.Scene {
     this.initMinionSpawners()
     this.initTowers()
     this.initNexuses()
+    this.initColliders()
+  }
+
+  initColliders() {
+    const handleOverlap = (obj1, obj2) => {
+      const projectile = obj1.getData('ref') as Projectile
+      const target = obj2.getData('ref')
+      projectile.handleOverlap(target)
+    }
+
+    this.physics.add.overlap(this.projectileGroup, this.leftChampionsGroup, handleOverlap)
+    this.physics.add.overlap(this.projectileGroup, this.rightChampionsGroup, handleOverlap)
+    this.physics.add.overlap(this.projectileGroup, this.leftMinionSpawner.minions, handleOverlap)
+    this.physics.add.overlap(this.projectileGroup, this.rightMinionSpawner.minions, handleOverlap)
   }
 
   public get leftChampions() {

@@ -138,7 +138,7 @@ export class Champion {
       projectile.destroyCallback = () => {
         if (this.attackTarget && this.attackTarget.getHealth() > 0) {
           if (this.attackTarget.getHealth() - this.damage <= 0) {
-            this.handleLastHit()
+            this.handleLastHit(this.attackTarget)
           }
           this.attackTarget.takeDamage(this.damage)
         }
@@ -147,20 +147,21 @@ export class Champion {
     }
   }
 
-  public handleLastHit() {
-    if (!this.attackTarget) {
+  public handleLastHit(attackTarget) {
+    if (!attackTarget) {
       return
     }
-    switch (this.attackTarget.constructor.name) {
+    switch (attackTarget.constructor.name) {
       case 'Champion': {
         const expForNextLevel = this.getExpForNextLevel()
         this.addExp(
           Math.round(
             0.75 *
               expForNextLevel *
-              Constants.getLevelDiffExpAdjuster(this.level, (this.attackTarget as Champion).level)
+              Constants.getLevelDiffExpAdjuster(this.level, (attackTarget as Champion).level)
           )
         )
+        console.log('KILLED CHAMPION!')
         this.numKills++
         break
       }

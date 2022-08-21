@@ -20,6 +20,8 @@ export class Constants {
   public static readonly TOWER_HEALTH = 500
   public static readonly TOWER_ATTACK_RADIUS = 75
 
+  public static readonly ATTACK_RANGE_COLOR = 0xadd8e6
+  public static readonly UI_HIGHLIGHT_COLOR = 0x77e8d5
   public static readonly EXP_BAR_COLOR = 0x8e44ad
   public static readonly EXP_TO_LEVEL_RANGES = [
     [0, 280],
