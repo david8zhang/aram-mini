@@ -9,6 +9,7 @@ import { Projectile } from '~/core/Projectile'
 import { Tower } from '~/core/tower/Tower'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
+import { UI } from './UI'
 
 export enum IgnoreDepthSortName {
   ON_MOUSE_HOVER = 'ON_MOUSE_HOVER',
@@ -144,16 +145,25 @@ export class Game extends Phaser.Scene {
       position: Constants.LEFT_NEXUS_SPAWN,
       texture: 'nexus_blue',
       scale: 3,
-      onDestroyCallback: () => {},
+      onDestroyCallback: () => {
+        this.handleEndOfGame(Side.RIGHT)
+      },
       side: Side.LEFT,
     })
     this.rightNexus = new Nexus(this, {
       position: Constants.RIGHT_NEXUS_SPAWN,
       texture: 'nexus_red',
       scale: 3,
-      onDestroyCallback: () => {},
+      onDestroyCallback: () => {
+        this.handleEndOfGame(Side.LEFT)
+      },
       side: Side.RIGHT,
     })
+  }
+
+  handleEndOfGame(victoriousSide: Side) {
+    UI.instance.showGameOverUI(victoriousSide === this.player.side)
+    this.scene.pause()
   }
 
   initTowers() {

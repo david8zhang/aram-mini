@@ -1,3 +1,5 @@
+import { UI } from '~/scenes/UI'
+
 interface UIValueBarConfig {
   x: number
   y: number
@@ -7,6 +9,7 @@ interface UIValueBarConfig {
   borderWidth: number
   fillColor?: number
   showBorder?: boolean
+  isVertical?: boolean
 }
 
 export class UIValueBar {
@@ -21,6 +24,7 @@ export class UIValueBar {
   fillColor: number
   showBorder: boolean
   borderWidth: number
+  isVertical: boolean = false
 
   constructor(scene: Phaser.Scene, config: UIValueBarConfig) {
     this.bar = new Phaser.GameObjects.Graphics(scene)
@@ -32,6 +36,10 @@ export class UIValueBar {
     this.width = width
     this.height = height
     this.borderWidth = borderWidth
+
+    if (config.isVertical) {
+      this.isVertical = config.isVertical
+    }
 
     this.fillColor = fillColor || 0x2ecc71
     this.showBorder = showBorder || false
@@ -72,6 +80,7 @@ export class UIValueBar {
     // Border
     const borderWidth = this.showBorder ? this.borderWidth : 0
     this.bar.fillStyle(0x000000)
+
     this.bar.fillRect(
       this.x - borderWidth / 2,
       this.y - borderWidth / 2,
@@ -82,8 +91,14 @@ export class UIValueBar {
     const percentage = this.currValue / this.maxValue
     this.bar.fillStyle(this.fillColor)
 
-    const length = Math.floor(percentage * this.width)
-    this.bar.fillRect(this.x, this.y, length, this.height)
+    if (this.isVertical) {
+      const length = Math.round(percentage * this.height)
+      const remainderLength = Math.round((1 - percentage) * this.height)
+      this.bar.fillRect(this.x, this.y + remainderLength, this.width, length)
+    } else {
+      const length = Math.floor(percentage * this.width)
+      this.bar.fillRect(this.x, this.y, length, this.height)
+    }
   }
 
   destroy() {

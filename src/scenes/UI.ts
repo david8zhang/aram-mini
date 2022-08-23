@@ -18,17 +18,42 @@ export class UI extends Phaser.Scene {
 
   public static UPPER_MARGIN: number = 5
 
+  // Game over UI
+  public screenTint!: Phaser.GameObjects.Rectangle
+  public gameOverText!: Phaser.GameObjects.Text
+
   constructor() {
     super('ui')
     UI._instance = this
   }
 
   create() {
-    this.setupPlayerExpBar()
     this.setupPlayerCSScore()
     this.setupPlayerKDA()
     this.setupStatBackgroundRect()
     this.setupAbilityRects()
+    this.setupPlayerExpBar()
+    this.setupGameOverUI()
+  }
+
+  setupGameOverUI() {
+    this.screenTint = this.add
+      .rectangle(
+        Constants.WINDOW_WIDTH / 2,
+        Constants.WINDOW_HEIGHT / 2,
+        Constants.WINDOW_WIDTH,
+        Constants.WINDOW_HEIGHT,
+        0x000000,
+        0.5
+      )
+      .setDepth(2500)
+      .setVisible(false)
+    this.gameOverText = this.add
+      .text(Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT / 2, 'Victory', {
+        fontSize: '40px',
+      })
+      .setDepth(this.screenTint.depth + 1)
+      .setVisible(false)
   }
 
   setupAbilityRects() {
@@ -94,17 +119,18 @@ export class UI extends Phaser.Scene {
 
   setupPlayerExpBar() {
     this.playerChampionExpBar = new UIValueBar(this, {
-      x: 20,
-      y: Constants.WINDOW_HEIGHT - 20,
+      x: this.qAbilityIcon.x - 30,
+      y: Constants.WINDOW_HEIGHT - 45,
       maxValue: 100,
-      height: 10,
-      width: 120,
+      height: 30,
+      width: 5,
       borderWidth: 1,
       fillColor: Constants.EXP_BAR_COLOR,
+      isVertical: true,
     })
     this.playerLevelText = this.add
-      .text(this.playerChampionExpBar.x, this.playerChampionExpBar.y, '', {
-        fontSize: '10px',
+      .text(this.playerChampionExpBar.x - 20, this.playerChampionExpBar.y, '', {
+        fontSize: '14px',
         color: '#ffffff',
       })
       .setDepth(1000)
@@ -171,16 +197,28 @@ export class UI extends Phaser.Scene {
       this.playerChampionExpBar.setCurrValue(currValue)
       this.playerChampionExpBar.draw()
 
-      this.playerLevelText.setText(`Level: ${player.champion.level}`)
+      this.playerLevelText.setText(`Lv:${player.champion.level}`)
       this.playerLevelText.setPosition(
-        this.playerChampionExpBar.x +
-          this.playerChampionExpBar.width / 2 -
-          this.playerLevelText.displayWidth / 2,
+        this.playerChampionExpBar.x -
+          this.playerChampionExpBar.width -
+          this.playerLevelText.displayWidth,
         this.playerChampionExpBar.y +
           this.playerChampionExpBar.height / 2 -
           this.playerLevelText.displayHeight / 2
       )
     }
+  }
+
+  public showGameOverUI(isVictory: boolean) {
+    this.screenTint.setVisible(true)
+    this.gameOverText
+      .setText(`${isVictory ? 'Victory' : 'Defeat'}`)
+      .setPosition(
+        Constants.WINDOW_WIDTH / 2 - this.gameOverText.displayWidth / 2,
+        Constants.WINDOW_HEIGHT / 2 - this.gameOverText.displayHeight / 2
+      )
+      .setDepth(this.screenTint.depth + 1)
+      .setVisible(true)
   }
 
   public static get instance() {

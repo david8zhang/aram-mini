@@ -81,6 +81,9 @@ export class Nexus {
 
   takeDamage(damage: number) {
     this.healthBar.decrease(damage)
+    if (this.healthBar.currValue == 0) {
+      this.destroy()
+    }
   }
 
   getHealth() {
