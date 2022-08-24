@@ -233,8 +233,6 @@ export class Champion {
   }
 
   respawn() {
-    const spawnPosition = this.side === Side.LEFT ? Constants.LEFT_SPAWN : Constants.RIGHT_SPAWN
-    this.sprite.setPosition(spawnPosition.x, spawnPosition.y)
     this.healthBar.setCurrValue(Constants.CHAMPION_HEALTH)
     this.healthBar.setVisible(true)
     this.sprite.setVisible(true)

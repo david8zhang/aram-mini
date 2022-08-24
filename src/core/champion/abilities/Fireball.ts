@@ -12,6 +12,7 @@ export class Fireball implements Ability {
 
   public static readonly DAMAGE = 1000
   public isTargetingMode: boolean = false
+  public mouseTriggered: boolean = false
   public key!: Phaser.Input.Keyboard.Key | null
   public attackRange = Constants.CHAMPION_ATTACK_RANGE + 25
   public targetingArrow: TargetingArrow
@@ -31,13 +32,28 @@ export class Fireball implements Ability {
       width: this.attackRange,
       height: 5,
     })
+    this.setupMouseClickListener()
+  }
+
+  setupMouseClickListener() {
+    this.game.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.leftButtonDown()) {
+        if (this.isTargetingMode) {
+          this.isTargetingMode = false
+          this.mouseTriggered = true
+          this.targetingArrow.hide()
+          this.triggerAbility()
+        }
+      }
+    })
   }
 
   handleKeyPress() {
     if (this.key && this.champion.isPlayerControlled) {
-      if (this.key.isDown) {
+      if (this.key.isDown && !this.mouseTriggered) {
         this.isTargetingMode = true
-      } else {
+      } else if (this.key.isUp) {
+        this.mouseTriggered = false
         if (this.isTargetingMode) {
           this.isTargetingMode = false
           this.targetingArrow.hide()

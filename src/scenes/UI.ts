@@ -21,6 +21,7 @@ export class UI extends Phaser.Scene {
   // Game over UI
   public screenTint!: Phaser.GameObjects.Rectangle
   public gameOverText!: Phaser.GameObjects.Text
+  public resetText!: Phaser.GameObjects.Text
 
   constructor() {
     super('ui')
@@ -49,11 +50,27 @@ export class UI extends Phaser.Scene {
       .setDepth(2500)
       .setVisible(false)
     this.gameOverText = this.add
-      .text(Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT / 2, 'Victory', {
+      .text(Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT / 2 - 40, 'Victory', {
         fontSize: '40px',
       })
       .setDepth(this.screenTint.depth + 1)
       .setVisible(false)
+
+    this.resetText = this.add
+      .text(this.gameOverText.x, this.gameOverText.y + 20, 'Press Esc to play again', {
+        fontSize: '20px',
+      })
+      .setDepth(this.screenTint.depth + 1)
+      .setVisible(false)
+
+    this.input.keyboard.on('keydown', (event: Phaser.Input.Keyboard.Key) => {
+      if (event.keyCode == Phaser.Input.Keyboard.KeyCodes.ESC) {
+        if (Game.instance.isGameOver) {
+          Game.instance.resumeGame()
+          this.hideGameOverUI()
+        }
+      }
+    })
   }
 
   setupAbilityRects() {
@@ -209,13 +226,27 @@ export class UI extends Phaser.Scene {
     }
   }
 
+  public hideGameOverUI() {
+    this.screenTint.setVisible(false)
+    this.gameOverText.setVisible(false)
+    this.resetText.setVisible(false)
+  }
+
   public showGameOverUI(isVictory: boolean) {
     this.screenTint.setVisible(true)
     this.gameOverText
       .setText(`${isVictory ? 'Victory' : 'Defeat'}`)
       .setPosition(
         Constants.WINDOW_WIDTH / 2 - this.gameOverText.displayWidth / 2,
-        Constants.WINDOW_HEIGHT / 2 - this.gameOverText.displayHeight / 2
+        Constants.WINDOW_HEIGHT / 2 - this.gameOverText.displayHeight / 2 - 20
+      )
+      .setDepth(this.screenTint.depth + 1)
+      .setVisible(true)
+    this.resetText
+      .setText('Press Esc to Play Again')
+      .setPosition(
+        Constants.WINDOW_WIDTH / 2 - this.resetText.displayWidth / 2,
+        this.resetText.y + 40
       )
       .setDepth(this.screenTint.depth + 1)
       .setVisible(true)

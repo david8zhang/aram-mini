@@ -47,6 +47,8 @@ export class Game extends Phaser.Scene {
   public leftNexus!: Nexus
   public rightNexus!: Nexus
 
+  public isGameOver: boolean = false
+
   constructor() {
     super('game')
     Game._instance = this
@@ -164,6 +166,12 @@ export class Game extends Phaser.Scene {
   handleEndOfGame(victoriousSide: Side) {
     UI.instance.showGameOverUI(victoriousSide === this.player.side)
     this.scene.pause()
+    this.isGameOver = true
+  }
+
+  resumeGame() {
+    this.scene.restart()
+    this.isGameOver = false
   }
 
   initTowers() {
