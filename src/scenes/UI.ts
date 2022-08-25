@@ -6,6 +6,12 @@ import { Game } from './Game'
 
 export class UI extends Phaser.Scene {
   private static _instance: UI
+  public playerManaBar!: UIValueBar
+  public playerManaBarText!: Phaser.GameObjects.Text
+
+  public playerHealthBar!: UIValueBar
+  public playerHealthBarText!: Phaser.GameObjects.Text
+
   public playerChampionExpBar!: UIValueBar
   public playerLevelText!: Phaser.GameObjects.Text
   public playerCSScoreText!: Phaser.GameObjects.Text
@@ -35,6 +41,8 @@ export class UI extends Phaser.Scene {
     this.setupAbilityRects()
     this.setupPlayerExpBar()
     this.setupGameOverUI()
+    this.setupPlayerManaBar()
+    this.setupPlayerHealthBar()
   }
 
   setupGameOverUI() {
@@ -75,11 +83,11 @@ export class UI extends Phaser.Scene {
 
   setupAbilityRects() {
     const midPoint = Constants.WINDOW_WIDTH / 2
-    const wPositionX = midPoint - 20
-    const qPositionX = wPositionX - 40
-    const ePositionX = midPoint + 20
-    const rPositionX = ePositionX + 40
-    const abilityPositionY = Constants.WINDOW_HEIGHT - 30
+    const wPositionX = midPoint - 16
+    const qPositionX = wPositionX - 32
+    const ePositionX = midPoint + 16
+    const rPositionX = ePositionX + 32
+    const abilityPositionY = Constants.WINDOW_HEIGHT - 60
 
     this.qAbilityIcon = this.setupAbilityUI('Q', qPositionX, abilityPositionY)
     this.wAbilityIcon = this.setupAbilityUI('W', wPositionX, abilityPositionY)
@@ -92,7 +100,7 @@ export class UI extends Phaser.Scene {
     xPosition: number,
     yPosition: number
   ): Phaser.GameObjects.Sprite {
-    const abilityRect = this.add.rectangle(xPosition, yPosition, 30, 30, 0x000000, 0.5)
+    const abilityRect = this.add.rectangle(xPosition, yPosition, 26, 26, 0x000000, 0.5)
     this.add
       .text(abilityRect.x + 10, abilityRect.y + 10, key, {
         fontSize: '12px',
@@ -134,12 +142,80 @@ export class UI extends Phaser.Scene {
     )
   }
 
+  setupPlayerManaBar() {
+    this.playerManaBar = new UIValueBar(this, {
+      x: Constants.WINDOW_WIDTH / 2 - 100 + 39,
+      y: Constants.WINDOW_HEIGHT - 37,
+      height: 10,
+      width: 122,
+      borderWidth: 1,
+      fillColor: 0x0000ff,
+      maxValue: Constants.CHAMPION_MANA_AMOUNT,
+    })
+    this.playerManaBarText = this.add
+      .text(this.playerManaBar.x + this.playerManaBar.width / 2, this.playerManaBar.y, 'Mana', {
+        fontSize: '10px',
+      })
+      .setDepth(1000)
+  }
+
+  setupPlayerHealthBar() {
+    this.playerHealthBar = new UIValueBar(this, {
+      x: Constants.WINDOW_WIDTH / 2 - 100 + 39,
+      y: Constants.WINDOW_HEIGHT - 25,
+      height: 10,
+      width: 122,
+      borderWidth: 1,
+      fillColor: Constants.LEFT_COLOR,
+      maxValue: Constants.CHAMPION_MANA_AMOUNT,
+    })
+    this.playerHealthBarText = this.add
+      .text(this.playerHealthBar.x + this.playerHealthBar.width / 2, this.playerHealthBar.y, 'HP', {
+        fontSize: '10px',
+      })
+      .setDepth(1000)
+  }
+
+  updatePlayerManaBar() {
+    const player = Game.instance ? Game.instance.player : null
+    if (player) {
+      this.playerManaBar.setMaxValue(player.champion.maxManaAmount)
+      this.playerManaBar.setCurrValue(player.champion.manaAmount)
+      this.playerManaBarText.setText(
+        `${player.champion.manaAmount}/${player.champion.maxManaAmount}`
+      )
+      this.playerManaBarText.setPosition(
+        this.playerManaBar.x +
+          this.playerManaBar.width / 2 -
+          this.playerManaBarText.displayWidth / 2,
+        this.playerManaBarText.y
+      )
+    }
+  }
+
+  updatePlayerHealthBar() {
+    const player = Game.instance ? Game.instance.player : null
+    if (player) {
+      this.playerHealthBar.setMaxValue(player.champion.getTotalHealth())
+      this.playerHealthBar.setCurrValue(player.champion.getHealth())
+      this.playerHealthBarText.setText(
+        `${player.champion.getHealth()}/${player.champion.getTotalHealth()}`
+      )
+      this.playerHealthBarText.setPosition(
+        this.playerHealthBar.x +
+          this.playerHealthBar.width / 2 -
+          this.playerHealthBarText.displayWidth / 2,
+        this.playerHealthBarText.y
+      )
+    }
+  }
+
   setupPlayerExpBar() {
     this.playerChampionExpBar = new UIValueBar(this, {
-      x: this.qAbilityIcon.x - 30,
-      y: Constants.WINDOW_HEIGHT - 45,
+      x: this.qAbilityIcon.x - 25,
+      y: Constants.WINDOW_HEIGHT - 73,
       maxValue: 100,
-      height: 30,
+      height: 58,
       width: 5,
       borderWidth: 1,
       fillColor: Constants.EXP_BAR_COLOR,
@@ -159,6 +235,8 @@ export class UI extends Phaser.Scene {
     this.updatePlayerKDA()
     this.updateStatsBackgroundRect()
     this.updatePlayerChampionAbilities()
+    this.updatePlayerManaBar()
+    this.updatePlayerHealthBar()
   }
 
   updatePlayerChampionAbilities() {

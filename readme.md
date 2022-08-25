@@ -7,9 +7,7 @@ Miniature version of ARAM in League of Legends
 ## Easy Wins
 
 - Ability cooldowns
-- Mana consumption for abilities
 - Health drops on map
-- Victory/Defeat + Play again button
 - Have enemy champion attack minions even if they are not within last hit distance
 
 ## Polish

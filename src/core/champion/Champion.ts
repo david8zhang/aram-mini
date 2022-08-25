@@ -42,6 +42,9 @@ export class Champion {
   public markerRectangle: Phaser.Geom.Rectangle
   public healthBar: UIValueBar
 
+  public manaAmount: number = Constants.CHAMPION_MANA_AMOUNT
+  public maxManaAmount: number = Constants.CHAMPION_MANA_AMOUNT
+
   public totalExp: number = 0
   public level: number = 1
   public csScore: number = 0
@@ -117,6 +120,10 @@ export class Champion {
         this.abilities[key] = new AbilityClass(this.game, this)
       })
     }
+  }
+
+  decreaseMana(manaCost: number) {
+    this.manaAmount -= manaCost
   }
 
   public getAbility() {}

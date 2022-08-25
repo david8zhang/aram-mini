@@ -11,10 +11,12 @@ export class Fireball implements Ability {
   champion: Champion
 
   public static readonly DAMAGE = 1000
+  public static readonly MANA_COST = 50
+  public static readonly ATTACK_RANGE = Constants.CHAMPION_ATTACK_RANGE + 25
+
   public isTargetingMode: boolean = false
   public mouseTriggered: boolean = false
   public key!: Phaser.Input.Keyboard.Key | null
-  public attackRange = Constants.CHAMPION_ATTACK_RANGE + 25
   public targetingArrow: TargetingArrow
   public iconTexture: string = 'fireball'
 
@@ -29,7 +31,7 @@ export class Fireball implements Ability {
         x: this.champion.sprite.x,
         y: this.champion.sprite.y,
       },
-      width: this.attackRange,
+      width: Fireball.ATTACK_RANGE,
       height: 5,
     })
     this.setupMouseClickListener()
@@ -51,7 +53,9 @@ export class Fireball implements Ability {
   handleKeyPress() {
     if (this.key && this.champion.isPlayerControlled) {
       if (this.key.isDown && !this.mouseTriggered) {
-        this.isTargetingMode = true
+        if (this.champion.manaAmount >= Fireball.MANA_COST) {
+          this.isTargetingMode = true
+        }
       } else if (this.key.isUp) {
         this.mouseTriggered = false
         if (this.isTargetingMode) {
@@ -64,6 +68,7 @@ export class Fireball implements Ability {
   }
 
   triggerAbility() {
+    this.champion.decreaseMana(Fireball.MANA_COST)
     const targetPoint = this.targetingArrow.getArrowPositionEnd()
     const angleToTargetPoint = Phaser.Math.Angle.Between(
       this.champion.sprite.x,
