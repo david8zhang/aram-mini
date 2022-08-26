@@ -6,14 +6,11 @@ Miniature version of ARAM in League of Legends
 
 ## Easy Wins
 
-- Ability cooldowns
 - Health drops on map
-- Have enemy champion attack minions even if they are not within last hit distance
 
 ## Polish
 
 - Respawn timer
-- K/D/A and CS stats at the top
 - Visual feedback for last-hits
 - Effects for ability usage
 
@@ -21,3 +18,4 @@ Miniature version of ARAM in League of Legends
 
 - Have CPU champion use abilities
 - Multiple champions on the team
+- Have enemy champion attack minions even if they are not within last hit distance

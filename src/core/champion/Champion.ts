@@ -41,7 +41,11 @@ export class Champion {
   public attackTarget: Champion | Minion | Tower | Nexus | null = null
   public markerRectangle: Phaser.Geom.Rectangle
   public healthBar: UIValueBar
+  public hpRegenAmt: number = 5
+  public healthRegenEvent!: Phaser.Time.TimerEvent
 
+  public manaRegenEvent!: Phaser.Time.TimerEvent
+  public manaRegenAmt: number = 5
   public manaAmount: number = Constants.CHAMPION_MANA_AMOUNT
   public maxManaAmount: number = Constants.CHAMPION_MANA_AMOUNT
 
@@ -111,6 +115,28 @@ export class Champion {
       fillColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
     })
     this.configureAbilities(config.abilities)
+    this.setupRegenerationEvents()
+  }
+
+  setupRegenerationEvents() {
+    this.healthRegenEvent = this.game.time.addEvent({
+      delay: 2000,
+      callback: () => {
+        if (this.getHealth() < this.getTotalHealth()) {
+          this.healthBar.increase(this.hpRegenAmt)
+        }
+      },
+      repeat: -1,
+    })
+    this.manaRegenEvent = this.game.time.addEvent({
+      delay: 3000,
+      callback: () => {
+        if (this.manaAmount < this.maxManaAmount) {
+          this.manaAmount = Math.min(this.maxManaAmount, this.manaAmount + this.manaRegenAmt)
+        }
+      },
+      repeat: -1,
+    })
   }
 
   configureAbilities(abilityConfig: { [key in AbilityKeys]?: Class }) {
@@ -243,6 +269,8 @@ export class Champion {
     this.healthBar.setCurrValue(Constants.CHAMPION_HEALTH)
     this.healthBar.setVisible(true)
     this.sprite.setVisible(true)
+    this.healthRegenEvent.paused = false
+    this.manaRegenEvent.paused = false
     if (this.side === Side.LEFT) {
       this.game.cameras.main.startFollow(this.sprite, true)
     }
@@ -260,6 +288,8 @@ export class Champion {
     this.moveTarget = null
     this.onDestroyedCallbacks.forEach((cb) => cb())
     this.numDeaths++
+    this.healthRegenEvent.paused = true
+    this.manaRegenEvent.paused = true
     this.stateMachine.transition(ChampionStates.DEAD)
   }
 

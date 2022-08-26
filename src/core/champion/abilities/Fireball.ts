@@ -13,12 +13,17 @@ export class Fireball implements Ability {
   public static readonly DAMAGE = 1000
   public static readonly MANA_COST = 50
   public static readonly ATTACK_RANGE = Constants.CHAMPION_ATTACK_RANGE + 25
+  public static readonly ABILITY_COOLDOWN_TIME = 10
 
   public isTargetingMode: boolean = false
   public mouseTriggered: boolean = false
   public key!: Phaser.Input.Keyboard.Key | null
   public targetingArrow: TargetingArrow
   public iconTexture: string = 'fireball'
+
+  public cooldownTimer: Phaser.Time.TimerEvent
+  public isInCooldown: boolean = false
+  public secondsUntilCooldownExpires: number = 0
 
   constructor(game: Game, champion: Champion) {
     this.game = game
@@ -35,6 +40,10 @@ export class Fireball implements Ability {
       height: 5,
     })
     this.setupMouseClickListener()
+    this.cooldownTimer = this.game.time.addEvent({
+      delay: 1000,
+      callback: () => {},
+    })
   }
 
   setupMouseClickListener() {
@@ -53,7 +62,7 @@ export class Fireball implements Ability {
   handleKeyPress() {
     if (this.key && this.champion.isPlayerControlled) {
       if (this.key.isDown && !this.mouseTriggered) {
-        if (this.champion.manaAmount >= Fireball.MANA_COST) {
+        if (this.canTriggerAbility()) {
           this.isTargetingMode = true
         }
       } else if (this.key.isUp) {
@@ -67,7 +76,28 @@ export class Fireball implements Ability {
     }
   }
 
+  canTriggerAbility() {
+    return this.champion.manaAmount >= Fireball.MANA_COST && !this.isInCooldown
+  }
+
+  startAbilityCooldown() {
+    this.isInCooldown = true
+    this.secondsUntilCooldownExpires = Fireball.ABILITY_COOLDOWN_TIME
+    const cooldownEvent = this.game.time.addEvent({
+      delay: 1000,
+      callback: () => {
+        this.secondsUntilCooldownExpires--
+        if (this.secondsUntilCooldownExpires === 0) {
+          this.isInCooldown = false
+          cooldownEvent.remove()
+        }
+      },
+      repeat: -1,
+    })
+  }
+
   triggerAbility() {
+    this.startAbilityCooldown()
     this.champion.decreaseMana(Fireball.MANA_COST)
     const targetPoint = this.targetingArrow.getArrowPositionEnd()
     const angleToTargetPoint = Phaser.Math.Angle.Between(

@@ -17,10 +17,11 @@ export class UI extends Phaser.Scene {
   public playerCSScoreText!: Phaser.GameObjects.Text
   public playerKDAText!: Phaser.GameObjects.Text
   public statsBackgroundRect!: Phaser.GameObjects.Rectangle
-  public qAbilityIcon!: Phaser.GameObjects.Sprite
-  public wAbilityIcon!: Phaser.GameObjects.Sprite
-  public eAbilityIcon!: Phaser.GameObjects.Sprite
-  public rAbilityIcon!: Phaser.GameObjects.Sprite
+
+  public qAbilityUIObj!: { [key: string]: Phaser.GameObjects.GameObject }
+  public wAbilityUIObj!: { [key: string]: Phaser.GameObjects.GameObject }
+  public eAbilityUIObj!: { [key: string]: Phaser.GameObjects.GameObject }
+  public rAbilityUIObj!: { [key: string]: Phaser.GameObjects.GameObject }
 
   public static UPPER_MARGIN: number = 5
 
@@ -89,24 +90,37 @@ export class UI extends Phaser.Scene {
     const rPositionX = ePositionX + 32
     const abilityPositionY = Constants.WINDOW_HEIGHT - 60
 
-    this.qAbilityIcon = this.setupAbilityUI('Q', qPositionX, abilityPositionY)
-    this.wAbilityIcon = this.setupAbilityUI('W', wPositionX, abilityPositionY)
-    this.eAbilityIcon = this.setupAbilityUI('E', ePositionX, abilityPositionY)
-    this.rAbilityIcon = this.setupAbilityUI('R', rPositionX, abilityPositionY)
+    this.qAbilityUIObj = this.setupAbilityUI('Q', qPositionX, abilityPositionY)
+    this.wAbilityUIObj = this.setupAbilityUI('W', wPositionX, abilityPositionY)
+    this.eAbilityUIObj = this.setupAbilityUI('E', ePositionX, abilityPositionY)
+    this.rAbilityUIObj = this.setupAbilityUI('R', rPositionX, abilityPositionY)
   }
 
   private setupAbilityUI(
     key: string,
     xPosition: number,
     yPosition: number
-  ): Phaser.GameObjects.Sprite {
+  ): {
+    [key: string]: Phaser.GameObjects.GameObject
+  } {
     const abilityRect = this.add.rectangle(xPosition, yPosition, 26, 26, 0x000000, 0.5)
     this.add
       .text(abilityRect.x + 10, abilityRect.y + 10, key, {
         fontSize: '12px',
       })
       .setDepth(1000)
-    return this.add.sprite(xPosition, yPosition, '').setVisible(false)
+    const iconSprite = this.add.sprite(xPosition, yPosition, '').setVisible(false)
+    const cooldownText = this.add
+      .text(xPosition, yPosition, '', {
+        fontSize: '12px',
+        color: '#ffffff',
+      })
+      .setVisible(false)
+    return {
+      sprite: iconSprite,
+      boundingRect: abilityRect,
+      cooldownText,
+    }
   }
 
   setupStatBackgroundRect() {
@@ -211,8 +225,9 @@ export class UI extends Phaser.Scene {
   }
 
   setupPlayerExpBar() {
+    const abilitySprite = this.qAbilityUIObj.sprite as Phaser.GameObjects.Sprite
     this.playerChampionExpBar = new UIValueBar(this, {
-      x: this.qAbilityIcon.x - 25,
+      x: abilitySprite.x - 25,
       y: Constants.WINDOW_HEIGHT - 73,
       maxValue: 100,
       height: 58,
@@ -244,11 +259,25 @@ export class UI extends Phaser.Scene {
     if (player) {
       const qAbility = player.champion.abilities[AbilityKeys.Q]
       if (qAbility) {
-        this.qAbilityIcon
-          .setVisible(true)
-          .setTexture(qAbility.iconTexture)
-          .setScale(2)
-          .setAlpha(0.9)
+        const sprite = this.qAbilityUIObj.sprite as Phaser.GameObjects.Sprite
+        const boundingRect = this.qAbilityUIObj.boundingRect as Phaser.GameObjects.Rectangle
+        const cooldownText = this.qAbilityUIObj.cooldownText as Phaser.GameObjects.Text
+
+        sprite.setVisible(true).setTexture(qAbility.iconTexture).setScale(2).setAlpha(0.9)
+        if (qAbility.isInCooldown) {
+          boundingRect.setDepth(sprite.depth + 1)
+          cooldownText
+            .setVisible(true)
+            .setText(`${qAbility.secondsUntilCooldownExpires}`)
+            .setDepth(boundingRect.depth + 1)
+            .setPosition(
+              boundingRect.x - cooldownText.displayWidth / 2,
+              boundingRect.y - cooldownText.displayHeight / 2
+            )
+        } else {
+          boundingRect.setDepth(sprite.depth - 1)
+          cooldownText.setVisible(false)
+        }
       }
     }
   }

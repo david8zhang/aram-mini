@@ -5,5 +5,7 @@ export interface Ability {
   game: Game
   champion: Champion
   iconTexture: string
+  isInCooldown: boolean
+  secondsUntilCooldownExpires: number
   triggerAbility(): void
 }
