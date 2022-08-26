@@ -12,6 +12,7 @@ export class Constants {
   public static readonly CHAMPION_HEALTH = 500
   public static readonly CHAMPION_ATTACK_RANGE = 75
   public static readonly CHAMPION_MANA_AMOUNT = 250
+  public static readonly CHAMPION_RESPAWN_DELAY_MILLISECONDS = 10000
 
   public static readonly TOWER_DAMAGE_MAPPING = {
     Minion: 40,

@@ -18,7 +18,7 @@ export class DeadState extends State {
 
   execute(champion: Champion) {
     const currTimestamp = Date.now()
-    if (currTimestamp - this.deathTimestamp > 10000) {
+    if (currTimestamp - this.deathTimestamp > Constants.CHAMPION_RESPAWN_DELAY_MILLISECONDS) {
       champion.respawn()
       champion.stateMachine.transition(ChampionStates.IDLE)
     }

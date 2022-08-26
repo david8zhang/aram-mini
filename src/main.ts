@@ -3,6 +3,7 @@ import { Game } from './scenes/Game'
 import { Preload } from './scenes/Preload'
 import { UI } from './scenes/UI'
 import OutlinePipelinePlugin from 'phaser3-rex-plugins/plugins/outlinepipeline-plugin'
+import GrayscalePipelinePlugin from 'phaser3-rex-plugins/plugins/grayscalepipeline-plugin'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -24,6 +25,11 @@ const config: Phaser.Types.Core.GameConfig = {
       {
         key: 'rexOutlinePipeline',
         plugin: OutlinePipelinePlugin,
+        start: true,
+      },
+      {
+        key: 'rexGrayscalePipeline',
+        plugin: GrayscalePipelinePlugin,
         start: true,
       },
     ],

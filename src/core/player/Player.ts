@@ -63,6 +63,9 @@ export class Player {
   setupMouseClickListener() {
     this.game.input.mouse.disableContextMenu()
     this.game.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.champion.isDead) {
+        return
+      }
       if (pointer.rightButtonDown()) {
         const minion = this.game.getMinionAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
         const tower = this.game.getTowerAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)

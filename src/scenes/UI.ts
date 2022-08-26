@@ -18,6 +18,9 @@ export class UI extends Phaser.Scene {
   public playerKDAText!: Phaser.GameObjects.Text
   public statsBackgroundRect!: Phaser.GameObjects.Rectangle
 
+  public playerRespawningText!: Phaser.GameObjects.Text
+  public playerRespawnTimerText!: Phaser.GameObjects.Text
+
   public qAbilityUIObj!: { [key: string]: Phaser.GameObjects.GameObject }
   public wAbilityUIObj!: { [key: string]: Phaser.GameObjects.GameObject }
   public eAbilityUIObj!: { [key: string]: Phaser.GameObjects.GameObject }
@@ -44,6 +47,22 @@ export class UI extends Phaser.Scene {
     this.setupGameOverUI()
     this.setupPlayerManaBar()
     this.setupPlayerHealthBar()
+    this.setupPlayerRespawnTimer()
+  }
+
+  setupPlayerRespawnTimer() {
+    this.playerRespawningText = this.add
+      .text(Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT / 2, 'Respawning in...', {
+        fontSize: '20px',
+        color: '#ffffff',
+      })
+      .setVisible(false)
+    this.playerRespawnTimerText = this.add
+      .text(Constants.WINDOW_WIDTH / 2, Constants.WINDOW_HEIGHT / 2, '', {
+        fontSize: '20px',
+        color: '#ffffff',
+      })
+      .setVisible(false)
   }
 
   setupGameOverUI() {
@@ -252,6 +271,38 @@ export class UI extends Phaser.Scene {
     this.updatePlayerChampionAbilities()
     this.updatePlayerManaBar()
     this.updatePlayerHealthBar()
+    this.updatePlayerRespawnTimer()
+  }
+
+  updatePlayerRespawnTimer() {
+    const player = Game.instance ? Game.instance.player : null
+    if (player) {
+      const champion = player.champion
+      if (champion.shouldShowRespawnTimer) {
+        if (Game.instance.cameraGrayscaleFilter) {
+          Game.instance.cameraGrayscaleFilter.intensity = 1
+        }
+        this.playerRespawnTimerText
+          .setText(`${champion.secondsUntilRespawn}`)
+          .setPosition(
+            Constants.WINDOW_WIDTH / 2 - this.playerRespawnTimerText.displayWidth / 2,
+            this.playerRespawningText.y + 30
+          )
+          .setVisible(true)
+        this.playerRespawningText
+          .setPosition(
+            Constants.WINDOW_WIDTH / 2 - this.playerRespawningText.displayWidth / 2,
+            Constants.WINDOW_HEIGHT / 2 - this.playerRespawningText.displayHeight / 2 - 20
+          )
+          .setVisible(true)
+      } else {
+        if (Game.instance.cameraGrayscaleFilter) {
+          Game.instance.cameraGrayscaleFilter.intensity = 0
+        }
+        this.playerRespawnTimerText.setVisible(false)
+        this.playerRespawningText.setVisible(false)
+      }
+    }
   }
 
   updatePlayerChampionAbilities() {

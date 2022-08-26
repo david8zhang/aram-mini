@@ -26,6 +26,8 @@ export class Game extends Phaser.Scene {
 
   public ignoreDepthSortNames = [IgnoreDepthSortName.ON_MOUSE_HOVER]
   public postFxPlugin: any
+  public grayscalePlugin: any
+  public cameraGrayscaleFilter: any
 
   // Tilemaps
   public tileMap!: Phaser.Tilemaps.Tilemap
@@ -69,6 +71,8 @@ export class Game extends Phaser.Scene {
 
   initPlugins() {
     this.postFxPlugin = this.plugins.get('rexOutlinePipeline')
+    this.grayscalePlugin = this.plugins.get('rexGrayscalePipeline')
+    this.cameraGrayscaleFilter = this.grayscalePlugin.add(this.cameras.main, { intensity: 0 })
   }
 
   create() {

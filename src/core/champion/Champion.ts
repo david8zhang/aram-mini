@@ -55,6 +55,9 @@ export class Champion {
   public numKills: number = 0
   public numDeaths: number = 0
 
+  public secondsUntilRespawn: number = 0
+  public shouldShowRespawnTimer: boolean = false
+
   public attackRange: number = Constants.CHAMPION_ATTACK_RANGE
   public onDestroyedCallbacks: Function[] = []
   public abilities: {
@@ -291,6 +294,25 @@ export class Champion {
     this.healthRegenEvent.paused = true
     this.manaRegenEvent.paused = true
     this.stateMachine.transition(ChampionStates.DEAD)
+    this.startRespawnTimer()
+  }
+
+  startRespawnTimer() {
+    if (!this.shouldShowRespawnTimer) {
+      this.shouldShowRespawnTimer = true
+      this.secondsUntilRespawn = Constants.CHAMPION_RESPAWN_DELAY_MILLISECONDS / 1000
+      const respawnTimerEvent = this.game.time.addEvent({
+        delay: 1000,
+        callback: () => {
+          this.secondsUntilRespawn--
+          if (this.secondsUntilRespawn === 0) {
+            this.shouldShowRespawnTimer = false
+            respawnTimerEvent.remove()
+          }
+        },
+        repeat: -1,
+      })
+    }
   }
 
   takeDamage(damage: number) {
