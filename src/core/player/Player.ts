@@ -24,7 +24,7 @@ export class Player {
   constructor(game: Game) {
     this.game = game
     this.champion = new Champion(this.game, {
-      texture: 'wizard',
+      texture: 'warrior',
       isPlayerControlled: true,
       position: {
         x: Constants.LEFT_SPAWN.x,
@@ -34,7 +34,7 @@ export class Player {
       abilities: {
         [AbilityKeys.Q]: Fireball,
       },
-      autoAttackType: AutoAttackType.RANGED,
+      autoAttackType: AutoAttackType.MELEE,
     })
     this.champion.damageOverride = 1000
 

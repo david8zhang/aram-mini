@@ -19,6 +19,9 @@ export class Preload extends Scene {
     this.load.image('projectile_red', 'projectile-red.png')
     this.load.image('fireball', 'fireball.png')
 
+    // Sword Animation
+    this.load.atlas('slash', 'animations/slash.png', 'animations/slash.json')
+
     // Towers
     this.load.image('tower_red', 'tower-red.png')
     this.load.image('tower_blue', 'tower-blue.png')

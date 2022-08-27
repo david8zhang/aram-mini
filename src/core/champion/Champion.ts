@@ -11,6 +11,7 @@ import { Ability } from './abilities/Ability'
 import { AbilityKeys } from './abilities/AbilityKeys'
 import { AutoAttack } from './auto-attack/AutoAttack'
 import { AutoAttackType } from './auto-attack/AutoAttackType'
+import { MeleeAttack } from './auto-attack/MeleeAttack'
 import { RangedAttack } from './auto-attack/RangedAttack'
 import { AttackState } from './states/AttackState'
 import { ChampionStates } from './states/ChampionStates'
@@ -83,7 +84,7 @@ export class Champion {
       .setData('ref', this)
       .setInteractive()
       .on('pointerover', () => {
-        if (this.shouldShowHoverOutline) {
+        if (this.shouldShowHoverOutline && !this.isDead) {
           this.game.postFxPlugin.add(this.sprite, {
             thickness: 2,
             outlineColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
@@ -91,7 +92,7 @@ export class Champion {
         }
       })
       .on('pointerout', () => {
-        if (this.shouldShowHoverOutline) {
+        if (this.shouldShowHoverOutline && !this.isDead) {
           this.game.postFxPlugin.remove(this.sprite)
         }
       })
@@ -128,28 +129,65 @@ export class Champion {
         this.autoAttack = new RangedAttack(this.game, this)
         break
       }
+      case AutoAttackType.MELEE: {
+        this.autoAttack = new MeleeAttack(this.game, this)
+        break
+      }
     }
   }
 
   setupRegenerationEvents() {
     this.healthRegenEvent = this.game.time.addEvent({
-      delay: 2000,
+      delay: 5000,
       callback: () => {
-        if (this.getHealth() < this.getTotalHealth()) {
-          this.healthBar.increase(this.hpRegenAmt)
+        if (!this.isBeingTargeted()) {
+          if (this.getHealth() < this.getTotalHealth()) {
+            this.healthBar.increase(this.hpRegenAmt)
+          }
         }
       },
       repeat: -1,
     })
     this.manaRegenEvent = this.game.time.addEvent({
-      delay: 3000,
+      delay: 5000,
       callback: () => {
-        if (this.manaAmount < this.maxManaAmount) {
-          this.manaAmount = Math.min(this.maxManaAmount, this.manaAmount + this.manaRegenAmt)
+        if (!this.isBeingTargeted()) {
+          if (this.manaAmount < this.maxManaAmount) {
+            this.manaAmount = Math.min(this.maxManaAmount, this.manaAmount + this.manaRegenAmt)
+          }
         }
       },
       repeat: -1,
     })
+  }
+
+  isBeingTargeted() {
+    const enemyMinions =
+      this.side === Side.LEFT
+        ? this.game.rightMinionSpawner.minions
+        : this.game.leftMinionSpawner.minions
+    for (let i = 0; i < enemyMinions.children.entries.length; i++) {
+      const minion = enemyMinions.children.entries[i].getData('ref') as Minion
+      if (minion.attackTarget === this) {
+        return true
+      }
+    }
+
+    const enemyTowers = this.side === Side.LEFT ? this.game.rightTowers : this.game.leftTowers
+    for (let i = 0; i < enemyTowers.length; i++) {
+      if (enemyTowers[i].attackTarget === this) {
+        return true
+      }
+    }
+
+    const enemyChampions =
+      this.side === Side.LEFT ? this.game.rightChampions : this.game.leftChampions
+    for (let i = 0; i < enemyChampions.length; i++) {
+      if (enemyChampions[i].attackTarget === this) {
+        return true
+      }
+    }
+    return false
   }
 
   configureAbilities(abilityConfig: { [key in AbilityKeys]?: Class } | undefined) {
@@ -265,6 +303,9 @@ export class Champion {
   }
 
   respawn() {
+    const respawnPosition = this.side === Side.LEFT ? Constants.LEFT_SPAWN : Constants.RIGHT_SPAWN
+    this.sprite.setPosition(respawnPosition.x, respawnPosition.y)
+    this.manaAmount = this.maxManaAmount
     this.healthBar.setCurrValue(Constants.CHAMPION_HEALTH)
     this.healthBar.setVisible(true)
     this.sprite.setVisible(true)
@@ -282,6 +323,7 @@ export class Champion {
   }
 
   destroy() {
+    this.stop()
     this.sprite.setVisible(false)
     this.healthBar.setVisible(false)
     this.moveTarget = null

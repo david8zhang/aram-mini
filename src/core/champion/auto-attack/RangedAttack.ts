@@ -3,8 +3,9 @@ import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Champion } from '../Champion'
+import { AutoAttack } from './AutoAttack'
 
-export class RangedAttack {
+export class RangedAttack implements AutoAttack {
   private game: Game
   private champion: Champion
 

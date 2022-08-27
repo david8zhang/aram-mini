@@ -404,7 +404,7 @@ export class UI extends Phaser.Scene {
       .setText('Press Esc to Play Again')
       .setPosition(
         Constants.WINDOW_WIDTH / 2 - this.resetText.displayWidth / 2,
-        this.resetText.y + 40
+        this.gameOverText.y + 40
       )
       .setDepth(this.screenTint.depth + 1)
       .setVisible(true)

@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { createSlashAnims } from '~/core/anims/slashAnims'
 import { Champion } from '~/core/champion/Champion'
 import { CPU } from '~/core/cpu/CPU'
 import { Debug } from '~/core/Debug'
@@ -12,7 +13,7 @@ import { Side } from '~/utils/Side'
 import { UI } from './UI'
 
 export enum IgnoreDepthSortName {
-  ON_MOUSE_HOVER = 'ON_MOUSE_HOVER',
+  MELEE_ATTACK = 'MELEE_ATTACK',
 }
 
 export class Game extends Phaser.Scene {
@@ -24,7 +25,7 @@ export class Game extends Phaser.Scene {
   public debug!: Debug
   public cpu!: CPU
 
-  public ignoreDepthSortNames = [IgnoreDepthSortName.ON_MOUSE_HOVER]
+  public ignoreDepthSortNames = [IgnoreDepthSortName.MELEE_ATTACK]
   public postFxPlugin: any
   public grayscalePlugin: any
   public cameraGrayscaleFilter: any
@@ -77,6 +78,7 @@ export class Game extends Phaser.Scene {
 
   create() {
     this.debug = new Debug(this)
+    this.createAnims()
     this.initPlugins()
     this.initCamera()
     this.initTilemap()
@@ -86,6 +88,10 @@ export class Game extends Phaser.Scene {
     this.initTowers()
     this.initNexuses()
     this.initColliders()
+  }
+
+  createAnims() {
+    createSlashAnims(this.anims)
   }
 
   initColliders() {
@@ -212,6 +218,29 @@ export class Game extends Phaser.Scene {
     this.leftChampionsGroup.add(this.player.champion.sprite)
   }
 
+  playAnimationFrames(
+    sprite: Phaser.Physics.Arcade.Sprite,
+    frames: any[],
+    frameIndex: number,
+    onCompletedFn: Function
+  ) {
+    if (frameIndex == frames.length) {
+      this.time.delayedCall(100, onCompletedFn)
+      return
+    }
+    const frame = frames[frameIndex]
+    this.time.delayedCall(frame.time, () => {
+      const xPos = this.player.champion.sprite.x + frame.x
+      const yPos = this.player.champion.sprite.y + frame.y
+      sprite.setAngle(frame.angle)
+      sprite.setPosition(xPos, yPos)
+      if (frame.onShowFn) {
+        frame.onShowFn()
+      }
+      this.playAnimationFrames(sprite, frames, frameIndex + 1, onCompletedFn)
+    })
+  }
+
   getMinionAtPosition(side: Side, x: number, y: number, range: number) {
     const minionsGroup =
       side === Side.LEFT ? this.leftMinionSpawner.minions : this.rightMinionSpawner.minions
@@ -297,7 +326,7 @@ export class Game extends Phaser.Scene {
     const sortedByY = this.sys.displayList
       .getChildren()
       .filter((child: any) => {
-        return child.y
+        return child.y && !this.ignoreDepthSortNames.includes(child.name)
       })
       .sort((a: any, b: any) => {
         return a.y - b.y

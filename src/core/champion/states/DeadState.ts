@@ -11,8 +11,6 @@ export class DeadState extends State {
     if (champion.side === champion.game.player.side) {
       champion.game.cameras.main.stopFollow()
     }
-    const spawnPosition = champion.side === Side.LEFT ? Constants.LEFT_SPAWN : Constants.RIGHT_SPAWN
-    champion.sprite.setPosition(spawnPosition.x, spawnPosition.y)
     this.deathTimestamp = Date.now()
   }
 
