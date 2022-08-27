@@ -1,7 +1,6 @@
 import { Minion } from '~/core/minion/Minion'
 import { Projectile } from '~/core/Projectile'
 import { Game } from '~/scenes/Game'
-import { Constants } from '~/utils/Constants'
 import { Champion } from '../Champion'
 import { Ability } from './Ability'
 import { TargetingArrow } from './TargetingArrow'
@@ -12,7 +11,7 @@ export class Fireball implements Ability {
 
   public static readonly DAMAGE = 1000
   public static readonly MANA_COST = 50
-  public static readonly ATTACK_RANGE = Constants.CHAMPION_ATTACK_RANGE + 25
+  public static readonly ATTACK_RANGE = 100
   public static readonly ABILITY_COOLDOWN_TIME = 10
 
   public isTargetingMode: boolean = false

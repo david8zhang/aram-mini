@@ -1,6 +1,7 @@
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
+import { AutoAttackType } from '../champion/auto-attack/AutoAttackType'
 import { Champion } from '../champion/Champion'
 import { BehaviorTreeNode } from './behavior-tree/BehaviorTreeNode'
 import { Blackboard } from './behavior-tree/Blackboard'
@@ -45,6 +46,7 @@ export class CPU {
         y: Constants.RIGHT_NEXUS_SPAWN.y,
       },
       side: Side.RIGHT,
+      autoAttackType: AutoAttackType.RANGED,
     })
     this.champion.onDestroyedCallbacks.push(() => {
       this.didCompleteOnSpawn = false

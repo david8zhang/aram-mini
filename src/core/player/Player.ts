@@ -3,6 +3,7 @@ import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { AbilityKeys } from '../champion/abilities/AbilityKeys'
 import { Fireball } from '../champion/abilities/Fireball'
+import { AutoAttackType } from '../champion/auto-attack/AutoAttackType'
 import { Champion } from '../champion/Champion'
 import { ChampionStates } from '../champion/states/ChampionStates'
 import { Minion } from '../minion/Minion'
@@ -33,6 +34,7 @@ export class Player {
       abilities: {
         [AbilityKeys.Q]: Fireball,
       },
+      autoAttackType: AutoAttackType.RANGED,
     })
     this.champion.damageOverride = 1000
 
@@ -43,7 +45,7 @@ export class Player {
       .setVisible(false)
       .setDepth(100)
     this.attackRangeCircle = this.game.add
-      .circle(this.champion.sprite.x, this.champion.sprite.y, Constants.CHAMPION_ATTACK_RANGE)
+      .circle(this.champion.sprite.x, this.champion.sprite.y, this.champion.attackRange)
       .setVisible(false)
       .setFillStyle(Constants.ATTACK_RANGE_COLOR, 0.2)
       .setStrokeStyle(2, Constants.ATTACK_RANGE_COLOR)

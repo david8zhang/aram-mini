@@ -9,6 +9,9 @@ import { Tower } from '../tower/Tower'
 import { UIValueBar } from '../ui/UIValueBar'
 import { Ability } from './abilities/Ability'
 import { AbilityKeys } from './abilities/AbilityKeys'
+import { AutoAttack } from './auto-attack/AutoAttack'
+import { AutoAttackType } from './auto-attack/AutoAttackType'
+import { RangedAttack } from './auto-attack/RangedAttack'
 import { AttackState } from './states/AttackState'
 import { ChampionStates } from './states/ChampionStates'
 import { DeadState } from './states/DeadState'
@@ -23,9 +26,10 @@ export interface ChampionConfig {
   }
   isPlayerControlled?: boolean
   side: Side
-  abilities: {
+  abilities?: {
     [key in AbilityKeys]?: Class
   }
+  autoAttackType: AutoAttackType
 }
 
 export class Champion {
@@ -39,7 +43,6 @@ export class Champion {
   public moveMarker: Phaser.GameObjects.Arc | null = null
 
   public attackTarget: Champion | Minion | Tower | Nexus | null = null
-  public markerRectangle: Phaser.Geom.Rectangle
   public healthBar: UIValueBar
   public hpRegenAmt: number = 5
   public healthRegenEvent!: Phaser.Time.TimerEvent
@@ -58,13 +61,15 @@ export class Champion {
   public secondsUntilRespawn: number = 0
   public shouldShowRespawnTimer: boolean = false
 
-  public attackRange: number = Constants.CHAMPION_ATTACK_RANGE
   public onDestroyedCallbacks: Function[] = []
   public abilities: {
     [key in AbilityKeys]?: Ability
   } = {}
 
+  // Auto attack configuration
+  public autoAttack!: AutoAttack
   private _damageOverride: number = -1
+
   public shouldShowHoverOutline: boolean = true
 
   constructor(game: Game, config: ChampionConfig) {
@@ -102,12 +107,6 @@ export class Champion {
       },
       [this]
     )
-    this.markerRectangle = new Phaser.Geom.Rectangle(
-      this.sprite.x - this.sprite.displayWidth / 2,
-      this.sprite.y - this.sprite.displayHeight / 2,
-      this.sprite.displayWidth,
-      this.sprite.displayHeight
-    )
     this.healthBar = new UIValueBar(this.game, {
       x: this.sprite.x - 15,
       y: this.sprite.y - this.sprite.body.height,
@@ -117,8 +116,19 @@ export class Champion {
       borderWidth: 1,
       fillColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
     })
+
+    this.setupAutoAttack(config.autoAttackType)
     this.configureAbilities(config.abilities)
     this.setupRegenerationEvents()
+  }
+
+  setupAutoAttack(autoAttackType: AutoAttackType) {
+    switch (autoAttackType) {
+      case AutoAttackType.RANGED: {
+        this.autoAttack = new RangedAttack(this.game, this)
+        break
+      }
+    }
   }
 
   setupRegenerationEvents() {
@@ -142,7 +152,7 @@ export class Champion {
     })
   }
 
-  configureAbilities(abilityConfig: { [key in AbilityKeys]?: Class }) {
+  configureAbilities(abilityConfig: { [key in AbilityKeys]?: Class } | undefined) {
     if (abilityConfig) {
       Object.keys(abilityConfig).forEach((key) => {
         const AbilityClass = abilityConfig[key]
@@ -169,25 +179,7 @@ export class Champion {
       if (!this.attackTarget.sprite.active || this.attackTarget.getHealth() === 0) {
         return
       }
-      const projectileColor = this.side === Side.LEFT ? 'blue' : 'red'
-      const projectile = new Projectile(this.game, {
-        position: {
-          x: this.sprite.x,
-          y: this.sprite.y,
-        },
-        target: this.attackTarget,
-        speed: 200,
-        texture: `projectile_${projectileColor}`,
-      })
-      projectile.destroyCallback = () => {
-        if (this.attackTarget && this.attackTarget.getHealth() > 0) {
-          if (this.attackTarget.getHealth() - this.damage <= 0) {
-            this.handleLastHit(this.attackTarget)
-          }
-          this.attackTarget.takeDamage(this.damage)
-        }
-      }
-      this.game.projectileGroup.add(projectile.sprite)
+      this.autoAttack.attack()
     }
   }
 
@@ -224,11 +216,15 @@ export class Champion {
     this._damageOverride = newDamage
   }
 
+  get attackRange(): number {
+    return this.autoAttack.attackRange
+  }
+
   get damage(): number {
     if (this._damageOverride != -1) {
       return this._damageOverride
     }
-    return this.level * Constants.CHAMPION_DAMAGE
+    return this.level * Constants.CHAMPION_DAMAGE_RANGED
   }
 
   getLevelForTotalExp(totalExp: number) {
@@ -324,10 +320,6 @@ export class Champion {
 
   update() {
     this.stateMachine.step()
-    this.markerRectangle.setPosition(
-      this.sprite.x - this.sprite.displayWidth / 2,
-      this.sprite.y - this.sprite.displayWidth / 2
-    )
     if (this.healthBar) {
       this.healthBar.x = this.sprite.x - 15
       this.healthBar.y = this.sprite.y - this.sprite.body.height

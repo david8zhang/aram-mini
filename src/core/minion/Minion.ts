@@ -223,7 +223,7 @@ export class Minion {
         this.sprite.x,
         this.sprite.y
       )
-      if (!c.isDead && distanceToChampion <= Constants.CHAMPION_ATTACK_RANGE * 2) {
+      if (!c.isDead && distanceToChampion <= c.attackRange * 2) {
         c.addExp(Constants.MINION_KILL_EXP)
       }
     })

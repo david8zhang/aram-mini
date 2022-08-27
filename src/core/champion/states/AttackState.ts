@@ -32,7 +32,7 @@ export class AttackState extends State {
         attackTarget.sprite.x,
         attackTarget.sprite.y
       )
-      return distanceToAttackTarget > Constants.CHAMPION_ATTACK_RANGE
+      return distanceToAttackTarget > champion.attackRange
     }
     return false
   }
