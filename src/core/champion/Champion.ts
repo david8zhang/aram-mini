@@ -225,6 +225,16 @@ export class Champion {
     if (!attackTarget) {
       return
     }
+    this.game.particleEmitter.emitParticles({
+      texture: 'coin',
+      scale: 1,
+      gravity: true,
+      position: {
+        x: attackTarget.sprite.x,
+        y: attackTarget.sprite.y,
+      },
+      count: 5,
+    })
     switch (attackTarget.constructor.name) {
       case 'Champion': {
         const expForNextLevel = this.getExpForNextLevel()

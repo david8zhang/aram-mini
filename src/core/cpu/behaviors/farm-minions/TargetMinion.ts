@@ -1,3 +1,4 @@
+import { Champion } from '~/core/champion/Champion'
 import { Minion } from '~/core/minion/Minion'
 import { Constants } from '~/utils/Constants'
 import { BehaviorStatus } from '../../behavior-tree/BehaviorStatus'
@@ -41,8 +42,9 @@ export class TargetMinion extends BehaviorTreeNode {
   }
 
   filterMinionsBasedOnHealth(minions: Minion[]): Minion[] {
+    const champion = this.blackboard.getData(BlackboardKeys.CHAMPION) as Champion
     return minions.filter((m) => {
-      return m.getHealth() <= Constants.CHAMPION_DAMAGE
+      return m.getHealth() <= champion.damage
     })
   }
 }

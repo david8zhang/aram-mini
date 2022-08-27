@@ -5,6 +5,7 @@ import { CPU } from '~/core/cpu/CPU'
 import { Debug } from '~/core/Debug'
 import { MinionSpawner } from '~/core/minion/MinionSpawner'
 import { Nexus } from '~/core/Nexus'
+import { ParticleEmitter } from '~/core/ParticleEmitter'
 import { Player } from '~/core/player/Player'
 import { Projectile } from '~/core/Projectile'
 import { Tower } from '~/core/tower/Tower'
@@ -52,6 +53,8 @@ export class Game extends Phaser.Scene {
 
   public isGameOver: boolean = false
 
+  public particleEmitter!: ParticleEmitter
+
   constructor() {
     super('game')
     Game._instance = this
@@ -78,7 +81,7 @@ export class Game extends Phaser.Scene {
 
   create() {
     this.debug = new Debug(this)
-    this.createAnims()
+    this.initAnimations()
     this.initPlugins()
     this.initCamera()
     this.initTilemap()
@@ -88,9 +91,14 @@ export class Game extends Phaser.Scene {
     this.initTowers()
     this.initNexuses()
     this.initColliders()
+    this.initParticleEmitters()
   }
 
-  createAnims() {
+  initParticleEmitters() {
+    this.particleEmitter = new ParticleEmitter(this)
+  }
+
+  initAnimations() {
     createSlashAnims(this.anims)
   }
 
@@ -319,7 +327,7 @@ export class Game extends Phaser.Scene {
     this.leftTowers.forEach((t) => t.update())
     this.rightTowers.forEach((t) => t.update())
     this.graphics.lineStyle(1, 0x00ff00, 1)
-    this.depthSort()
+    // this.depthSort()
   }
 
   depthSort() {

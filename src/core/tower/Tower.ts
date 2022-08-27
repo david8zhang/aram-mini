@@ -25,7 +25,6 @@ export class Tower {
   private game: Game
   public sprite: Phaser.Physics.Arcade.Sprite
   public side: Side
-  public markerRectangle: Phaser.Geom.Rectangle
   public healthBar: UIValueBar
   public attackTarget: Minion | Champion | null = null
   public stateMachine: StateMachine
@@ -57,13 +56,6 @@ export class Tower {
           this.game.postFxPlugin.remove(this.sprite)
         }
       })
-
-    this.markerRectangle = new Phaser.Geom.Rectangle(
-      this.sprite.x - this.sprite.displayWidth / 2,
-      this.sprite.y - this.sprite.displayHeight / 2,
-      this.sprite.displayWidth,
-      this.sprite.displayHeight
-    )
 
     this.healthBar = new UIValueBar(this.game, {
       x: this.sprite.x - this.sprite.displayWidth / 2,
