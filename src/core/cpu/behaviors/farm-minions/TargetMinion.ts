@@ -13,17 +13,52 @@ export class TargetMinion extends BehaviorTreeNode {
 
   public process(): BehaviorStatus {
     const enemyMinions = this.blackboard.getData(BlackboardKeys.ENEMY_MINIONS) as Minion[]
-    const lastHittableMinions = this.filterMinionsBasedOnHealth(enemyMinions)
-    if (lastHittableMinions.length == 0) {
-      return BehaviorStatus.FAILURE
+
+    // If there are minions currently attacking this champion prioritize those, else farm the ones that are last-hittable
+    const minionsAttackingThisChampion = this.getMinionsAttackingThisChampion(enemyMinions)
+    if (minionsAttackingThisChampion.length > 0) {
+      const closestAttackingMinion = this.getClosestMinionCustomFn(
+        minionsAttackingThisChampion,
+        (minion: Minion) => {
+          this.getDistanceToChampion(minion)
+        }
+      )
+      this.blackboard.setData(BlackboardKeys.TARGET_MINION, closestAttackingMinion)
+      return BehaviorStatus.SUCCESS
+    } else {
+      const lastHittableMinions = this.filterMinionsBasedOnHealth(enemyMinions)
+      if (lastHittableMinions.length == 0) {
+        return BehaviorStatus.FAILURE
+      }
+      const closestMinionToFriendly = this.getClosestMinionCustomFn(
+        lastHittableMinions,
+        (minion: Minion) => {
+          this.getDistanceToClosestFriendlyMinion(minion)
+        }
+      )
+      this.blackboard.setData(BlackboardKeys.TARGET_MINION, closestMinionToFriendly)
+      return BehaviorStatus.SUCCESS
     }
-    const sortByDistanceToFriendlyMinion = lastHittableMinions.sort((a, b) => {
-      const closestFriendlyMinionDistanceA = this.getDistanceToClosestFriendlyMinion(a)
-      const closestFriendlyMinionDistanceB = this.getDistanceToClosestFriendlyMinion(b)
-      return closestFriendlyMinionDistanceA - closestFriendlyMinionDistanceB
+  }
+
+  getClosestMinionCustomFn(minions: Minion[], sortingFn: Function) {
+    let minDistance = Number.MAX_SAFE_INTEGER
+    let closestMinion: Minion = minions[0]
+    minions.forEach((minion: Minion) => {
+      const minionDistance = sortingFn(minion)
+      if (minionDistance < minDistance) {
+        minDistance = minionDistance
+        closestMinion = minion
+      }
     })
-    this.blackboard.setData(BlackboardKeys.TARGET_MINION, sortByDistanceToFriendlyMinion[0])
-    return BehaviorStatus.SUCCESS
+    return closestMinion
+  }
+
+  getMinionsAttackingThisChampion(enemyMinions: Minion[]) {
+    const champion = this.blackboard.getData(BlackboardKeys.CHAMPION) as Champion
+    return enemyMinions.filter((minion: Minion) => {
+      return minion.attackTarget === champion
+    })
   }
 
   getDistanceToClosestFriendlyMinion(minion: Minion): number {
@@ -39,6 +74,16 @@ export class TargetMinion extends BehaviorTreeNode {
       minDistance = Math.min(distanceToMinion, minDistance)
     })
     return minDistance
+  }
+
+  getDistanceToChampion(minion: Minion): number {
+    const champion = this.blackboard.getData(BlackboardKeys.CHAMPION) as Champion
+    return Phaser.Math.Distance.Between(
+      champion.sprite.x,
+      champion.sprite.y,
+      minion.sprite.x,
+      minion.sprite.y
+    )
   }
 
   filterMinionsBasedOnHealth(minions: Minion[]): Minion[] {

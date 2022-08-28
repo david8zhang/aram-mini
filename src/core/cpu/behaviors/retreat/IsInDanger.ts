@@ -14,29 +14,52 @@ export class IsInDanger extends BehaviorTreeNode {
   }
 
   public process(): BehaviorStatus {
-    return this.isInRangeOfEnemyChampion() ||
-      this.isInRangeOfEnemyTower() ||
+    return this.isTargetedByEnemyTower() ||
+      this.isInRangeOfEnemyChampion() ||
       this.isInRangeOfEnemyMinions()
       ? BehaviorStatus.SUCCESS
       : BehaviorStatus.FAILURE
   }
 
-  isInRangeOfEnemyTower(): boolean {
+  isProtectedByFriendlyTower(): boolean {
+    let friendlyTowers = this.blackboard.getData(BlackboardKeys.FRIENDLY_TOWERS) as Tower[]
+    friendlyTowers = friendlyTowers.filter((tower: Tower) => {
+      return !tower.isDead
+    })
+    if (friendlyTowers.length === 0) {
+      return false
+    }
+    const { closestTower, distance } = this.getClosestTowerAndDistance(friendlyTowers)
+    return distance <= closestTower.attackRange - IsInDanger.ATTACK_RANGE_BUFFER
+  }
+
+  public getClosestTowerAndDistance(towers: Tower[]) {
+    const champion = this.blackboard.getData(BlackboardKeys.CHAMPION) as Champion
+    let minDistance = Number.MAX_SAFE_INTEGER
+    let closestTower = towers[0]
+    towers.forEach((t: Tower) => {
+      const distanceBetweenTowerAndChampion = Phaser.Math.Distance.Between(
+        champion.sprite.x,
+        champion.sprite.y,
+        t.sprite.x,
+        t.sprite.y
+      )
+      if (distanceBetweenTowerAndChampion < minDistance) {
+        minDistance = distanceBetweenTowerAndChampion
+        closestTower = t
+      }
+    })
+    return { closestTower, distance: minDistance }
+  }
+
+  isTargetedByEnemyTower(): boolean {
     const champion = this.blackboard.getData(BlackboardKeys.CHAMPION) as Champion
     const enemyTowerList = this.blackboard.getData(BlackboardKeys.ENEMY_TOWERS) as Tower[]
     if (enemyTowerList && enemyTowerList.length > 0) {
       for (let i = 0; i < enemyTowerList.length; i++) {
         const enemyTower = enemyTowerList[i]
-        if (!enemyTower.isDead) {
-          const distanceToEnemyChampion = Phaser.Math.Distance.Between(
-            champion.sprite.x,
-            champion.sprite.y,
-            enemyTower.sprite.x,
-            enemyTower.sprite.y
-          )
-          if (distanceToEnemyChampion <= enemyTower.attackRange) {
-            return true
-          }
+        if (!enemyTower.isDead && enemyTower.attackTarget === champion) {
+          return true
         }
       }
     }
@@ -48,7 +71,13 @@ export class IsInDanger extends BehaviorTreeNode {
     const enemyMinions = this.blackboard.getData(BlackboardKeys.ENEMY_MINIONS) as Minion[]
     for (let i = 0; i < enemyMinions.length; i++) {
       const minion = enemyMinions[i]
-      if (minion.attackTarget == champion) {
+      const distanceToChampion = Phaser.Math.Distance.Between(
+        champion.sprite.x,
+        champion.sprite.y,
+        minion.sprite.x,
+        minion.sprite.y
+      )
+      if (distanceToChampion <= minion.attackRange + IsInDanger.ATTACK_RANGE_BUFFER) {
         return true
       }
     }

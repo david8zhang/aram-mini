@@ -20,6 +20,8 @@ import { CheckTowerVulnerable } from './behaviors/attack-tower/CheckTowerVulnera
 import { SetTargetTower } from './behaviors/attack-tower/SetTargetTower'
 import { CheckIsDead } from './behaviors/death/CheckIsDead'
 import { HandleDeath } from './behaviors/death/HandleDeath'
+import { HasEnoughHealth } from './behaviors/emergency-retreat/HasEnoughHealth'
+import { IsSafeFromTower } from './behaviors/emergency-retreat/IsSafeFromTower'
 import { AttackMinion } from './behaviors/farm-minions/AttackMinion'
 import { TargetMinion } from './behaviors/farm-minions/TargetMinion'
 import { CheckCompletedOncePerSpawn } from './behaviors/init/CheckCompletedOncePerSpawn'
@@ -125,6 +127,17 @@ export class CPU {
       pushLaneSelector,
       farmMinionSequence
     )
+    // Add some pre-checks to see if it is safe to continue attacking or if retreat is necessary
+    const isSafeFromTower = new IsSafeFromTower(blackboard)
+    const hasEnoughHealth = new HasEnoughHealth(blackboard)
+    const checkIsSafeSequence = new SequenceNode('IsSafeSequence', blackboard, [
+      isSafeFromTower,
+      hasEnoughHealth,
+    ])
+    const attackDecisionSequence = new SequenceNode('AttackDecisionSequence', blackboard, [
+      checkIsSafeSequence,
+      attackBehaviorSelector,
+    ])
 
     // Retreat behaviors
     const isInDanger = new IsInDanger(blackboard)
@@ -134,8 +147,8 @@ export class CPU {
       moveTowardsBase,
     ])
     const idle = new Idle(blackboard)
-    const retreatBehaviorSelector = new SelectorNode(
-      'RetreatSelector',
+    const defensiveBehaviorSelector = new SelectorNode(
+      'DefensiveSelector',
       blackboard,
       moveOutOfDangerSequence,
       idle
@@ -145,8 +158,8 @@ export class CPU {
     const postInitializationSelector = new SelectorNode(
       'PostInitializeSelector',
       blackboard,
-      attackBehaviorSelector,
-      retreatBehaviorSelector
+      attackDecisionSequence,
+      defensiveBehaviorSelector
     )
 
     // Configure once per spawn behaviors

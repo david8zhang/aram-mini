@@ -17,6 +17,7 @@ export class PopulateBlackboard extends BehaviorTreeNode {
     const game = this.cpu.game
     const enemyChampions = this.cpu.side === Side.RIGHT ? game.leftChampions : game.rightChampions
     const enemyTowers = this.cpu.side === Side.RIGHT ? game.leftTowers : game.rightTowers
+    const friendlyTowers = this.cpu.side === Side.RIGHT ? game.rightTowers : game.leftTowers
     const enemyMinions =
       this.cpu.side === Side.RIGHT
         ? game.leftMinionSpawner.minions
@@ -33,6 +34,7 @@ export class PopulateBlackboard extends BehaviorTreeNode {
     this.blackboard.setData(BlackboardKeys.FRIENDLY_MINIONS, this.parseMinions(friendlyMinions))
     this.blackboard.setData(BlackboardKeys.ENEMY_CHAMPIONS, enemyChampions)
     this.blackboard.setData(BlackboardKeys.ENEMY_TOWERS, enemyTowers)
+    this.blackboard.setData(BlackboardKeys.FRIENDLY_TOWERS, friendlyTowers)
     this.blackboard.setData(BlackboardKeys.CHAMPION, champion)
     this.blackboard.setData(BlackboardKeys.SIDE, this.cpu.side)
     this.blackboard.setData(BlackboardKeys.NEXUS, nexus)
