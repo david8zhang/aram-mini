@@ -1,4 +1,6 @@
+import { Minion } from '~/core/minion/Minion'
 import { Game } from '~/scenes/Game'
+import { Side } from '~/utils/Side'
 import { Champion } from '../Champion'
 import { Ability } from './Ability'
 
@@ -6,6 +8,7 @@ export class AxeSpin implements Ability {
   public game: Game
   public champion: Champion
 
+  public static readonly DAMAGE = 20
   public isTargetingMode: boolean = false
   public mouseTriggered: boolean = false
   public iconTexture: string = 'axe'
@@ -13,11 +16,17 @@ export class AxeSpin implements Ability {
 
   public secondsUntilCooldownExpires: number = 0
   public isInCooldown: boolean = false
-  public isTriggeringAbility: boolean = false
 
   // Graphics
-  public axeSprite: Phaser.Physics.Arcade.Sprite
+  public axeHitbox: Phaser.Physics.Arcade.Sprite
+  public axeSprite: Phaser.GameObjects.Sprite
   public slashArc: Phaser.GameObjects.Arc
+
+  public minionCollider!: Phaser.Physics.Arcade.Collider
+  public championCollider!: Phaser.Physics.Arcade.Collider
+
+  public isHitboxActive = false
+  public isTriggeringAbility: boolean = false
 
   constructor(game: Game, champion: Champion) {
     this.game = game
@@ -35,12 +44,69 @@ export class AxeSpin implements Ability {
       .setAlpha(0)
 
     // Setup axe sprite
-    this.axeSprite = this.game.physics.add
+    this.axeHitbox = this.game.physics.add.sprite(0, 0, '').setVisible(false)
+    this.axeHitbox.body.setSize(16, 16)
+    this.axeSprite = this.game.add
       .sprite(this.champion.sprite.x, this.champion.sprite.y, 'axe')
       .setVisible(false)
       .setScale(1)
       .setDepth(100)
       .setOrigin(0.5, 3.5)
+  }
+
+  setupColliders() {
+    if (!this.minionCollider) {
+      if (this.game.leftMinionSpawner && this.game.rightMinionSpawner) {
+        const enemyMinionsGroup =
+          this.champion.side === Side.LEFT
+            ? this.game.rightMinionSpawner.minions
+            : this.game.leftMinionSpawner.minions
+        this.minionCollider = this.game.physics.add.overlap(
+          enemyMinionsGroup,
+          this.axeHitbox,
+          (obj1, obj2) => {
+            this.handleCollisionWithTarget(obj1 as Phaser.Physics.Arcade.Sprite)
+          }
+        )
+      }
+    }
+    if (!this.championCollider) {
+      const enemyChampionsGroup =
+        this.champion.side === Side.LEFT
+          ? this.game.rightChampionsGroup
+          : this.game.leftChampionsGroup
+      this.championCollider = this.game.physics.add.overlap(
+        enemyChampionsGroup,
+        this.axeHitbox,
+        (obj1, obj2) => {
+          this.handleCollisionWithTarget(obj1 as Phaser.Physics.Arcade.Sprite)
+        }
+      )
+    }
+  }
+
+  handleCollisionWithTarget(target: Phaser.Physics.Arcade.Sprite) {
+    const isHit = target.getData('isCollidedWithAxeSpin')
+    if (!isHit && this.isHitboxActive) {
+      target.setTintFill(0xff0000)
+      this.game.time.delayedCall(100, () => {
+        target.clearTint()
+      })
+      target.setData('isCollidedWithAxeSpin', true)
+      const entity = target.getData('ref')
+      if (entity.getHealth() > 0) {
+        if (entity.getHealth() - AxeSpin.DAMAGE <= 0) {
+          this.champion.handleLastHit(entity)
+        } else {
+          this.game.time.delayedCall(1000, () => {
+            if (target.active) {
+              target.setData('isCollidedWithAxeSpin', false)
+            }
+          })
+        }
+        entity.takeDamage(AxeSpin.DAMAGE)
+      }
+    }
   }
 
   triggerAbility(): void {
@@ -68,7 +134,11 @@ export class AxeSpin implements Ability {
           angle: { from: 0, to: 360 },
           duration: 350,
           onStart: () => {
-            console.log('Started tween!')
+            this.isHitboxActive = true
+          },
+          onUpdate: () => {
+            const topCenter = this.axeSprite.getTopCenter()
+            this.axeHitbox.setPosition(topCenter.x, topCenter.y)
           },
           repeat: 0,
           onComplete: () => {
@@ -77,6 +147,7 @@ export class AxeSpin implements Ability {
               alpha: { from: 0.3, to: 0 },
               duration: 200,
               onComplete: () => {
+                this.isHitboxActive = false
                 this.slashArc.setVisible(false).setAlpha(0)
               },
             })
@@ -97,7 +168,7 @@ export class AxeSpin implements Ability {
 
   handleKeyPress() {
     if (this.key && this.champion.isPlayerControlled) {
-      if (this.key.isDown && !this.isTriggeringAbility) {
+      if (this.key.isDown && !this.isTriggeringAbility && !this.champion.isDead) {
         this.isTriggeringAbility = true
         this.triggerAbility()
       }
@@ -106,5 +177,6 @@ export class AxeSpin implements Ability {
 
   update() {
     this.handleKeyPress()
+    this.setupColliders()
   }
 }
