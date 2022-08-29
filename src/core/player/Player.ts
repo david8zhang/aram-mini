@@ -2,6 +2,7 @@ import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { AbilityKeys } from '../champion/abilities/AbilityKeys'
+import { AxeSpin } from '../champion/abilities/AxeSpin'
 import { Fireball } from '../champion/abilities/Fireball'
 import { AutoAttackType } from '../champion/auto-attack/AutoAttackType'
 import { Champion } from '../champion/Champion'
@@ -32,7 +33,7 @@ export class Player {
       },
       side: Side.LEFT,
       abilities: {
-        [AbilityKeys.Q]: Fireball,
+        [AbilityKeys.Q]: AxeSpin,
       },
       autoAttackType: AutoAttackType.MELEE,
     })

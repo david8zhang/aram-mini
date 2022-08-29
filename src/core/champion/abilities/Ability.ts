@@ -8,4 +8,5 @@ export interface Ability {
   isInCooldown: boolean
   secondsUntilCooldownExpires: number
   triggerAbility(): void
+  update(): void
 }

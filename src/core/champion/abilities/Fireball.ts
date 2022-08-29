@@ -20,7 +20,6 @@ export class Fireball implements Ability {
   public targetingArrow: TargetingArrow
   public iconTexture: string = 'fireball'
 
-  public cooldownTimer: Phaser.Time.TimerEvent
   public isInCooldown: boolean = false
   public secondsUntilCooldownExpires: number = 0
 
@@ -39,10 +38,6 @@ export class Fireball implements Ability {
       height: 5,
     })
     this.setupMouseClickListener()
-    this.cooldownTimer = this.game.time.addEvent({
-      delay: 1000,
-      callback: () => {},
-    })
   }
 
   setupMouseClickListener() {

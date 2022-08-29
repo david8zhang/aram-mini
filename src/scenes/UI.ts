@@ -1,6 +1,5 @@
 import { AbilityKeys } from '~/core/champion/abilities/AbilityKeys'
 import { UIValueBar } from '~/core/ui/UIValueBar'
-import { text } from '~/ui/Text'
 import { Constants } from '~/utils/Constants'
 import { Game } from './Game'
 
@@ -314,7 +313,7 @@ export class UI extends Phaser.Scene {
         const boundingRect = this.qAbilityUIObj.boundingRect as Phaser.GameObjects.Rectangle
         const cooldownText = this.qAbilityUIObj.cooldownText as Phaser.GameObjects.Text
 
-        sprite.setVisible(true).setTexture(qAbility.iconTexture).setScale(2).setAlpha(0.9)
+        sprite.setVisible(true).setTexture(qAbility.iconTexture).setScale(1).setAlpha(0.9)
         if (qAbility.isInCooldown) {
           boundingRect.setDepth(sprite.depth + 1)
           cooldownText

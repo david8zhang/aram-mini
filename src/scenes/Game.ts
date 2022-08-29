@@ -156,7 +156,7 @@ export class Game extends Phaser.Scene {
     this.physics.add.collider(this.leftMinionSpawner.minions, this.leftMinionSpawner.minions)
     this.physics.add.collider(this.rightMinionSpawner.minions, this.rightMinionSpawner.minions)
 
-    // this.rightMinionSpawner.startSpawning()
+    this.rightMinionSpawner.startSpawning()
     this.leftMinionSpawner.startSpawning()
   }
 

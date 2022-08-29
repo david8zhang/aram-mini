@@ -14,7 +14,16 @@ Miniature version of ARAM in League of Legends
 
 ## Harder Stuff
 
-- Warrior slashing ability
+- Warrior slashing ability (Q)
+- Warrior empowered attack (W)
+- Warrior pull ability (E)
+- Warrior execute (R)
+- Mage AOE explosion ability (W)
+- Mage Stun ability (E)
+- Mage tracking blast ability (R)
+
 - Have CPU champion use abilities
-- Multiple champions on the team
-- Have enemy champion attack minions even if they are not within last hit distance
+
+## Stretch Goals (Not needed for MVP)
+
+- Multiple champions per team (coordinated team-play)
