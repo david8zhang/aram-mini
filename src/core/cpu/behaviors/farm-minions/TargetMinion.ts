@@ -1,5 +1,6 @@
 import { Champion } from '~/core/champion/Champion'
 import { Minion } from '~/core/minion/Minion'
+import { Tower } from '~/core/tower/Tower'
 import { Constants } from '~/utils/Constants'
 import { BehaviorStatus } from '../../behavior-tree/BehaviorStatus'
 import { BehaviorTreeNode } from '../../behavior-tree/BehaviorTreeNode'
@@ -12,7 +13,8 @@ export class TargetMinion extends BehaviorTreeNode {
   }
 
   public process(): BehaviorStatus {
-    const enemyMinions = this.blackboard.getData(BlackboardKeys.ENEMY_MINIONS) as Minion[]
+    let enemyMinions = this.blackboard.getData(BlackboardKeys.ENEMY_MINIONS) as Minion[]
+    enemyMinions = this.filterMinionsProtectedByTower(enemyMinions)
 
     // If there are minions currently attacking this champion prioritize those, else farm the ones that are last-hittable
     const minionsAttackingThisChampion = this.getMinionsAttackingThisChampion(enemyMinions)
@@ -39,6 +41,29 @@ export class TargetMinion extends BehaviorTreeNode {
       this.blackboard.setData(BlackboardKeys.TARGET_MINION, closestMinionToFriendly)
       return BehaviorStatus.SUCCESS
     }
+  }
+
+  filterMinionsProtectedByTower(minions: Minion[]) {
+    let enemyTowers = this.blackboard.getData(BlackboardKeys.ENEMY_TOWERS) as Tower[]
+    enemyTowers = enemyTowers.filter((tower: Tower) => !tower.isDead)
+    const isInRangeOfTower = (minion: Minion, towerList: Tower[]) => {
+      for (let i = 0; i < towerList.length; i++) {
+        const tower = towerList[i]
+        const distanceToTower = Phaser.Math.Distance.Between(
+          minion.sprite.x,
+          minion.sprite.y,
+          tower.sprite.x,
+          tower.sprite.y
+        )
+        if (distanceToTower <= tower.attackRange) {
+          return true
+        }
+      }
+      return false
+    }
+    return minions.filter((m) => {
+      return !isInRangeOfTower(m, enemyTowers)
+    })
   }
 
   getClosestMinionCustomFn(minions: Minion[], sortingFn: Function) {

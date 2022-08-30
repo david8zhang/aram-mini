@@ -3,6 +3,7 @@ import { createSlashAnims } from '~/core/anims/slashAnims'
 import { Champion } from '~/core/champion/Champion'
 import { CPU } from '~/core/cpu/CPU'
 import { Debug } from '~/core/Debug'
+import { HealthOrb } from '~/core/HealthOrb'
 import { MinionSpawner } from '~/core/minion/MinionSpawner'
 import { Nexus } from '~/core/Nexus'
 import { ParticleEmitter } from '~/core/ParticleEmitter'
@@ -92,6 +93,7 @@ export class Game extends Phaser.Scene {
     this.initNexuses()
     this.initColliders()
     this.initParticleEmitters()
+    this.initHealthOrbs()
   }
 
   initParticleEmitters() {
@@ -225,6 +227,8 @@ export class Game extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.champion.sprite, true)
     this.leftChampionsGroup.add(this.player.champion.sprite)
   }
+
+  initHealthOrbs() {}
 
   playAnimationFrames(
     sprite: Phaser.Physics.Arcade.Sprite,
