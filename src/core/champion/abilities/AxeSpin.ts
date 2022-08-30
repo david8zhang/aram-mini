@@ -3,19 +3,20 @@ import { Game } from '~/scenes/Game'
 import { Side } from '~/utils/Side'
 import { Champion } from '../Champion'
 import { Ability } from './Ability'
+import { CooldownTimer } from './CooldownTimer'
 
 export class AxeSpin implements Ability {
   public game: Game
   public champion: Champion
 
-  public static readonly DAMAGE = 20
+  public static readonly DAMAGE = 25
+  public static readonly ABILITY_COOLDOWN_TIME_SECONDS = 5
+  public static readonly MANA_COST = 25
+
   public isTargetingMode: boolean = false
   public mouseTriggered: boolean = false
   public iconTexture: string = 'axe'
   public key!: Phaser.Input.Keyboard.Key | null
-
-  public secondsUntilCooldownExpires: number = 0
-  public isInCooldown: boolean = false
 
   // Graphics
   public axeHitbox: Phaser.Physics.Arcade.Sprite
@@ -27,6 +28,7 @@ export class AxeSpin implements Ability {
 
   public isHitboxActive = false
   public isTriggeringAbility: boolean = false
+  public cooldownTimer: CooldownTimer
 
   constructor(game: Game, champion: Champion) {
     this.game = game
@@ -52,6 +54,8 @@ export class AxeSpin implements Ability {
       .setScale(1)
       .setDepth(100)
       .setOrigin(0.5, 3.5)
+
+    this.cooldownTimer = new CooldownTimer(this.game, AxeSpin.ABILITY_COOLDOWN_TIME_SECONDS)
   }
 
   setupColliders() {
@@ -109,7 +113,26 @@ export class AxeSpin implements Ability {
     }
   }
 
+  public canTriggerAbility(): boolean {
+    return (
+      !this.isTriggeringAbility &&
+      !this.champion.isDead &&
+      this.champion.manaAmount >= AxeSpin.MANA_COST &&
+      !this.isInCooldown
+    )
+  }
+
+  public get isInCooldown() {
+    return this.cooldownTimer.isInCooldown
+  }
+
+  public get secondsUntilCooldownExpires() {
+    return this.cooldownTimer.secondsUntilCooldownExpires
+  }
+
   triggerAbility(): void {
+    this.cooldownTimer.startAbilityCooldown()
+    this.champion.decreaseMana(AxeSpin.MANA_COST)
     const event = this.game.time.addEvent({
       delay: 1,
       callback: () => {
@@ -168,7 +191,7 @@ export class AxeSpin implements Ability {
 
   handleKeyPress() {
     if (this.key && this.champion.isPlayerControlled) {
-      if (this.key.isDown && !this.isTriggeringAbility && !this.champion.isDead) {
+      if (this.key.isDown && this.canTriggerAbility()) {
         this.isTriggeringAbility = true
         this.triggerAbility()
       }

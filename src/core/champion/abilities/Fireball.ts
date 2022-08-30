@@ -3,6 +3,7 @@ import { Projectile } from '~/core/Projectile'
 import { Game } from '~/scenes/Game'
 import { Champion } from '../Champion'
 import { Ability } from './Ability'
+import { CooldownTimer } from './CooldownTimer'
 import { TargetingArrow } from './TargetingArrow'
 
 export class Fireball implements Ability {
@@ -12,7 +13,7 @@ export class Fireball implements Ability {
   public static readonly DAMAGE = 1000
   public static readonly MANA_COST = 50
   public static readonly ATTACK_RANGE = 100
-  public static readonly ABILITY_COOLDOWN_TIME = 10
+  public static readonly ABILITY_COOLDOWN_TIME_SECONDS = 10
 
   public isTargetingMode: boolean = false
   public mouseTriggered: boolean = false
@@ -20,8 +21,7 @@ export class Fireball implements Ability {
   public targetingArrow: TargetingArrow
   public iconTexture: string = 'fireball'
 
-  public isInCooldown: boolean = false
-  public secondsUntilCooldownExpires: number = 0
+  public cooldownTimer: CooldownTimer
 
   constructor(game: Game, champion: Champion) {
     this.game = game
@@ -37,6 +37,7 @@ export class Fireball implements Ability {
       width: Fireball.ATTACK_RANGE,
       height: 5,
     })
+    this.cooldownTimer = new CooldownTimer(this.game, Fireball.ABILITY_COOLDOWN_TIME_SECONDS)
     this.setupMouseClickListener()
   }
 
@@ -70,28 +71,20 @@ export class Fireball implements Ability {
     }
   }
 
+  public get isInCooldown() {
+    return this.cooldownTimer.isInCooldown
+  }
+
+  public get secondsUntilCooldownExpires() {
+    return this.cooldownTimer.secondsUntilCooldownExpires
+  }
+
   canTriggerAbility() {
     return this.champion.manaAmount >= Fireball.MANA_COST && !this.isInCooldown
   }
 
-  startAbilityCooldown() {
-    this.isInCooldown = true
-    this.secondsUntilCooldownExpires = Fireball.ABILITY_COOLDOWN_TIME
-    const cooldownEvent = this.game.time.addEvent({
-      delay: 1000,
-      callback: () => {
-        this.secondsUntilCooldownExpires--
-        if (this.secondsUntilCooldownExpires === 0) {
-          this.isInCooldown = false
-          cooldownEvent.remove()
-        }
-      },
-      repeat: -1,
-    })
-  }
-
   triggerAbility() {
-    this.startAbilityCooldown()
+    this.cooldownTimer.startAbilityCooldown()
     this.champion.decreaseMana(Fireball.MANA_COST)
     const targetPoint = this.targetingArrow.getArrowPositionEnd()
     const angleToTargetPoint = Phaser.Math.Angle.Between(

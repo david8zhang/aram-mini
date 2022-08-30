@@ -17,7 +17,6 @@ export class HasEnoughHealth extends BehaviorTreeNode {
       champion.getTotalHealth() * HasEnoughHealth.LOW_HEALTH_THRESHOLD
     )
     if (champion.getHealth() <= healthThresholdAmount) {
-      console.log('Failed health check!')
       return BehaviorStatus.FAILURE
     } else {
       return BehaviorStatus.SUCCESS

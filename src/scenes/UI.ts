@@ -314,6 +314,7 @@ export class UI extends Phaser.Scene {
         const cooldownText = this.qAbilityUIObj.cooldownText as Phaser.GameObjects.Text
 
         sprite.setVisible(true).setTexture(qAbility.iconTexture).setScale(1).setAlpha(0.9)
+
         if (qAbility.isInCooldown) {
           boundingRect.setDepth(sprite.depth + 1)
           cooldownText
