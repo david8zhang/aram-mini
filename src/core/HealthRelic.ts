@@ -49,7 +49,8 @@ export class HealthRelic {
 
   handleHealthPickup(champion: Champion) {
     if (!this.cooldownTimer.isInCooldown) {
-      const circle = this.game.add.circle(this.sprite.x, this.sprite.y, 25, 0x43e1b3, 1)
+      const circle = this.game.add.circle(this.sprite.x, this.sprite.y, 25, 0x43e1b3, 0.5)
+      circle.setStrokeStyle(5, 0x43e1b3, 1)
       this.game.tweens.add({
         targets: circle,
         alpha: { from: 1, to: 0 },
