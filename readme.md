@@ -6,7 +6,6 @@ Miniature version of ARAM in League of Legends
 
 ## Easy Wins
 
-- Health drops on map
 - Damage scaling for abilities based on level
 
 ## Polish
