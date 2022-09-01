@@ -136,6 +136,10 @@ export class Champion {
     }
   }
 
+  heal(healAmount: number) {
+    this.healthBar.increase(healAmount)
+  }
+
   setupRegenerationEvents() {
     this.healthRegenEvent = this.game.time.addEvent({
       delay: 5000,

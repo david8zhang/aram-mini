@@ -3,7 +3,7 @@ import { createSlashAnims } from '~/core/anims/slashAnims'
 import { Champion } from '~/core/champion/Champion'
 import { CPU } from '~/core/cpu/CPU'
 import { Debug } from '~/core/Debug'
-import { HealthOrb } from '~/core/HealthOrb'
+import { HealthRelic } from '~/core/HealthRelic'
 import { MinionSpawner } from '~/core/minion/MinionSpawner'
 import { Nexus } from '~/core/Nexus'
 import { ParticleEmitter } from '~/core/ParticleEmitter'
@@ -53,8 +53,8 @@ export class Game extends Phaser.Scene {
   public rightNexus!: Nexus
 
   public isGameOver: boolean = false
-
   public particleEmitter!: ParticleEmitter
+  public healthRelics: HealthRelic[] = []
 
   constructor() {
     super('game')
@@ -93,7 +93,7 @@ export class Game extends Phaser.Scene {
     this.initNexuses()
     this.initColliders()
     this.initParticleEmitters()
-    this.initHealthOrbs()
+    this.initHealthRelics()
   }
 
   initParticleEmitters() {
@@ -228,7 +228,22 @@ export class Game extends Phaser.Scene {
     this.leftChampionsGroup.add(this.player.champion.sprite)
   }
 
-  initHealthOrbs() {}
+  initHealthRelics() {
+    const coordinates = [
+      [16, 5],
+      [12, 9],
+      [5, 16],
+      [9, 12],
+    ]
+    coordinates.forEach((coordinate) => {
+      const worldPosition = this.debug.getWorldPositionForCoordinates(coordinate[0], coordinate[1])
+      const healthRelic = new HealthRelic(this, {
+        position: worldPosition,
+        healAmount: 100,
+      })
+      this.healthRelics.push(healthRelic)
+    })
+  }
 
   playAnimationFrames(
     sprite: Phaser.Physics.Arcade.Sprite,
@@ -330,6 +345,7 @@ export class Game extends Phaser.Scene {
     })
     this.leftTowers.forEach((t) => t.update())
     this.rightTowers.forEach((t) => t.update())
+    this.healthRelics.forEach((h) => h.update())
     this.graphics.lineStyle(1, 0x00ff00, 1)
     // this.depthSort()
   }

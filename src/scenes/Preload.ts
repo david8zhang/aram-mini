@@ -36,6 +36,7 @@ export class Preload extends Scene {
     this.load.tilemapTiledJSON('map', 'map.json')
     this.load.image('tilemap_packed', 'tilemap_packed.png')
     this.load.image('attack-cursor', 'attack-cursor.png')
+    this.load.image('health-relic', 'health-relic.png')
   }
 
   create() {

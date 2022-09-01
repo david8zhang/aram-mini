@@ -10,6 +10,8 @@ export class Debug {
 
   public onDebugToggleHooks: Function[] = []
 
+  public grid: Phaser.GameObjects.Rectangle[][] = []
+
   constructor(game: Game) {
     this.game = game
     this.objects = this.game.add.group()
@@ -40,6 +42,7 @@ export class Debug {
     const gridHeight = Constants.GAME_HEIGHT / Debug.FIELD_ZONE_HEIGHT
 
     for (let i = 0; i < gridWidth; i++) {
+      this.grid.push(new Array(gridHeight))
       position.x = 20
       for (let j = 0; j < gridHeight; j++) {
         const zoneRect = this.game.add
@@ -65,8 +68,17 @@ export class Debug {
         this.objects.add(zoneRect)
         this.objects.add(text)
         position.x += Debug.FIELD_ZONE_WIDTH
+        this.grid[i][j] = zoneRect
       }
       position.y += Debug.FIELD_ZONE_HEIGHT
+    }
+  }
+
+  getWorldPositionForCoordinates(row: number, col: number) {
+    const zoneRect = this.grid[row][col]
+    return {
+      x: zoneRect.x,
+      y: zoneRect.y,
     }
   }
 
