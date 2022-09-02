@@ -10,7 +10,6 @@ export class Fireball implements Ability {
   game: Game
   champion: Champion
 
-  public static readonly DAMAGE = 1000
   public static readonly MANA_COST = 50
   public static readonly ATTACK_RANGE = 100
   public static readonly ABILITY_COOLDOWN_TIME_SECONDS = 10
@@ -109,18 +108,23 @@ export class Fireball implements Ability {
         scaleY: 0.4,
       },
       onOverlapFn: (target: Minion | Champion) => {
+        const damage = this.getDamageBasedOnChampionLevel()
         if (target.side !== this.champion.side) {
           if (target.getHealth() > 0) {
-            if (target.getHealth() - Fireball.DAMAGE <= 0) {
+            if (target.getHealth() - damage <= 0) {
               this.champion.handleLastHit(target)
             }
-            target.takeDamage(Fireball.DAMAGE)
+            target.takeDamage(damage)
             fireball.destroy()
           }
         }
       },
     })
     this.game.projectileGroup.add(fireball.sprite)
+  }
+
+  getDamageBasedOnChampionLevel() {
+    return Math.round((450 * this.champion.level) / 17 + 400 / 17)
   }
 
   renderTargetingUI() {

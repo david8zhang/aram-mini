@@ -401,6 +401,9 @@ export class Champion {
       return
     }
     if (moveTarget && !this.isAtMoveTarget(moveTarget)) {
+      if (this.moveMarker) {
+        this.moveMarker?.setVisible(true)
+      }
       let angle = Phaser.Math.Angle.BetweenPoints(
         {
           x: this.sprite.x,
@@ -415,6 +418,9 @@ export class Champion {
       this.game.physics.velocityFromRotation(angle, 100, velocityVector)
       this.sprite.setVelocity(velocityVector.x, velocityVector.y)
     } else {
+      if (this.moveMarker) {
+        this.moveMarker?.setVisible(false)
+      }
       this.sprite.setVelocity(0, 0)
     }
   }

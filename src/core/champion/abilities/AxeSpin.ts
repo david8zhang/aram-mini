@@ -9,7 +9,6 @@ export class AxeSpin implements Ability {
   public game: Game
   public champion: Champion
 
-  public static readonly DAMAGE = 25
   public static readonly ABILITY_COOLDOWN_TIME_SECONDS = 5
   public static readonly MANA_COST = 25
 
@@ -92,14 +91,26 @@ export class AxeSpin implements Ability {
   handleCollisionWithTarget(target: Phaser.Physics.Arcade.Sprite) {
     const isHit = target.getData('isCollidedWithAxeSpin')
     if (!isHit && this.isHitboxActive) {
+      // Show burst of blood particles
+      this.game.particleEmitter.emitParticles({
+        texture: 'blood',
+        scale: 1,
+        gravity: true,
+        position: {
+          x: target.x,
+          y: target.y,
+        },
+        count: 3,
+      })
       target.setTintFill(0xff0000)
       this.game.time.delayedCall(100, () => {
         target.clearTint()
       })
       target.setData('isCollidedWithAxeSpin', true)
       const entity = target.getData('ref')
+      const damage = this.getDamageBasedOnChampionLevel()
       if (entity.getHealth() > 0) {
-        if (entity.getHealth() - AxeSpin.DAMAGE <= 0) {
+        if (entity.getHealth() - damage <= 0) {
           this.champion.handleLastHit(entity)
         } else {
           this.game.time.delayedCall(1000, () => {
@@ -108,7 +119,7 @@ export class AxeSpin implements Ability {
             }
           })
         }
-        entity.takeDamage(AxeSpin.DAMAGE)
+        entity.takeDamage(damage)
       }
     }
   }
@@ -120,6 +131,10 @@ export class AxeSpin implements Ability {
       this.champion.manaAmount >= AxeSpin.MANA_COST &&
       !this.isInCooldown
     )
+  }
+
+  public getDamageBasedOnChampionLevel() {
+    return Math.round((775 * this.champion.level) / 17 + 350 / 17)
   }
 
   public get isInCooldown() {

@@ -6,11 +6,8 @@ Miniature version of ARAM in League of Legends
 
 ## Easy Wins
 
-- Damage scaling for abilities based on level
-
 ## Polish
 
-- Effects for ability usage
 - Enhance axe sprite for warrior slash and make hitbox bigger
 
 ## Harder Stuff

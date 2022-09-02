@@ -2,7 +2,7 @@ import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 
 interface EmissionConfig {
-  texture: string
+  texture: string | string[]
   scale: number
   position: {
     x: number
@@ -22,11 +22,11 @@ export class ParticleEmitter {
     for (let i = 0; i < config.count; i++) {
       const xVelocity = Phaser.Math.Between(-50, 50)
       const yVelocity = Phaser.Math.Between(-100, -50)
-      const sprite = this.game.physics.add.sprite(
-        config.position.x,
-        config.position.y,
-        config.texture
-      )
+      const texture =
+        typeof config.texture === 'string'
+          ? config.texture
+          : config.texture[Phaser.Math.Between(0, config.texture.length)]
+      const sprite = this.game.physics.add.sprite(config.position.x, config.position.y, texture)
       sprite.setScale(config.scale)
       sprite.setVelocity(xVelocity, yVelocity)
 
