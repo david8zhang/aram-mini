@@ -3,4 +3,5 @@ export enum ChampionStates {
   ATTACK = 'Attack',
   IDLE = 'Idle',
   DEAD = 'Dead',
+  ABILITY_MOVE = 'AbilityMove',
 }

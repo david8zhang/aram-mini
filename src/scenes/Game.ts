@@ -4,6 +4,7 @@ import { Champion } from '~/core/champion/Champion'
 import { CPU } from '~/core/cpu/CPU'
 import { Debug } from '~/core/Debug'
 import { HealthRelic } from '~/core/HealthRelic'
+import { Minion } from '~/core/minion/Minion'
 import { MinionSpawner } from '~/core/minion/MinionSpawner'
 import { Nexus } from '~/core/Nexus'
 import { ParticleEmitter } from '~/core/ParticleEmitter'
@@ -117,6 +118,18 @@ export class Game extends Phaser.Scene {
     this.physics.add.overlap(this.projectileGroup, this.rightMinionSpawner.minions, handleOverlap)
   }
 
+  public get leftMinions() {
+    return this.leftMinionSpawner.minions.children.entries.map((entry) => {
+      return entry.getData('ref') as Minion
+    })
+  }
+
+  public get rightMinions() {
+    return this.rightMinionSpawner.minions.children.entries.map((entry) => {
+      return entry.getData('ref') as Minion
+    })
+  }
+
   public get leftChampions() {
     return this.leftChampionsGroup.children.entries.map((entry) => {
       return entry.getData('ref') as Champion
@@ -131,6 +144,14 @@ export class Game extends Phaser.Scene {
 
   public static get instance() {
     return Game._instance
+  }
+
+  public hideCursor() {
+    document.getElementsByTagName('body')[0]?.setAttribute('style', 'cursor:none;')
+  }
+
+  public showCursor() {
+    document.getElementsByTagName('body')[0]?.setAttribute('style', 'cursor:visible;')
   }
 
   initCamera() {

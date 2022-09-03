@@ -1,4 +1,5 @@
 import { AbilityKeys } from '~/core/champion/abilities/AbilityKeys'
+import { Player } from '~/core/player/Player'
 import { UIValueBar } from '~/core/ui/UIValueBar'
 import { Constants } from '~/utils/Constants'
 import { Game } from './Game'
@@ -304,32 +305,59 @@ export class UI extends Phaser.Scene {
     }
   }
 
+  updatePlayerAbility(abilityKey: AbilityKeys, player: Player) {
+    const ability = player.champion.abilities[abilityKey]
+    let abilityUIObj: any
+    switch (abilityKey) {
+      case AbilityKeys.Q: {
+        abilityUIObj = this.qAbilityUIObj
+        break
+      }
+      case AbilityKeys.W: {
+        abilityUIObj = this.wAbilityUIObj
+        break
+      }
+      case AbilityKeys.E: {
+        abilityUIObj = this.eAbilityUIObj
+        break
+      }
+      case AbilityKeys.R: {
+        abilityUIObj = this.rAbilityUIObj
+        break
+      }
+    }
+
+    if (ability) {
+      const sprite = abilityUIObj.sprite as Phaser.GameObjects.Sprite
+      const boundingRect = abilityUIObj.boundingRect as Phaser.GameObjects.Rectangle
+      const cooldownText = abilityUIObj.cooldownText as Phaser.GameObjects.Text
+
+      sprite.setVisible(true).setTexture(ability.iconTexture).setScale(1).setAlpha(0.9)
+
+      if (ability.isInCooldown) {
+        boundingRect.setDepth(sprite.depth + 1)
+        cooldownText
+          .setVisible(true)
+          .setText(`${ability.secondsUntilCooldownExpires}`)
+          .setDepth(boundingRect.depth + 1)
+          .setPosition(
+            boundingRect.x - cooldownText.displayWidth / 2,
+            boundingRect.y - cooldownText.displayHeight / 2
+          )
+      } else {
+        boundingRect.setDepth(sprite.depth - 1)
+        cooldownText.setVisible(false)
+      }
+    }
+  }
+
   updatePlayerChampionAbilities() {
     const player = Game.instance ? Game.instance.player : null
     if (player) {
-      const qAbility = player.champion.abilities[AbilityKeys.Q]
-      if (qAbility) {
-        const sprite = this.qAbilityUIObj.sprite as Phaser.GameObjects.Sprite
-        const boundingRect = this.qAbilityUIObj.boundingRect as Phaser.GameObjects.Rectangle
-        const cooldownText = this.qAbilityUIObj.cooldownText as Phaser.GameObjects.Text
-
-        sprite.setVisible(true).setTexture(qAbility.iconTexture).setScale(1).setAlpha(0.9)
-
-        if (qAbility.isInCooldown) {
-          boundingRect.setDepth(sprite.depth + 1)
-          cooldownText
-            .setVisible(true)
-            .setText(`${qAbility.secondsUntilCooldownExpires}`)
-            .setDepth(boundingRect.depth + 1)
-            .setPosition(
-              boundingRect.x - cooldownText.displayWidth / 2,
-              boundingRect.y - cooldownText.displayHeight / 2
-            )
-        } else {
-          boundingRect.setDepth(sprite.depth - 1)
-          cooldownText.setVisible(false)
-        }
-      }
+      this.updatePlayerAbility(AbilityKeys.Q, player)
+      this.updatePlayerAbility(AbilityKeys.W, player)
+      this.updatePlayerAbility(AbilityKeys.E, player)
+      this.updatePlayerAbility(AbilityKeys.W, player)
     }
   }
 

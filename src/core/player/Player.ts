@@ -2,8 +2,9 @@ import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { AbilityKeys } from '../champion/abilities/AbilityKeys'
-import { AxeSpin } from '../champion/abilities/AxeSpin'
 import { Fireball } from '../champion/abilities/Fireball'
+import { FireBlastAOE } from '../champion/abilities/FireBlastAOE'
+import { FlameSpread } from '../champion/abilities/FlameSpread'
 import { AutoAttackType } from '../champion/auto-attack/AutoAttackType'
 import { Champion } from '../champion/Champion'
 import { ChampionStates } from '../champion/states/ChampionStates'
@@ -34,6 +35,8 @@ export class Player {
       side: Side.LEFT,
       abilities: {
         [AbilityKeys.Q]: Fireball,
+        [AbilityKeys.W]: FireBlastAOE,
+        [AbilityKeys.E]: FlameSpread,
       },
       autoAttackType: AutoAttackType.RANGED,
     })
@@ -168,14 +171,14 @@ export class Player {
   }
 
   enableAttackTargeting() {
-    document.getElementById('phaser')?.setAttribute('style', 'cursor:none;')
+    this.game.hideCursor()
     this.attackCursorImage.setVisible(true)
     this.attackRangeCircle.setVisible(true)
     this.inAttackTargetingMode = true
   }
 
   disableAttackTargeting() {
-    document.getElementById('phaser')?.setAttribute('style', 'cursor:default;')
+    this.game.showCursor()
     this.attackCursorImage.setVisible(false)
     this.attackRangeCircle.setVisible(false)
     this.inAttackTargetingMode = false

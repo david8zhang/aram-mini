@@ -14,16 +14,17 @@ export class Preload extends Scene {
     this.load.image('minion_blue', 'minion-blue.png')
     this.load.image('minion_red', 'minion-red.png')
 
-    // Projectiles
+    // Projectiles & Abilities
     this.load.image('projectile_blue', 'projectile-blue.png')
     this.load.image('projectile_red', 'projectile-red.png')
     this.load.image('fireball', 'fireball.png')
-    this.load.image('coin', 'coin.png')
-    this.load.image('blood', 'blood.png')
-
-    // weapons
+    this.load.image('fire-blast', 'fire-blast.png')
     this.load.atlas('slash', 'animations/slash.png', 'animations/slash.json')
     this.load.image('axe', 'axe.png')
+
+    // Particles
+    this.load.image('coin', 'coin.png')
+    this.load.image('blood', 'blood.png')
 
     // Towers
     this.load.image('tower_red', 'tower-red.png')
@@ -36,8 +37,11 @@ export class Preload extends Scene {
     // Tilemaps & Etc.
     this.load.tilemapTiledJSON('map', 'map.json')
     this.load.image('tilemap_packed', 'tilemap_packed.png')
-    this.load.image('attack-cursor', 'attack-cursor.png')
     this.load.image('health-relic', 'health-relic.png')
+
+    // Targeting UI
+    this.load.image('attack-cursor', 'attack-cursor.png')
+    this.load.image('targeting-cursor', 'targeting-cursor.png')
   }
 
   create() {

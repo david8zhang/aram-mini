@@ -3,16 +3,17 @@ import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Minion } from '../minion/Minion'
 import { Nexus } from '../Nexus'
-import { Projectile } from '../Projectile'
 import { StateMachine } from '../StateMachine'
 import { Tower } from '../tower/Tower'
 import { UIValueBar } from '../ui/UIValueBar'
 import { Ability } from './abilities/Ability'
 import { AbilityKeys } from './abilities/AbilityKeys'
+import { AbilityWithRange } from './abilities/AbilityWithRange'
 import { AutoAttack } from './auto-attack/AutoAttack'
 import { AutoAttackType } from './auto-attack/AutoAttackType'
 import { MeleeAttack } from './auto-attack/MeleeAttack'
 import { RangedAttack } from './auto-attack/RangedAttack'
+import { AbilityMoveState } from './states/AbilityMoveState'
 import { AttackState } from './states/AttackState'
 import { ChampionStates } from './states/ChampionStates'
 import { DeadState } from './states/DeadState'
@@ -47,6 +48,9 @@ export class Champion {
   public healthBar: UIValueBar
   public hpRegenAmt: number = 5
   public healthRegenEvent!: Phaser.Time.TimerEvent
+
+  // To enable the champion to move within range of ability
+  public abilityWithRange: AbilityWithRange | null = null
 
   public manaRegenEvent!: Phaser.Time.TimerEvent
   public manaRegenAmt: number = 5
@@ -105,6 +109,7 @@ export class Champion {
         [ChampionStates.MOVE]: new MoveState(),
         [ChampionStates.ATTACK]: new AttackState(),
         [ChampionStates.DEAD]: new DeadState(),
+        [ChampionStates.ABILITY_MOVE]: new AbilityMoveState(),
       },
       [this]
     )
