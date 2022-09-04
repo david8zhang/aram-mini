@@ -206,6 +206,9 @@ export class AxeSpin implements Ability {
 
   handleKeyPress() {
     if (this.key && this.champion.isPlayerControlled) {
+      if (this.game.player.inAttackTargetingMode) {
+        return
+      }
       if (this.key.isDown && this.canTriggerAbility()) {
         this.isTriggeringAbility = true
         this.triggerAbility()

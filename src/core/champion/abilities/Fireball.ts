@@ -55,6 +55,9 @@ export class Fireball implements Ability {
 
   handleKeyPress() {
     if (this.key && this.champion.isPlayerControlled) {
+      if (this.game.player.inAttackTargetingMode) {
+        return
+      }
       if (this.key.isDown && !this.mouseTriggered) {
         if (this.canTriggerAbility()) {
           this.isTargetingMode = true

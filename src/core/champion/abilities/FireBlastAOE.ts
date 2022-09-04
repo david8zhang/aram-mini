@@ -15,7 +15,7 @@ export class FireBlastAOE implements Ability, AbilityWithRange {
   private static readonly TARGETING_CIRCLE_RADIUS = 40
   private static readonly EXPLOSION_CIRCLE_COLOR = 0xfe7817
   private static readonly EXPLOSION_CIRCLE_OUTLINE_COLOR = 0xfed874
-  private static readonly ABILITY_COOLDOWN_TIME_SECONDS = 1
+  private static readonly ABILITY_COOLDOWN_TIME_SECONDS = 15
   private static readonly MANA_COST = 75
   private static readonly ABILITY_RANGE = 100
 
@@ -82,11 +82,19 @@ export class FireBlastAOE implements Ability, AbilityWithRange {
       duration: 1000,
       onComplete: () => {
         this.handleDamageToEnemiesWithinExplosionRadius(explosionCircleOutline)
-        explosionCircle.destroy()
-        explosionCircleOutline.destroy()
-        if (onCompleteCallback) {
-          onCompleteCallback()
-        }
+        this.game.tweens.add({
+          targets: explosionCircle,
+          radius: { from: 0, to: FireBlastAOE.TARGETING_CIRCLE_RADIUS * 2 },
+          alpha: { from: 1, to: 0 },
+          duration: 250,
+          onComplete: () => {
+            explosionCircle.destroy()
+            explosionCircleOutline.destroy()
+            if (onCompleteCallback) {
+              onCompleteCallback()
+            }
+          },
+        })
       },
     })
   }
@@ -119,6 +127,9 @@ export class FireBlastAOE implements Ability, AbilityWithRange {
 
   handleKeyPress() {
     if (this.key && this.champion.isPlayerControlled) {
+      if (this.game.player.inAttackTargetingMode) {
+        return
+      }
       if (this.key.isDown && !this.mouseTriggered) {
         if (this.canTriggerAbility()) {
           this.isTargetingMode = true
@@ -160,7 +171,6 @@ export class FireBlastAOE implements Ability, AbilityWithRange {
     if (this.isInRangeOfPosition(position)) {
       this.triggerAbilityAtPosition(position, null)
     } else {
-      console.log('Went here!')
       this.champion.abilityWithRange = this
       this.abilityTarget = position
       this.champion.stateMachine.transition(ChampionStates.ABILITY_MOVE)

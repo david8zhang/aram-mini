@@ -1,17 +1,26 @@
+import { Minion } from '~/core/minion/Minion'
 import { Game } from '~/scenes/Game'
+import { Side } from '~/utils/Side'
 import { Champion } from '../Champion'
 import { Ability } from './Ability'
+import { CooldownTimer } from './CooldownTimer'
 
 export class FlameSpread implements Ability {
   game: Game
   champion: Champion
+
+  private static readonly MANA_COST = 30
+  private static readonly ABILITY_COOLDOWN_TIME_SECONDS = 15
+  private static readonly EXPLOSION_CIRCLE_COLOR = 0xfe7817
+  private static readonly EXPLOSION_CIRCLE_OUTLINE_COLOR = 0xfed874
 
   public key!: Phaser.Input.Keyboard.Key | null
   public mouseTriggered: boolean = false
   public isTargetingMode: boolean = false
   public targetingCursor: Phaser.GameObjects.Sprite
 
-  public iconTexture: string = ''
+  public iconTexture: string = 'flame-spread'
+  public cooldownTimer: CooldownTimer
 
   constructor(game: Game, champion: Champion) {
     this.game = game
@@ -23,18 +32,20 @@ export class FlameSpread implements Ability {
       .sprite(0, 0, 'targeting-cursor')
       .setVisible(false)
       .setDepth(1000)
+    this.cooldownTimer = new CooldownTimer(this.game, FlameSpread.ABILITY_COOLDOWN_TIME_SECONDS)
+    this.setupMouseClickListener()
   }
 
   public get isInCooldown() {
-    return false
+    return this.cooldownTimer.isInCooldown
   }
 
   public get secondsUntilCooldownExpires() {
-    return 0
+    return this.cooldownTimer.secondsUntilCooldownExpires
   }
 
   public canTriggerAbility(): boolean {
-    return true
+    return this.champion.manaAmount >= FlameSpread.MANA_COST && !this.isInCooldown
   }
 
   setupMouseClickListener() {
@@ -52,6 +63,9 @@ export class FlameSpread implements Ability {
 
   handleKeyPress() {
     if (this.key && this.champion.isPlayerControlled) {
+      if (this.game.player.inAttackTargetingMode) {
+        return
+      }
       if (this.key.isDown && !this.mouseTriggered) {
         if (this.canTriggerAbility()) {
           this.isTargetingMode = true
@@ -80,7 +94,122 @@ export class FlameSpread implements Ability {
     }
   }
 
-  triggerAbility(): void {}
+  triggerAbility(): void {
+    const targetingCircle = new Phaser.Geom.Circle(
+      this.game.input.mousePointer.worldX,
+      this.game.input.mousePointer.worldY,
+      8
+    )
+    const enemyMinions =
+      this.champion.side === Side.LEFT ? this.game.rightMinions : this.game.leftMinions
+    const enemyChampions =
+      this.champion.side === Side.LEFT ? this.game.rightChampions : this.game.leftChampions
+    const clickedEntity = this.getClickedEntity(enemyMinions, enemyChampions, targetingCircle)
+    if (clickedEntity) {
+      this.cooldownTimer.startAbilityCooldown()
+      this.handleFireExplosionOnEntity(clickedEntity, enemyMinions, enemyChampions, true, 0)
+    }
+  }
+
+  public get damage(): number {
+    return 35
+  }
+
+  handleFireExplosionOnEntity(
+    entity: Minion | Champion,
+    minions: Minion[],
+    champions: Champion[],
+    shouldSpread: boolean,
+    delay: number
+  ) {
+    const explosionCircle = this.game.add
+      .circle(entity.sprite.x, entity.sprite.y, 5, FlameSpread.EXPLOSION_CIRCLE_COLOR)
+      .setVisible(false)
+    this.game.tweens.add({
+      delay,
+      targets: explosionCircle,
+      radius: { from: 15, to: 30 },
+      alpha: { from: 0.8, to: 0.25 },
+      fill: {
+        from: FlameSpread.EXPLOSION_CIRCLE_COLOR,
+        to: FlameSpread.EXPLOSION_CIRCLE_OUTLINE_COLOR,
+      },
+      onStart: () => {
+        explosionCircle.setVisible(true)
+        if (entity.getHealth() > 0) {
+          if (entity.getHealth() - this.damage <= 0) {
+            this.champion.handleLastHit(entity)
+          }
+          entity.takeDamage(this.damage)
+        }
+      },
+      duration: 250,
+      onComplete: () => {
+        explosionCircle.destroy()
+        if (shouldSpread) {
+          const enemiesWithinRange = this.getEnemiesWithinRange(entity, minions, champions, 30)
+          enemiesWithinRange.forEach((e, index) => {
+            this.handleFireExplosionOnEntity(e, minions, champions, false, 250 * index)
+          })
+        }
+      },
+    })
+  }
+
+  getEnemiesWithinRange(
+    entity: Minion | Champion,
+    minions: Minion[],
+    champions: Champion[],
+    range: number
+  ) {
+    let result: (Minion | Champion)[] = []
+    const addIfWithinRange = (e: Minion | Champion) => {
+      if (e != entity) {
+        const distance = Phaser.Math.Distance.Between(
+          entity.sprite.x,
+          entity.sprite.y,
+          e.sprite.x,
+          e.sprite.y
+        )
+        if (distance <= range) {
+          result.push(e)
+        }
+      }
+    }
+    minions.forEach((minion) => addIfWithinRange(minion))
+    champions.forEach((champion) => addIfWithinRange(champion))
+    return result
+  }
+
+  getClickedEntity(minions: Minion[], champions: Champion[], targetingCircle: Phaser.Geom.Circle) {
+    const overlappedEntities: (Minion | Champion)[] = []
+    minions.forEach((minion: Minion) => {
+      if (targetingCircle.contains(minion.sprite.x, minion.sprite.y)) {
+        overlappedEntities.push(minion)
+      }
+    })
+    champions.forEach((champion: Champion) => {
+      if (targetingCircle.contains(champion.sprite.x, champion.sprite.y)) {
+        overlappedEntities.push(champion)
+      }
+    })
+
+    let closestToCircleCenter: Minion | Champion | null = null
+    let minDistanceToCircleCenter: number = Number.MAX_SAFE_INTEGER
+    overlappedEntities.forEach((entity: Minion | Champion) => {
+      const distanceToCircleCenter = Phaser.Math.Distance.Between(
+        entity.sprite.x,
+        entity.sprite.y,
+        targetingCircle.x,
+        targetingCircle.y
+      )
+      if (distanceToCircleCenter <= minDistanceToCircleCenter) {
+        closestToCircleCenter = entity
+        minDistanceToCircleCenter = distanceToCircleCenter
+      }
+    })
+    return closestToCircleCenter
+  }
 
   update(): void {
     this.renderTargetingUI()
