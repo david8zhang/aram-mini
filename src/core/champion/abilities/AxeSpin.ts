@@ -18,12 +18,10 @@ export class AxeSpin implements Ability {
   public key!: Phaser.Input.Keyboard.Key | null
 
   // Graphics
-  public axeHitbox: Phaser.Physics.Arcade.Sprite
+  public axeHitbox: Phaser.Geom.Circle
   public axeSprite: Phaser.GameObjects.Sprite
   public slashArc: Phaser.GameObjects.Arc
-
-  public minionCollider!: Phaser.Physics.Arcade.Collider
-  public championCollider!: Phaser.Physics.Arcade.Collider
+  public slashArcInner: Phaser.GameObjects.Arc
 
   public isHitboxActive = false
   public isTriggeringAbility: boolean = false
@@ -40,52 +38,27 @@ export class AxeSpin implements Ability {
     this.slashArc = this.game.add
       .circle(this.champion.sprite.x, this.champion.sprite.y, 50)
       .setVisible(false)
-      .setStrokeStyle(20, 0xff0000)
+      .setStrokeStyle(15, 0xff0000)
+      .setDepth(100)
+      .setAlpha(0)
+
+    this.slashArcInner = this.game.add
+      .circle(this.champion.sprite.x, this.champion.sprite.y, 30)
+      .setVisible(false)
+      .setStrokeStyle(18, 0xff0000)
       .setDepth(100)
       .setAlpha(0)
 
     // Setup axe sprite
-    this.axeHitbox = this.game.physics.add.sprite(0, 0, '').setVisible(false)
-    this.axeHitbox.body.setSize(16, 16)
+    this.axeHitbox = new Phaser.Geom.Circle(0, 0, 57)
     this.axeSprite = this.game.add
-      .sprite(this.champion.sprite.x, this.champion.sprite.y, 'axe')
+      .sprite(this.champion.sprite.x, this.champion.sprite.y, 'axe-spin')
       .setVisible(false)
       .setScale(1)
       .setDepth(100)
-      .setOrigin(0.5, 3.5)
+      .setOrigin(0.5, 1.75)
 
     this.cooldownTimer = new CooldownTimer(this.game, AxeSpin.ABILITY_COOLDOWN_TIME_SECONDS)
-  }
-
-  setupColliders() {
-    if (!this.minionCollider) {
-      if (this.game.leftMinionSpawner && this.game.rightMinionSpawner) {
-        const enemyMinionsGroup =
-          this.champion.side === Side.LEFT
-            ? this.game.rightMinionSpawner.minions
-            : this.game.leftMinionSpawner.minions
-        this.minionCollider = this.game.physics.add.overlap(
-          enemyMinionsGroup,
-          this.axeHitbox,
-          (obj1, obj2) => {
-            this.handleCollisionWithTarget(obj1 as Phaser.Physics.Arcade.Sprite)
-          }
-        )
-      }
-    }
-    if (!this.championCollider) {
-      const enemyChampionsGroup =
-        this.champion.side === Side.LEFT
-          ? this.game.rightChampionsGroup
-          : this.game.leftChampionsGroup
-      this.championCollider = this.game.physics.add.overlap(
-        enemyChampionsGroup,
-        this.axeHitbox,
-        (obj1, obj2) => {
-          this.handleCollisionWithTarget(obj1 as Phaser.Physics.Arcade.Sprite)
-        }
-      )
-    }
   }
 
   handleCollisionWithTarget(target: Phaser.Physics.Arcade.Sprite) {
@@ -124,6 +97,25 @@ export class AxeSpin implements Ability {
     }
   }
 
+  handleDamageToEntitiesWithinHitbox() {
+    const enemyMinions =
+      this.champion.side === Side.LEFT ? this.game.rightMinions : this.game.leftMinions
+    const enemyChampion =
+      this.champion.side === Side.LEFT ? this.game.rightChampions : this.game.leftChampions
+    enemyMinions.forEach((minion: Minion) => {
+      const isInHitbox = this.axeHitbox.contains(minion.sprite.x, minion.sprite.y)
+      if (isInHitbox) {
+        this.handleCollisionWithTarget(minion.sprite)
+      }
+    })
+    enemyChampion.forEach((champion: Champion) => {
+      const isInHitbox = this.axeHitbox.contains(champion.sprite.x, champion.sprite.y)
+      if (isInHitbox) {
+        this.handleCollisionWithTarget(champion.sprite)
+      }
+    })
+  }
+
   public canTriggerAbility(): boolean {
     return (
       !this.isTriggeringAbility &&
@@ -151,6 +143,9 @@ export class AxeSpin implements Ability {
     const event = this.game.time.addEvent({
       delay: 1,
       callback: () => {
+        this.slashArcInner
+          .setPosition(this.champion.sprite.x, this.champion.sprite.y)
+          .setVisible(true)
         this.slashArc.setPosition(this.champion.sprite.x, this.champion.sprite.y).setVisible(true)
         this.axeSprite
           .setPosition(this.champion.sprite.x, this.champion.sprite.y)
@@ -160,32 +155,36 @@ export class AxeSpin implements Ability {
       repeat: -1,
     })
 
+    const graphics = this.game.add.graphics()
+
     this.game.add.tween({
       alpha: { from: 0, to: 0.3 },
       duration: 400,
-      targets: this.slashArc,
+      targets: [this.slashArc, this.slashArcInner],
       onComplete: () => {
         this.champion.stop()
         event.destroy()
         this.game.add.tween({
           targets: this.axeSprite,
           angle: { from: 0, to: 360 },
-          duration: 350,
+          duration: 250,
           onStart: () => {
             this.isHitboxActive = true
           },
           onUpdate: () => {
-            const topCenter = this.axeSprite.getTopCenter()
-            this.axeHitbox.setPosition(topCenter.x, topCenter.y)
+            this.axeHitbox.setPosition(this.champion.sprite.x, this.champion.sprite.y)
+            this.handleDamageToEntitiesWithinHitbox()
           },
           repeat: 0,
           onComplete: () => {
+            graphics.clear()
             this.game.add.tween({
-              targets: this.slashArc,
+              targets: [this.slashArc, this.slashArcInner],
               alpha: { from: 0.3, to: 0 },
               duration: 200,
               onComplete: () => {
                 this.isHitboxActive = false
+                this.slashArcInner.setVisible(false).setAlpha(0)
                 this.slashArc.setVisible(false).setAlpha(0)
               },
             })
@@ -218,6 +217,5 @@ export class AxeSpin implements Ability {
 
   update() {
     this.handleKeyPress()
-    this.setupColliders()
   }
 }

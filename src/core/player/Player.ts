@@ -1,7 +1,9 @@
 import { Game } from '~/scenes/Game'
+import { ChampionTypes } from '~/utils/ChampionTypes'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { AbilityKeys } from '../champion/abilities/AbilityKeys'
+import { AxeSpin } from '../champion/abilities/AxeSpin'
 import { Fireball } from '../champion/abilities/Fireball'
 import { FireBlastAOE } from '../champion/abilities/FireBlastAOE'
 import { FlameSpread } from '../champion/abilities/FlameSpread'
@@ -21,13 +23,29 @@ export class Player {
   public inAttackTargetingMode: boolean = false
   public attackCursorImage: Phaser.GameObjects.Image
   public attackRangeCircle: Phaser.GameObjects.Arc
-
+  qq
   public targetToHighlight: Minion | Champion | Tower | Nexus | null = null
 
   constructor(game: Game) {
     this.game = game
+    // this.champion = new Champion(this.game, {
+    //   texture: ChampionTypes.WIZARD,
+    //   isPlayerControlled: true,
+    //   position: {
+    //     x: Constants.LEFT_SPAWN.x,
+    //     y: Constants.LEFT_SPAWN.y,
+    //   },
+    //   side: Side.LEFT,
+    //   abilities: {
+    //     [AbilityKeys.Q]: Fireball,
+    //     [AbilityKeys.W]: FireBlastAOE,
+    //     [AbilityKeys.E]: FlameSpread,
+    //     [AbilityKeys.R]: TrackingFirebomb,
+    //   },
+    //   autoAttackType: AutoAttackType.RANGED,
+    // })
     this.champion = new Champion(this.game, {
-      texture: 'wizard',
+      texture: ChampionTypes.WARRIOR,
       isPlayerControlled: true,
       position: {
         x: Constants.LEFT_SPAWN.x,
@@ -35,14 +53,10 @@ export class Player {
       },
       side: Side.LEFT,
       abilities: {
-        [AbilityKeys.Q]: Fireball,
-        [AbilityKeys.W]: FireBlastAOE,
-        [AbilityKeys.E]: FlameSpread,
-        [AbilityKeys.R]: TrackingFirebomb,
+        [AbilityKeys.Q]: AxeSpin,
       },
-      autoAttackType: AutoAttackType.RANGED,
+      autoAttackType: AutoAttackType.MELEE,
     })
-    this.champion.damageOverride = 1000
 
     this.setupMouseClickListener()
     this.setupKeyboardListener()

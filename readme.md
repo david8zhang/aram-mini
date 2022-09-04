@@ -7,6 +7,7 @@ Miniature version of ARAM in League of Legends
 ## Easy Wins
 
 - Add blue highlight on abilities that cannot be cast due to insufficient mana
+- Have health drops recover mana as well
 
 ## Polish
 
@@ -19,7 +20,6 @@ Miniature version of ARAM in League of Legends
 - Warrior empowered attack (W)
 - Warrior pull ability (E)
 - Warrior execute (R)
-- Mage tracking blast ability (R)
 - Have CPU champion use abilities
 
 ## Stretch Goals (Not needed for MVP)
