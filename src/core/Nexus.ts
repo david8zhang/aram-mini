@@ -29,7 +29,7 @@ export class Nexus {
     this.onDestroyCallback = config.onDestroyCallback
 
     const { position, texture, scale } = config
-    this.sprite = this.game.physics.add.sprite(position.x, position.y, texture)
+    this.sprite = this.game.physics.add.sprite(position.x, position.y, texture).setDepth(100)
     this.sprite.setScale(scale ? scale : 1)
 
     this.sprite

@@ -357,7 +357,7 @@ export class UI extends Phaser.Scene {
       this.updatePlayerAbility(AbilityKeys.Q, player)
       this.updatePlayerAbility(AbilityKeys.W, player)
       this.updatePlayerAbility(AbilityKeys.E, player)
-      this.updatePlayerAbility(AbilityKeys.W, player)
+      this.updatePlayerAbility(AbilityKeys.R, player)
     }
   }
 

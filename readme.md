@@ -11,16 +11,15 @@ Miniature version of ARAM in League of Legends
 ## Polish
 
 - Enhance axe sprite for warrior slash and make hitbox bigger
+- Make EXP bar a semi-circle
+- Better art for Mage abilities
 
 ## Harder Stuff
 
 - Warrior empowered attack (W)
 - Warrior pull ability (E)
 - Warrior execute (R)
-- Mage AOE explosion ability (W)
-- Mage Stun ability (E)
 - Mage tracking blast ability (R)
-
 - Have CPU champion use abilities
 
 ## Stretch Goals (Not needed for MVP)

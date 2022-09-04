@@ -5,6 +5,7 @@ import { AbilityKeys } from '../champion/abilities/AbilityKeys'
 import { Fireball } from '../champion/abilities/Fireball'
 import { FireBlastAOE } from '../champion/abilities/FireBlastAOE'
 import { FlameSpread } from '../champion/abilities/FlameSpread'
+import { TrackingFirebomb } from '../champion/abilities/TrackingFirebomb'
 import { AutoAttackType } from '../champion/auto-attack/AutoAttackType'
 import { Champion } from '../champion/Champion'
 import { ChampionStates } from '../champion/states/ChampionStates'
@@ -37,6 +38,7 @@ export class Player {
         [AbilityKeys.Q]: Fireball,
         [AbilityKeys.W]: FireBlastAOE,
         [AbilityKeys.E]: FlameSpread,
+        [AbilityKeys.R]: TrackingFirebomb,
       },
       autoAttackType: AutoAttackType.RANGED,
     })

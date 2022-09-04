@@ -20,6 +20,7 @@ export interface ProjectileConfig {
   speed: number
   scale?: number
   rotation?: number
+  autoRotate?: boolean // Rotate to always face champion while in flight
   onOverlapFn?: Function
   bodyConfig?: {
     scaleX: number
@@ -36,6 +37,7 @@ export class Projectile {
   public speed: number = 200
   public destroyCallback: Function | null = null
   public onOverlapFn: Function | null = null
+  public autoRotate: boolean = false
 
   constructor(game: Game, config: ProjectileConfig) {
     this.game = game
@@ -47,6 +49,9 @@ export class Projectile {
         this.sprite.body.width * config.bodyConfig.scaleX,
         this.sprite.body.width * config.bodyConfig.scaleY
       )
+    }
+    if (config.autoRotate) {
+      this.autoRotate = true
     }
 
     if (config.onOverlapFn) {
@@ -97,6 +102,9 @@ export class Projectile {
         y: target.y,
       }
     )
+    if (this.autoRotate) {
+      this.sprite.setRotation(angle)
+    }
     const velocityVector = new Phaser.Math.Vector2()
     this.game.physics.velocityFromRotation(angle, this.speed, velocityVector)
     this.sprite.setVelocity(velocityVector.x, velocityVector.y)

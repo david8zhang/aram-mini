@@ -39,6 +39,7 @@ export class Tower {
     const { position } = config
     this.sprite = this.game.physics.add
       .sprite(position.x, position.y, config.texture)
+      .setDepth(100)
       .setScale(config.scale)
 
     this.sprite

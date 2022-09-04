@@ -20,6 +20,7 @@ export class Preload extends Scene {
     this.load.image('fireball', 'fireball.png')
     this.load.image('fire-blast', 'fire-blast.png')
     this.load.image('flame-spread', 'flame-spread.png')
+    this.load.image('tracking-fireball', 'tracking-fireball.png')
     this.load.atlas('slash', 'animations/slash.png', 'animations/slash.json')
     this.load.image('axe', 'axe.png')
 

@@ -9,6 +9,7 @@ import { UIValueBar } from '../ui/UIValueBar'
 import { Ability } from './abilities/Ability'
 import { AbilityKeys } from './abilities/AbilityKeys'
 import { AbilityWithRange } from './abilities/AbilityWithRange'
+import { TrackingAbility } from './abilities/TrackingAbility'
 import { AutoAttack } from './auto-attack/AutoAttack'
 import { AutoAttackType } from './auto-attack/AutoAttackType'
 import { MeleeAttack } from './auto-attack/MeleeAttack'
@@ -19,6 +20,7 @@ import { ChampionStates } from './states/ChampionStates'
 import { DeadState } from './states/DeadState'
 import { IdleState } from './states/IdleState'
 import { MoveState } from './states/MoveState'
+import { TrackingAbilityMove } from './states/TrackingAbilityMove'
 
 export interface ChampionConfig {
   texture: string
@@ -51,6 +53,7 @@ export class Champion {
 
   // To enable the champion to move within range of ability
   public abilityWithRange: AbilityWithRange | null = null
+  public trackingAbility: TrackingAbility | null = null
 
   public manaRegenEvent!: Phaser.Time.TimerEvent
   public manaRegenAmt: number = 5
@@ -110,6 +113,7 @@ export class Champion {
         [ChampionStates.ATTACK]: new AttackState(),
         [ChampionStates.DEAD]: new DeadState(),
         [ChampionStates.ABILITY_MOVE]: new AbilityMoveState(),
+        [ChampionStates.TRACKING_ABILITY_MOVE]: new TrackingAbilityMove(),
       },
       [this]
     )

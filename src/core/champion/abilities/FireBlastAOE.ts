@@ -56,6 +56,7 @@ export class FireBlastAOE implements Ability, AbilityWithRange {
     position: { x: number; y: number },
     onCompleteCallback: Function | null
   ): void {
+    this.champion.decreaseMana(FireBlastAOE.MANA_COST)
     this.cooldownTimer.startAbilityCooldown()
     const explosionCircle = this.game.add
       .circle(
@@ -216,8 +217,8 @@ export class FireBlastAOE implements Ability, AbilityWithRange {
   renderTargetingUI() {
     if (this.isTargetingMode) {
       this.rangeCircle.setVisible(true)
-      this.targetingCircle.setVisible(true)
       this.rangeCircle.setPosition(this.champion.sprite.x, this.champion.sprite.y)
+      this.targetingCircle.setVisible(true)
       this.targetingCircle.setPosition(
         this.game.input.mousePointer.worldX,
         this.game.input.mousePointer.worldY
