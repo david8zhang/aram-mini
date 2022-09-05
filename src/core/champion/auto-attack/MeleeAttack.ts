@@ -11,8 +11,6 @@ export class MeleeAttack implements AutoAttack {
   public attackRange: number = Constants.CHAMPION_ATTACK_RANGE_MELEE
   public damage: number = Constants.CHAMPION_DAMAGE_MELEE
 
-  public isHandlingDamage: boolean = false
-
   constructor(game: Game, champion: Champion) {
     this.game = game
     this.champion = champion
@@ -54,7 +52,6 @@ export class MeleeAttack implements AutoAttack {
       }
       this.slashAnimationSprite.setDepth(this.champion.sprite.depth + 100).setVisible(true)
       this.slashAnimationSprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-        this.isHandlingDamage = false
         this.slashAnimationSprite.setVisible(false)
       })
       if (!this.slashAnimationSprite.anims.isPlaying) {

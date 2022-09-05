@@ -9,6 +9,7 @@ import { UIValueBar } from '../ui/UIValueBar'
 import { Ability } from './abilities/Ability'
 import { AbilityKeys } from './abilities/AbilityKeys'
 import { AbilityWithRange } from './abilities/AbilityWithRange'
+import { EmpoweredAbility } from './abilities/EmpoweredAbility'
 import { TrackingAbility } from './abilities/TrackingAbility'
 import { AutoAttack } from './auto-attack/AutoAttack'
 import { AutoAttackType } from './auto-attack/AutoAttackType'
@@ -54,6 +55,7 @@ export class Champion {
   // To enable the champion to move within range of ability
   public abilityWithRange: AbilityWithRange | null = null
   public trackingAbility: TrackingAbility | null = null
+  public empoweredAbility: EmpoweredAbility | null = null
 
   public manaRegenEvent!: Phaser.Time.TimerEvent
   public manaRegenAmt: number = 5
@@ -230,7 +232,12 @@ export class Champion {
       if (!this.attackTarget.sprite.active || this.attackTarget.getHealth() === 0) {
         return
       }
-      this.autoAttack.attack()
+      // If the champion uses an ability that empowers their auto attack
+      if (this.empoweredAbility && this.empoweredAbility.canInterceptAutoAttack()) {
+        this.empoweredAbility.interceptAutoAttack()
+      } else {
+        this.autoAttack.attack()
+      }
     }
   }
 

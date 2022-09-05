@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { createEmpoweredStrikeAnims } from '~/core/anims/empoweredStrikeAnims'
 import { createSlashAnims } from '~/core/anims/slashAnims'
 import { Champion } from '~/core/champion/Champion'
 import { CPU } from '~/core/cpu/CPU'
@@ -103,6 +104,7 @@ export class Game extends Phaser.Scene {
 
   initAnimations() {
     createSlashAnims(this.anims)
+    createEmpoweredStrikeAnims(this.anims)
   }
 
   initColliders() {

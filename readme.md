@@ -11,7 +11,6 @@ Miniature version of ARAM in League of Legends
 
 ## Polish
 
-- Enhance axe sprite for warrior slash and make hitbox bigger
 - Make EXP bar a semi-circle
 - Better art for Mage abilities
 

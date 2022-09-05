@@ -3,7 +3,9 @@ import { ChampionTypes } from '~/utils/ChampionTypes'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { AbilityKeys } from '../champion/abilities/AbilityKeys'
+import { AxePull } from '../champion/abilities/AxePull'
 import { AxeSpin } from '../champion/abilities/AxeSpin'
+import { EmpoweredStrike } from '../champion/abilities/EmpoweredStrike'
 import { Fireball } from '../champion/abilities/Fireball'
 import { FireBlastAOE } from '../champion/abilities/FireBlastAOE'
 import { FlameSpread } from '../champion/abilities/FlameSpread'
@@ -54,6 +56,8 @@ export class Player {
       side: Side.LEFT,
       abilities: {
         [AbilityKeys.Q]: AxeSpin,
+        [AbilityKeys.W]: EmpoweredStrike,
+        [AbilityKeys.E]: AxePull
       },
       autoAttackType: AutoAttackType.MELEE,
     })

@@ -15,7 +15,10 @@ export class AttackState extends State {
       } else {
         const currTime = Date.now()
         champion.sprite.setVelocity(0, 0)
-        if (currTime - this.lastAttackedTimestamp > Constants.CHAMPION_ATTACK_DELAY) {
+        if (
+          currTime - this.lastAttackedTimestamp > Constants.CHAMPION_ATTACK_DELAY ||
+          champion.empoweredAbility
+        ) {
           this.lastAttackedTimestamp = currTime
           champion.attack()
         }
