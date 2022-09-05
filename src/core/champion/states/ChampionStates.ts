@@ -5,4 +5,5 @@ export enum ChampionStates {
   DEAD = 'Dead',
   ABILITY_MOVE = 'AbilityMove',
   TRACKING_ABILITY_MOVE = 'TrackingAbilityMove',
+  STUNNED = 'Stunned',
 }

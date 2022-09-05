@@ -1,6 +1,5 @@
 import { State } from '~/core/StateMachine'
 import { Constants } from '~/utils/Constants'
-import { Side } from '~/utils/Side'
 import { Champion } from '../Champion'
 import { ChampionStates } from './ChampionStates'
 

@@ -18,6 +18,7 @@ import { TargetPlayer } from './behaviors/attack-player/TargetPlayer'
 import { AttackTower } from './behaviors/attack-tower/AttackTower'
 import { CheckTowerVulnerable } from './behaviors/attack-tower/CheckTowerVulnerable'
 import { SetTargetTower } from './behaviors/attack-tower/SetTargetTower'
+import { CheckStatusEffect } from './behaviors/CheckStatusEffect'
 import { CheckIsDead } from './behaviors/death/CheckIsDead'
 import { HandleDeath } from './behaviors/death/HandleDeath'
 import { HasEnoughHealth } from './behaviors/emergency-retreat/HasEnoughHealth'
@@ -162,6 +163,13 @@ export class CPU {
       defensiveBehaviorSelector
     )
 
+    // Check status effects in case status prevents champion from taking action (e.g. Stun)
+    const checkStatusEffect = new CheckStatusEffect(blackboard)
+    const postInitSequence = new SequenceNode('PostInitSeqeunce', blackboard, [
+      checkStatusEffect,
+      postInitializationSelector,
+    ])
+
     // Configure once per spawn behaviors
     const checkCompletedOncePerSpawn = new CheckCompletedOncePerSpawn(blackboard, this)
     const moveToStartPosition = new MoveToStartPosition(blackboard)
@@ -177,7 +185,7 @@ export class CPU {
       'ChampionAliveSelector',
       blackboard,
       oncePerSpawnBehaviorSequence,
-      postInitializationSelector
+      postInitSequence
     )
 
     const checkIsDead = new CheckIsDead(blackboard)

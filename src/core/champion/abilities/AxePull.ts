@@ -1,8 +1,10 @@
 import { Minion } from '~/core/minion/Minion'
+import { MinionStates } from '~/core/minion/states/MinionStates'
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { Champion } from '../Champion'
+import { ChampionStates } from '../states/ChampionStates'
 import { Ability } from './Ability'
 import { CooldownTimer } from './CooldownTimer'
 
@@ -65,7 +67,7 @@ export class AxePull implements Ability {
   }
 
   public canTriggerAbility(): boolean {
-    return true
+    return !this.isInCooldown && this.champion.manaAmount >= AxePull.MANA_COST
   }
 
   triggerAbility(): void {
@@ -78,11 +80,15 @@ export class AxePull implements Ability {
     enemyMinions.forEach((minion: Minion) => {
       if (this.targetingRectangle.getBounds().contains(minion.sprite.x, minion.sprite.y)) {
         this.pushTowardsChampion(minion)
+        const prevState: MinionStates = minion.stateMachine.getState()
+        minion.stateMachine.transition(MinionStates.STUNNED, this.game, 10000, prevState)
       }
     })
     enemyChampions.forEach((champion: Champion) => {
       if (this.targetingRectangle.getBounds().contains(champion.sprite.x, champion.sprite.y)) {
         this.pushTowardsChampion(champion)
+        const prevState: ChampionStates = champion.stateMachine.getState()
+        champion.stateMachine.transition(ChampionStates.STUNNED, this.game, 1000, prevState)
       }
     })
   }

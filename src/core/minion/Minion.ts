@@ -10,6 +10,7 @@ import { UIValueBar } from '../ui/UIValueBar'
 import { AttackState } from './states/AttackState'
 import { MinionStates } from './states/MinionStates'
 import { MoveState } from './states/MoveState'
+import { StunnedState } from './states/StunnedState'
 
 export interface MinionConfig {
   texture: string
@@ -42,6 +43,8 @@ export class Minion {
   public attackTarget: Minion | Tower | Champion | Nexus | null = null
   public shouldShowHoverOutline: boolean = true
 
+  public cleanupOnDestroy: Phaser.GameObjects.GameObject[] | undefined = []
+
   constructor(game: Game, config: MinionConfig) {
     this.game = game
     this.side = config.side
@@ -69,6 +72,7 @@ export class Minion {
       {
         [MinionStates.MOVE]: new MoveState(),
         [MinionStates.ATTACK]: new AttackState(),
+        [MinionStates.STUNNED]: new StunnedState(),
       },
       [this]
     )
@@ -211,6 +215,10 @@ export class Minion {
     }
     this.game.postFxPlugin.remove(this.sprite)
     this.attackCircle.destroy()
+    if (this.cleanupOnDestroy) {
+      this.cleanupOnDestroy.forEach((obj) => obj.destroy())
+      this.cleanupOnDestroy = undefined
+    }
   }
 
   addEXPToChampsInRange() {

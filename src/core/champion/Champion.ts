@@ -21,6 +21,7 @@ import { ChampionStates } from './states/ChampionStates'
 import { DeadState } from './states/DeadState'
 import { IdleState } from './states/IdleState'
 import { MoveState } from './states/MoveState'
+import { StunnedState } from './states/StunnedState'
 import { TrackingAbilityMove } from './states/TrackingAbilityMove'
 
 export interface ChampionConfig {
@@ -80,6 +81,7 @@ export class Champion {
   public autoAttack!: AutoAttack
   private _damageOverride: number = -1
 
+  // Hover outline
   public shouldShowHoverOutline: boolean = true
 
   constructor(game: Game, config: ChampionConfig) {
@@ -116,6 +118,7 @@ export class Champion {
         [ChampionStates.DEAD]: new DeadState(),
         [ChampionStates.ABILITY_MOVE]: new AbilityMoveState(),
         [ChampionStates.TRACKING_ABILITY_MOVE]: new TrackingAbilityMove(),
+        [ChampionStates.STUNNED]: new StunnedState(),
       },
       [this]
     )
