@@ -1,9 +1,9 @@
 import { Minion } from '~/core/minion/Minion'
 import { Game } from '~/scenes/Game'
 import { Side } from '~/utils/Side'
-import { Champion } from '../Champion'
-import { Ability } from './Ability'
-import { CooldownTimer } from './CooldownTimer'
+import { Champion } from '../../Champion'
+import { Ability } from '../Ability'
+import { CooldownTimer } from '../CooldownTimer'
 
 export class AxeSpin implements Ability {
   public game: Game

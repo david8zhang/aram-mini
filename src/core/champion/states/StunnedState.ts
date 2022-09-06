@@ -42,4 +42,11 @@ export class StunnedState extends State {
       champion.stateMachine.transition(ChampionStates.IDLE)
     }
   }
+
+  exit(champion: Champion) {
+    champion.sprite.clearTint()
+    if (this.stunText) {
+      this.stunText.destroy()
+    }
+  }
 }

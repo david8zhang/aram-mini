@@ -2,11 +2,11 @@ import { Minion } from '~/core/minion/Minion'
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
-import { Champion } from '../Champion'
-import { ChampionStates } from '../states/ChampionStates'
-import { Ability } from './Ability'
-import { AbilityWithRange } from './AbilityWithRange'
-import { CooldownTimer } from './CooldownTimer'
+import { Champion } from '../../Champion'
+import { ChampionStates } from '../../states/ChampionStates'
+import { Ability } from '../Ability'
+import { AbilityWithRange } from '../AbilityWithRange'
+import { CooldownTimer } from '../CooldownTimer'
 
 export class FireBlastAOE implements Ability, AbilityWithRange {
   game: Game

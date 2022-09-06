@@ -1,10 +1,10 @@
 import { Minion } from '~/core/minion/Minion'
 import { Projectile } from '~/core/Projectile'
 import { Game } from '~/scenes/Game'
-import { Champion } from '../Champion'
-import { Ability } from './Ability'
-import { CooldownTimer } from './CooldownTimer'
-import { TargetingArrow } from './TargetingArrow'
+import { Champion } from '../../Champion'
+import { Ability } from '../Ability'
+import { CooldownTimer } from '../CooldownTimer'
+import { TargetingArrow } from '../TargetingArrow'
 
 export class Fireball implements Ability {
   game: Game

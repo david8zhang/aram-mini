@@ -3,13 +3,14 @@ import { ChampionTypes } from '~/utils/ChampionTypes'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { AbilityKeys } from '../champion/abilities/AbilityKeys'
-import { AxePull } from '../champion/abilities/AxePull'
-import { AxeSpin } from '../champion/abilities/AxeSpin'
-import { EmpoweredStrike } from '../champion/abilities/EmpoweredStrike'
-import { Fireball } from '../champion/abilities/Fireball'
-import { FireBlastAOE } from '../champion/abilities/FireBlastAOE'
-import { FlameSpread } from '../champion/abilities/FlameSpread'
-import { TrackingFirebomb } from '../champion/abilities/TrackingFirebomb'
+import { AxePull } from '../champion/abilities/warrior/AxePull'
+import { AxeSpin } from '../champion/abilities/warrior/AxeSpin'
+import { EmpoweredStrike } from '../champion/abilities/warrior/EmpoweredStrike'
+import { ExecutionStrike } from '../champion/abilities/warrior/ExecutionStrike'
+import { Fireball } from '../champion/abilities/wizard/Fireball'
+import { FireBlastAOE } from '../champion/abilities/wizard/FireBlastAOE'
+import { FlameSpread } from '../champion/abilities/wizard/FlameSpread'
+import { TrackingFirebomb } from '../champion/abilities/wizard/TrackingFirebomb'
 import { AutoAttackType } from '../champion/auto-attack/AutoAttackType'
 import { Champion } from '../champion/Champion'
 import { ChampionStates } from '../champion/states/ChampionStates'
@@ -25,7 +26,6 @@ export class Player {
   public inAttackTargetingMode: boolean = false
   public attackCursorImage: Phaser.GameObjects.Image
   public attackRangeCircle: Phaser.GameObjects.Arc
-  qq
   public targetToHighlight: Minion | Champion | Tower | Nexus | null = null
 
   constructor(game: Game) {
@@ -57,7 +57,8 @@ export class Player {
       abilities: {
         [AbilityKeys.Q]: AxeSpin,
         [AbilityKeys.W]: EmpoweredStrike,
-        [AbilityKeys.E]: AxePull
+        [AbilityKeys.E]: AxePull,
+        [AbilityKeys.R]: ExecutionStrike,
       },
       autoAttackType: AutoAttackType.MELEE,
     })

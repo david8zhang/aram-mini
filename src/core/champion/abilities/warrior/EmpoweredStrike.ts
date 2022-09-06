@@ -1,8 +1,8 @@
 import { Game } from '~/scenes/Game'
-import { Champion } from '../Champion'
-import { Ability } from './Ability'
-import { CooldownTimer } from './CooldownTimer'
-import { EmpoweredAbility } from './EmpoweredAbility'
+import { Champion } from '../../Champion'
+import { Ability } from '../Ability'
+import { CooldownTimer } from '../CooldownTimer'
+import { EmpoweredAbility } from '../EmpoweredAbility'
 
 export class EmpoweredStrike implements Ability, EmpoweredAbility {
   game: Game

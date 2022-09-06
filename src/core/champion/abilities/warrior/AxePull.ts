@@ -3,10 +3,10 @@ import { MinionStates } from '~/core/minion/states/MinionStates'
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
-import { Champion } from '../Champion'
-import { ChampionStates } from '../states/ChampionStates'
-import { Ability } from './Ability'
-import { CooldownTimer } from './CooldownTimer'
+import { Champion } from '../../Champion'
+import { ChampionStates } from '../../states/ChampionStates'
+import { Ability } from '../Ability'
+import { CooldownTimer } from '../CooldownTimer'
 
 export class AxePull implements Ability {
   game: Game
@@ -15,6 +15,7 @@ export class AxePull implements Ability {
   private static readonly MANA_COST = 20
   private static readonly ABILITY_COOLDOWN_TIME_SECONDS = 5
   private static readonly PULL_SPEED = 500
+  private static readonly STUN_DURATION = 1000
 
   public iconTexture: string = 'axe-pull-icon'
   public key!: Phaser.Input.Keyboard.Key | null
@@ -81,14 +82,24 @@ export class AxePull implements Ability {
       if (this.targetingRectangle.getBounds().contains(minion.sprite.x, minion.sprite.y)) {
         this.pushTowardsChampion(minion)
         const prevState: MinionStates = minion.stateMachine.getState()
-        minion.stateMachine.transition(MinionStates.STUNNED, this.game, 10000, prevState)
+        minion.stateMachine.transition(
+          MinionStates.STUNNED,
+          this.game,
+          AxePull.STUN_DURATION,
+          prevState
+        )
       }
     })
     enemyChampions.forEach((champion: Champion) => {
       if (this.targetingRectangle.getBounds().contains(champion.sprite.x, champion.sprite.y)) {
         this.pushTowardsChampion(champion)
         const prevState: ChampionStates = champion.stateMachine.getState()
-        champion.stateMachine.transition(ChampionStates.STUNNED, this.game, 1000, prevState)
+        champion.stateMachine.transition(
+          ChampionStates.STUNNED,
+          this.game,
+          AxePull.STUN_DURATION,
+          prevState
+        )
       }
     })
   }

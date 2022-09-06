@@ -3,11 +3,11 @@ import { Projectile } from '~/core/Projectile'
 import { Game } from '~/scenes/Game'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
-import { Champion } from '../Champion'
-import { ChampionStates } from '../states/ChampionStates'
-import { Ability } from './Ability'
-import { CooldownTimer } from './CooldownTimer'
-import { TrackingAbility } from './TrackingAbility'
+import { Champion } from '../../Champion'
+import { ChampionStates } from '../../states/ChampionStates'
+import { Ability } from '../Ability'
+import { CooldownTimer } from '../CooldownTimer'
+import { TrackingAbility } from '../TrackingAbility'
 
 export class TrackingFirebomb implements Ability, TrackingAbility {
   game: Game

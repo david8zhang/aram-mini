@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { createEmpoweredStrikeAnims } from '~/core/anims/empoweredStrikeAnims'
+import { createExecutionStrikeAnims } from '~/core/anims/executionStrikeAnims'
 import { createSlashAnims } from '~/core/anims/slashAnims'
 import { Champion } from '~/core/champion/Champion'
 import { CPU } from '~/core/cpu/CPU'
@@ -105,6 +106,7 @@ export class Game extends Phaser.Scene {
   initAnimations() {
     createSlashAnims(this.anims)
     createEmpoweredStrikeAnims(this.anims)
+    createExecutionStrikeAnims(this.anims)
   }
 
   initColliders() {
@@ -262,7 +264,8 @@ export class Game extends Phaser.Scene {
       const worldPosition = this.debug.getWorldPositionForCoordinates(coordinate[0], coordinate[1])
       const healthRelic = new HealthRelic(this, {
         position: worldPosition,
-        healAmount: 100,
+        healAmount: Constants.HEALTH_RELIC_HEAL_AMOUNT,
+        manaRegenAmount: Constants.HEALTH_RELIC_MANA_REGEN_AMOUNT,
       })
       this.healthRelics.push(healthRelic)
     })

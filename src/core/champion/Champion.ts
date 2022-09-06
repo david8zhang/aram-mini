@@ -150,6 +150,10 @@ export class Champion {
     }
   }
 
+  recoverMana(manaRegenAmount: number) {
+    this.manaAmount = Math.min(this.manaAmount + manaRegenAmount, this.maxManaAmount)
+  }
+
   heal(healAmount: number) {
     this.healthBar.increase(healAmount)
   }

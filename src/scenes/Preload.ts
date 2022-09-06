@@ -27,10 +27,17 @@ export class Preload extends Scene {
       'animations/empowered-strike.png',
       'animations/empowered-strike.json'
     )
+    this.load.atlas(
+      'execution-strike',
+      'animations/execution-strike.png',
+      'animations/execution-strike.json'
+    )
     this.load.image('empowered-strike-icon', 'empowered-strike-icon.png')
     this.load.image('axe', 'axe.png')
     this.load.image('axe-spin', 'axe-spin.png')
     this.load.image('axe-pull-icon', 'axe-pull-icon.png')
+    this.load.image('execution-ready-icon', 'execution-ready-icon.png')
+    this.load.image('execution-strike-icon', 'execution-strike-icon.png')
 
     // Particles
     this.load.image('coin', 'coin.png')

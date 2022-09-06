@@ -4,6 +4,7 @@ import { Champion } from './champion/Champion'
 
 export interface HealthRelicConfig {
   healAmount: number
+  manaRegenAmount: number
   position: {
     x: number
     y: number
@@ -15,6 +16,7 @@ export class HealthRelic {
   public static readonly HEALTH_RELIC_COOLDOWN_SECONDS = 90
 
   public healAmount: number
+  public manaRegenAmount: number
   public sprite: Phaser.Physics.Arcade.Sprite
   public colliders: Phaser.Physics.Arcade.Collider[] = []
   public cooldownTimer: CooldownTimer
@@ -22,6 +24,7 @@ export class HealthRelic {
 
   constructor(game: Game, config: HealthRelicConfig) {
     this.game = game
+    this.manaRegenAmount = config.manaRegenAmount
     this.healAmount = config.healAmount
     this.sprite = this.game.physics.add.sprite(config.position.x, config.position.y, 'health-relic')
     this.game.physics.world.enable(this.sprite, Phaser.Physics.Arcade.DYNAMIC_BODY)
@@ -64,6 +67,7 @@ export class HealthRelic {
           circle.destroy()
         },
       })
+      champion.recoverMana(this.manaRegenAmount)
       champion.heal(this.healAmount)
       this.cooldownTimer.startAbilityCooldown()
     }
