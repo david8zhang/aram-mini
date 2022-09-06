@@ -365,7 +365,6 @@ export class Champion {
     this.healthBar.setVisible(false)
     this.moveTarget = null
     this.onDestroyedCallbacks.forEach((cb) => cb())
-    this.numDeaths++
     this.healthRegenEvent.paused = true
     this.manaRegenEvent.paused = true
     this.stateMachine.transition(ChampionStates.DEAD)

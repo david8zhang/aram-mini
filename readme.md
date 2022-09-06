@@ -7,18 +7,21 @@ Miniature version of ARAM in League of Legends
 ## Easy Wins
 
 - Add blue highlight on abilities that cannot be cast due to insufficient mana
-- Have health drops recover mana as well
 
 ## Polish
 
 - Make EXP bar a semi-circle
 - Better art for Mage abilities
+- Better art for Warrior "Execution Strike" ability
 
-## Harder Stuff
+## Bugs
 
-- Warrior empowered attack (W)
-- Warrior pull ability (E)
-- Warrior execute (R)
+- Sometimes Warrior Axe Pull does not stun for some reason
+- Auto attacks don't work for Warrior character in rare cases
+- Deaths get counted twice in some instances
+
+## Harder Stuffe
+
 - Have CPU champion use abilities
 
 ## Stretch Goals (Not needed for MVP)

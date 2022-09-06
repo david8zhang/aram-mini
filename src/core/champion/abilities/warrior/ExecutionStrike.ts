@@ -14,8 +14,9 @@ export class ExecutionStrike implements Ability, TrackingAbility {
 
   private static readonly EXECUTION_HEALTH_PCT_THRESHOLD = 0.2
   private static readonly ABILITY_RANGE = 50
-  private static readonly ABILITY_COOLDOWN_TIME_SECONDS = 90
-  private static readonly MANA_COST = 150
+  private static readonly ABILITY_COOLDOWN_TIME_SECONDS = 75
+  private static readonly MANA_COST = 100
+  private static readonly STUN_DURATION = 2000
 
   public iconTexture: string = 'execution-strike-icon'
   public key!: Phaser.Input.Keyboard.Key | null
@@ -190,11 +191,17 @@ export class ExecutionStrike implements Ability, TrackingAbility {
     this.isTriggeringAbility = true
     this.champion.decreaseMana(ExecutionStrike.MANA_COST)
     this.cooldownTimer.startAbilityCooldown()
-
     const executionReadySprite = this.executionReadySpriteArray[0]
     if (executionReadySprite) {
       executionReadySprite.setVisible(false)
     }
+    const prevState = target.stateMachine.getState()
+    target.stateMachine.transition(
+      ChampionStates.STUNNED,
+      this.game,
+      ExecutionStrike.STUN_DURATION,
+      prevState
+    )
     this.executionStrikeSprite
       .setPosition(target.sprite.x, target.sprite.y - target.sprite.displayHeight * 2)
       .setVisible(true)
