@@ -272,6 +272,7 @@ export class Champion {
               Constants.getLevelDiffExpAdjuster(this.level, (attackTarget as Champion).level)
           )
         )
+        console.log('Went here!')
         this.numKills++
         break
       }

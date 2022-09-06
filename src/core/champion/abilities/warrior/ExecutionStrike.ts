@@ -68,6 +68,7 @@ export class ExecutionStrike implements Ability, TrackingAbility {
           )
         }
         if (frame.index === 3) {
+          this.game.cameras.main.shake(500, 0.01)
           this.isTriggeringAbility = false
           if (this.abilityTargetEntity) {
             if (this.isReadyForExecution(this.abilityTargetEntity as Champion)) {
@@ -270,7 +271,7 @@ export class ExecutionStrike implements Ability, TrackingAbility {
     const executionHealthAmt = Math.round(
       champion.getTotalHealth() * ExecutionStrike.EXECUTION_HEALTH_PCT_THRESHOLD
     )
-    return champion.getHealth() > 0 && champion.getHealth() <= executionHealthAmt
+    return champion.getHealth() > 0 && champion.getHealth() - this.damage <= executionHealthAmt
   }
 
   update() {

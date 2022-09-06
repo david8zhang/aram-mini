@@ -74,6 +74,9 @@ export class HealthRelic {
   }
 
   update() {
+    if (!this.sprite.active) {
+      return
+    }
     if (this.cooldownTimer.isInCooldown) {
       this.sprite.body.enable = false
       this.sprite.setVisible(false)
