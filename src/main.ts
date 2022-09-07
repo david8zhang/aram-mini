@@ -4,6 +4,7 @@ import { Preload } from './scenes/Preload'
 import { UI } from './scenes/UI'
 import OutlinePipelinePlugin from 'phaser3-rex-plugins/plugins/outlinepipeline-plugin'
 import GrayscalePipelinePlugin from 'phaser3-rex-plugins/plugins/grayscalepipeline-plugin'
+import { Start } from './scenes/Start'
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -40,7 +41,7 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Preload, Game, UI],
+  scene: [Preload, Start, Game, UI],
 }
 
 export default new Phaser.Game(config)
