@@ -13,6 +13,7 @@ import { ParticleEmitter } from '~/core/ParticleEmitter'
 import { Player } from '~/core/player/Player'
 import { Projectile } from '~/core/Projectile'
 import { Tower } from '~/core/tower/Tower'
+import { ChampionTypes } from '~/utils/ChampionTypes'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
 import { UI } from './UI'
@@ -50,6 +51,7 @@ export class Game extends Phaser.Scene {
   // Champions
   public leftChampionsGroup!: Phaser.GameObjects.Group
   public rightChampionsGroup!: Phaser.GameObjects.Group
+  public championType?: ChampionTypes
 
   // Nexuses
   public leftNexus!: Nexus
@@ -62,6 +64,10 @@ export class Game extends Phaser.Scene {
   constructor() {
     super('game')
     Game._instance = this
+  }
+
+  init(data: { championType: ChampionTypes }) {
+    this.championType = data.championType
   }
 
   preload() {
@@ -248,7 +254,7 @@ export class Game extends Phaser.Scene {
   }
 
   initPlayer() {
-    this.player = new Player(this)
+    this.player = new Player(this, this.championType)
     this.cameras.main.startFollow(this.player.champion.sprite, true)
     this.leftChampionsGroup.add(this.player.champion.sprite)
   }

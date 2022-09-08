@@ -28,43 +28,11 @@ export class Player {
   public attackRangeCircle: Phaser.GameObjects.Arc
   public targetToHighlight: Minion | Champion | Tower | Nexus | null = null
 
-  constructor(game: Game) {
+  constructor(game: Game, championType: ChampionTypes | undefined) {
     this.game = game
-    // this.champion = new Champion(this.game, {
-    //   texture: ChampionTypes.WIZARD,
-    //   isPlayerControlled: true,
-    //   position: {
-    //     x: Constants.LEFT_SPAWN.x,
-    //     y: Constants.LEFT_SPAWN.y,
-    //   },
-    //   side: Side.LEFT,
-    //   abilities: {
-    //     [AbilityKeys.Q]: Fireball,
-    //     [AbilityKeys.W]: FireBlastAOE,
-    //     [AbilityKeys.E]: FlameSpread,
-    //     [AbilityKeys.R]: TrackingFirebomb,
-    //   },
-    //   autoAttackType: AutoAttackType.RANGED,
-    // })
-    this.champion = new Champion(this.game, {
-      texture: ChampionTypes.WARRIOR,
-      isPlayerControlled: true,
-      position: {
-        x: Constants.LEFT_SPAWN.x,
-        y: Constants.LEFT_SPAWN.y,
-      },
-      side: Side.LEFT,
-      abilities: {
-        [AbilityKeys.Q]: AxeSpin,
-        [AbilityKeys.W]: EmpoweredStrike,
-        [AbilityKeys.E]: AxePull,
-        [AbilityKeys.R]: ExecutionStrike,
-      },
-      autoAttackType: AutoAttackType.MELEE,
-    })
-
     this.setupMouseClickListener()
     this.setupKeyboardListener()
+    this.champion = this.setupChampion(championType!)
     this.attackCursorImage = this.game.add
       .image(0, 0, 'attack-cursor')
       .setVisible(false)
@@ -74,6 +42,47 @@ export class Player {
       .setVisible(false)
       .setFillStyle(Constants.ATTACK_RANGE_COLOR, 0.2)
       .setStrokeStyle(2, Constants.ATTACK_RANGE_COLOR)
+  }
+
+  setupChampion(championType: ChampionTypes) {
+    switch (championType) {
+      case ChampionTypes.WARRIOR: {
+        return new Champion(this.game, {
+          texture: ChampionTypes.WARRIOR,
+          isPlayerControlled: true,
+          position: {
+            x: Constants.LEFT_SPAWN.x,
+            y: Constants.LEFT_SPAWN.y,
+          },
+          side: Side.LEFT,
+          abilities: {
+            [AbilityKeys.Q]: AxeSpin,
+            [AbilityKeys.W]: EmpoweredStrike,
+            [AbilityKeys.E]: AxePull,
+            [AbilityKeys.R]: ExecutionStrike,
+          },
+          autoAttackType: AutoAttackType.MELEE,
+        })
+      }
+      case ChampionTypes.WIZARD: {
+        return new Champion(this.game, {
+          texture: ChampionTypes.WIZARD,
+          isPlayerControlled: true,
+          position: {
+            x: Constants.LEFT_SPAWN.x,
+            y: Constants.LEFT_SPAWN.y,
+          },
+          side: Side.LEFT,
+          abilities: {
+            [AbilityKeys.Q]: Fireball,
+            [AbilityKeys.W]: FireBlastAOE,
+            [AbilityKeys.E]: FlameSpread,
+            [AbilityKeys.R]: TrackingFirebomb,
+          },
+          autoAttackType: AutoAttackType.RANGED,
+        })
+      }
+    }
   }
 
   update() {
