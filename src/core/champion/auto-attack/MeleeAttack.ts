@@ -9,7 +9,6 @@ export class MeleeAttack implements AutoAttack {
   public slashAnimationSprite: Phaser.GameObjects.Sprite
 
   public attackRange: number = Constants.CHAMPION_ATTACK_RANGE_MELEE
-  public damage: number = Constants.CHAMPION_DAMAGE_MELEE
 
   constructor(game: Game, champion: Champion) {
     this.game = game
@@ -36,6 +35,13 @@ export class MeleeAttack implements AutoAttack {
         }
       }
     )
+  }
+
+  public get damage() {
+    if (this.champion.damageOverride) {
+      return this.champion.damageOverride
+    }
+    return Constants.CHAMPION_DAMAGE_MELEE
   }
 
   attack() {

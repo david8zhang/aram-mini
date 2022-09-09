@@ -27,10 +27,12 @@ export class SelectCharacter extends Phaser.Scene {
       },
       text: 'Continue',
       onPress: () => {
-        this.scene.start('ui')
-        this.scene.start('game', {
-          championType: this.championType,
-        })
+        if (this.championType) {
+          this.scene.start('ui')
+          this.scene.start('game', {
+            championType: this.championType,
+          })
+        }
       },
       width: 100,
       height: 50,

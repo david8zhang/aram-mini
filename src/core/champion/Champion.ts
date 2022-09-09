@@ -79,7 +79,7 @@ export class Champion {
 
   // Auto attack configuration
   public autoAttack!: AutoAttack
-  private _damageOverride: number = -1
+  public damageOverride: number | null = null
 
   // Hover outline
   public shouldShowHoverOutline: boolean = true
@@ -231,6 +231,10 @@ export class Champion {
     return this.stateMachine.getState() === ChampionStates.DEAD
   }
 
+  public get damage() {
+    return this.autoAttack.damage
+  }
+
   attack() {
     if (this.isDead) {
       return
@@ -288,19 +292,8 @@ export class Champion {
     this.level = this.getLevelForTotalExp(this.totalExp)
   }
 
-  set damageOverride(newDamage: number) {
-    this._damageOverride = newDamage
-  }
-
   get attackRange(): number {
     return this.autoAttack.attackRange
-  }
-
-  get damage(): number {
-    if (this._damageOverride != -1) {
-      return this._damageOverride
-    }
-    return this.level * Constants.CHAMPION_DAMAGE_RANGED
   }
 
   getLevelForTotalExp(totalExp: number) {

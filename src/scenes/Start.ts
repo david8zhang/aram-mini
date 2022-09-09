@@ -1,4 +1,5 @@
 import { Button } from '~/core/ui/Button'
+import { ChampionTypes } from '~/utils/ChampionTypes'
 import { Constants } from '~/utils/Constants'
 
 export class Start extends Phaser.Scene {
@@ -44,8 +45,6 @@ export class Start extends Phaser.Scene {
       },
       onPress: () => {
         this.scene.start('select-character')
-        // this.scene.start('game')
-        // this.scene.start('ui')
       },
       text: 'Play',
       width: buttonWidth,

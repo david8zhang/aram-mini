@@ -221,11 +221,14 @@ export class Game extends Phaser.Scene {
   }
 
   resumeGame() {
-    this.scene.restart()
-    this.isGameOver = false
+    UI.instance.scene.stop()
+    this.scene.stop()
+    this.scene.start('select-character')
   }
 
   initTowers() {
+    this.leftTowers = []
+    this.rightTowers = []
     Constants.LEFT_TOWER_CONFIGS.forEach((config) => {
       this.leftTowers.push(
         new Tower(this, {

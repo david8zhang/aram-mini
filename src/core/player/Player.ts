@@ -33,6 +33,7 @@ export class Player {
     this.setupMouseClickListener()
     this.setupKeyboardListener()
     this.champion = this.setupChampion(championType!)
+    this.champion.damageOverride = 1000
     this.attackCursorImage = this.game.add
       .image(0, 0, 'attack-cursor')
       .setVisible(false)
