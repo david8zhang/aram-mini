@@ -1,6 +1,12 @@
 import { Game } from '~/scenes/Game'
+import { ChampionTypes } from '~/utils/ChampionTypes'
 import { Constants } from '~/utils/Constants'
 import { Side } from '~/utils/Side'
+import { AbilityKeys } from '../champion/abilities/AbilityKeys'
+import { Fireball } from '../champion/abilities/wizard/Fireball'
+import { FireBlastAOE } from '../champion/abilities/wizard/FireBlastAOE'
+import { FlameSpread } from '../champion/abilities/wizard/FlameSpread'
+import { TrackingFirebomb } from '../champion/abilities/wizard/TrackingFirebomb'
 import { AutoAttackType } from '../champion/auto-attack/AutoAttackType'
 import { Champion } from '../champion/Champion'
 import { BehaviorTreeNode } from './behavior-tree/BehaviorTreeNode'
@@ -9,12 +15,14 @@ import { SelectorNode } from './behavior-tree/SelectorNode'
 import { SequenceNode } from './behavior-tree/SequenceNode'
 import { AttackNexus } from './behaviors/attack-nexus/AttackNexus'
 import { CheckNexusTargetable } from './behaviors/attack-nexus/CheckNexusTargetable'
-import { AttackPlayer } from './behaviors/attack-player/AttackPlayer'
+import { AutoAttackPlayer } from './behaviors/attack-player/AutoAttackPlayer'
 import { CheckPlayerAttackable } from './behaviors/attack-player/CheckPlayerAttackable'
 import { CheckPlayerLowHealth } from './behaviors/attack-player/CheckPlayerLowHealth'
 import { CheckPlayerVulnerable } from './behaviors/attack-player/CheckPlayerVulnerable'
+import { SelectAbility } from './behaviors/attack-player/SelectAbility'
 import { SetTargetCandidates } from './behaviors/attack-player/SetTargetCandidates'
 import { TargetPlayer } from './behaviors/attack-player/TargetPlayer'
+import { UseAbility } from './behaviors/attack-player/UseAbility'
 import { AttackTower } from './behaviors/attack-tower/AttackTower'
 import { CheckTowerVulnerable } from './behaviors/attack-tower/CheckTowerVulnerable'
 import { SetTargetTower } from './behaviors/attack-tower/SetTargetTower'
@@ -39,14 +47,21 @@ export class CPU {
   public side: Side = Side.RIGHT
   public behaviorTree!: BehaviorTreeNode
   public didCompleteOnSpawn: boolean = false
+  public lastUsedAbilityTimestamp: number = 0
 
   constructor(game: Game) {
     this.game = game
     this.champion = new Champion(this.game, {
-      texture: 'wizard',
+      texture: ChampionTypes.WIZARD,
       position: {
         x: Constants.RIGHT_NEXUS_SPAWN.x,
         y: Constants.RIGHT_NEXUS_SPAWN.y,
+      },
+      abilities: {
+        [AbilityKeys.Q]: Fireball,
+        [AbilityKeys.W]: FireBlastAOE,
+        [AbilityKeys.E]: FlameSpread,
+        [AbilityKeys.R]: TrackingFirebomb,
       },
       side: Side.RIGHT,
       autoAttackType: AutoAttackType.RANGED,
@@ -71,14 +86,27 @@ export class CPU {
     const checkPlayerLowHealth = new CheckPlayerLowHealth(blackboard)
     const checkPlayerVulnerable = new CheckPlayerVulnerable(blackboard)
     const targetPlayer = new TargetPlayer(blackboard)
-    const attackPlayer = new AttackPlayer(blackboard)
+
+    // Choose to use either an ability or an auto attack
+    const useAbilitySequence = new SequenceNode('UseAbilitySequence', blackboard, [
+      new SelectAbility(blackboard, this),
+      new UseAbility(blackboard),
+    ])
+    const autoAttackPlayer = new AutoAttackPlayer(blackboard)
+    const abilityOrAutoAttackSelector = new SelectorNode(
+      'AbilityOrAutoAttackSelector',
+      blackboard,
+      useAbilitySequence,
+      autoAttackPlayer
+    )
+
     const attackPlayerSequence = new SequenceNode('AttackPlayerSequence', blackboard, [
       setTargetCandidates,
       checkPlayerAttackable,
       checkPlayerLowHealth,
       checkPlayerVulnerable,
       targetPlayer,
-      attackPlayer,
+      abilityOrAutoAttackSelector,
     ])
 
     // Attack Turret Behaviors

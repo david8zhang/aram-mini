@@ -5,7 +5,7 @@ import { BehaviorTreeNode } from '../../behavior-tree/BehaviorTreeNode'
 import { Blackboard } from '../../behavior-tree/Blackboard'
 import { BlackboardKeys } from '../BlackboardKeys'
 
-export class AttackPlayer extends BehaviorTreeNode {
+export class AutoAttackPlayer extends BehaviorTreeNode {
   constructor(blackboard: Blackboard) {
     super('AttackPlayer', blackboard)
   }

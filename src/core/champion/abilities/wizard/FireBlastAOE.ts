@@ -7,8 +7,9 @@ import { ChampionStates } from '../../states/ChampionStates'
 import { Ability } from '../Ability'
 import { AbilityWithRange } from '../AbilityWithRange'
 import { CooldownTimer } from '../CooldownTimer'
+import { CPUAbility } from '../CPUAbility'
 
-export class FireBlastAOE implements Ability, AbilityWithRange {
+export class FireBlastAOE implements Ability, AbilityWithRange, CPUAbility {
   game: Game
   champion: Champion
 
@@ -99,6 +100,19 @@ export class FireBlastAOE implements Ability, AbilityWithRange {
         })
       },
     })
+  }
+
+  public triggerCPUAbility(target?: Champion | undefined): void {
+    if (!target) {
+      return
+    }
+    this.triggerAbilityAtPosition(
+      {
+        x: target.sprite.x,
+        y: target.sprite.y,
+      },
+      null
+    )
   }
 
   public get isInCooldown() {

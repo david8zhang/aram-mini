@@ -16,6 +16,7 @@ export class AxePull implements Ability {
   private static readonly ABILITY_COOLDOWN_TIME_SECONDS = 5
   private static readonly PULL_SPEED = 500
   private static readonly STUN_DURATION = 1000
+  private static readonly ABILITY_RANGE = 70
 
   public iconTexture: string = 'axe-pull-icon'
   public key!: Phaser.Input.Keyboard.Key | null
@@ -25,6 +26,7 @@ export class AxePull implements Ability {
   public targetingRectangle: Phaser.GameObjects.Rectangle
   public cooldownTimer: CooldownTimer
   public manaCost: number = AxePull.MANA_COST
+  public abilityRange: number = AxePull.ABILITY_RANGE
 
   constructor(game: Game, champion: Champion) {
     this.game = game
@@ -36,7 +38,7 @@ export class AxePull implements Ability {
       .rectangle(
         this.champion.sprite.x,
         this.champion.sprite.y,
-        70,
+        this.abilityRange,
         30,
         Constants.UI_HIGHLIGHT_COLOR,
         0.75
@@ -140,6 +142,10 @@ export class AxePull implements Ability {
         }
       },
     })
+  }
+
+  public get damage(): number {
+    return 0
   }
 
   update(): void {

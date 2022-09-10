@@ -10,6 +10,7 @@ export enum BlackboardKeys {
   FRIENDLY_MINIONS = 'friendlyMinions',
   FRIENDLY_TOWERS = 'friendlyTowers',
   TARGET_MINION = 'targetMinion',
+  ABILITY_TO_USE = 'abilityToUse',
   CHAMPION = 'champion',
   SIDE = 'side',
 }

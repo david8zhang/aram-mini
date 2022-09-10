@@ -11,11 +11,13 @@ export class AxeSpin implements Ability {
 
   public static readonly ABILITY_COOLDOWN_TIME_SECONDS = 5
   public static readonly MANA_COST = 25
+  public static readonly ABILITY_RANGE = 50
 
   public isTargetingMode: boolean = false
   public mouseTriggered: boolean = false
   public iconTexture: string = 'axe'
   public key!: Phaser.Input.Keyboard.Key | null
+  public abilityRange: number = AxeSpin.ABILITY_RANGE
 
   // Graphics
   public axeHitbox: Phaser.Geom.Circle
@@ -37,7 +39,7 @@ export class AxeSpin implements Ability {
 
     // Set up slash path arc
     this.slashArc = this.game.add
-      .circle(this.champion.sprite.x, this.champion.sprite.y, 50)
+      .circle(this.champion.sprite.x, this.champion.sprite.y, this.abilityRange)
       .setVisible(false)
       .setStrokeStyle(15, 0xff0000)
       .setDepth(100)
@@ -82,9 +84,8 @@ export class AxeSpin implements Ability {
       })
       target.setData('isCollidedWithAxeSpin', true)
       const entity = target.getData('ref')
-      const damage = this.getDamageBasedOnChampionLevel()
       if (entity.getHealth() > 0) {
-        if (entity.getHealth() - damage <= 0) {
+        if (entity.getHealth() - this.damage <= 0) {
           this.champion.handleLastHit(entity)
         } else {
           this.game.time.delayedCall(1000, () => {
@@ -93,7 +94,7 @@ export class AxeSpin implements Ability {
             }
           })
         }
-        entity.takeDamage(damage)
+        entity.takeDamage(this.damage)
       }
     }
   }
@@ -126,7 +127,7 @@ export class AxeSpin implements Ability {
     )
   }
 
-  public getDamageBasedOnChampionLevel() {
+  public get damage() {
     return Math.round((775 * this.champion.level) / 17 + 350 / 17)
   }
 

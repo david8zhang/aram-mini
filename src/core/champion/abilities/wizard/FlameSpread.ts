@@ -7,8 +7,9 @@ import { ChampionStates } from '../../states/ChampionStates'
 import { Ability } from '../Ability'
 import { AbilityWithRange } from '../AbilityWithRange'
 import { CooldownTimer } from '../CooldownTimer'
+import { CPUAbility } from '../CPUAbility'
 
-export class FlameSpread implements Ability, AbilityWithRange {
+export class FlameSpread implements Ability, AbilityWithRange, CPUAbility {
   game: Game
   champion: Champion
 
@@ -56,6 +57,19 @@ export class FlameSpread implements Ability, AbilityWithRange {
 
   public get secondsUntilCooldownExpires() {
     return this.cooldownTimer.secondsUntilCooldownExpires
+  }
+
+  public triggerCPUAbility(target?: Champion | undefined): void {
+    if (!target) {
+      return
+    }
+    this.champion.decreaseMana(FlameSpread.MANA_COST)
+    this.cooldownTimer.startAbilityCooldown()
+    const enemyMinions =
+      this.champion.side === Side.LEFT ? this.game.rightMinions : this.game.leftMinions
+    const enemyChampions =
+      this.champion.side === Side.LEFT ? this.game.rightChampions : this.game.leftChampions
+    this.handleFireExplosionOnEntity(target, enemyMinions, enemyChampions, true, 0)
   }
 
   public canTriggerAbility(): boolean {

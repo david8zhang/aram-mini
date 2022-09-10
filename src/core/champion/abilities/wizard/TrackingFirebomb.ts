@@ -7,9 +7,10 @@ import { Champion } from '../../Champion'
 import { ChampionStates } from '../../states/ChampionStates'
 import { Ability } from '../Ability'
 import { CooldownTimer } from '../CooldownTimer'
+import { CPUAbility } from '../CPUAbility'
 import { TrackingAbility } from '../TrackingAbility'
 
-export class TrackingFirebomb implements Ability, TrackingAbility {
+export class TrackingFirebomb implements Ability, TrackingAbility, CPUAbility {
   game: Game
   champion: Champion
 
@@ -164,6 +165,13 @@ export class TrackingFirebomb implements Ability, TrackingAbility {
       }
     })
     return closestToCircleCenter
+  }
+
+  triggerCPUAbility(target?: Champion | undefined): void {
+    if (!target) {
+      return
+    }
+    this.triggerAbilityTowardsTarget(target, null)
   }
 
   triggerAbilityTowardsTarget(

@@ -100,17 +100,17 @@ export class Champion {
             thickness: 2,
             outlineColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
           })
-          if (this.side !== this.game.player.side) {
-            this.game.player.clickTarget['champion'] = this
-          }
+        }
+        if (this.side !== this.game.player.side) {
+          this.game.player.clickTarget['champion'] = this
         }
       })
       .on('pointerout', () => {
         if (this.shouldShowHoverOutline && !this.isDead) {
           this.game.postFxPlugin.remove(this.sprite)
-          if (this.side !== this.game.player.side) {
-            this.game.player.clickTarget['champion'] = null
-          }
+        }
+        if (this.side !== this.game.player.side) {
+          this.game.player.clickTarget['champion'] = null
         }
       })
 
@@ -229,6 +229,10 @@ export class Champion {
 
   decreaseMana(manaCost: number) {
     this.manaAmount -= manaCost
+  }
+
+  public getAbilities(): Ability[] {
+    return Object.keys(this.abilities).map((key: string) => this.abilities[key])
   }
 
   public getAbility() {}

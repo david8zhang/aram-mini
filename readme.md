@@ -20,7 +20,7 @@ Miniature version of ARAM in League of Legends
 
 ## Harder Stuffe
 
-- Have CPU champion use abilities
+- Have CPU get health packs
 
 ## Stretch Goals (Not needed for MVP)
 

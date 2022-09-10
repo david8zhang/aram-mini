@@ -4,14 +4,15 @@ import { Game } from '~/scenes/Game'
 import { Champion } from '../../Champion'
 import { Ability } from '../Ability'
 import { CooldownTimer } from '../CooldownTimer'
+import { CPUAbility } from '../CPUAbility'
 import { TargetingArrow } from '../TargetingArrow'
 
-export class Fireball implements Ability {
+export class Fireball implements Ability, CPUAbility {
   game: Game
   champion: Champion
 
   public static readonly MANA_COST = 50
-  public static readonly ATTACK_RANGE = 100
+  public static readonly ABILITY_RANGE = 100
   public static readonly ABILITY_COOLDOWN_TIME_SECONDS = 10
 
   public isTargetingMode: boolean = false
@@ -20,6 +21,7 @@ export class Fireball implements Ability {
   public targetingArrow: TargetingArrow
   public iconTexture: string = 'fireball'
   public manaCost = Fireball.MANA_COST
+  public abilityRange: number = Fireball.ABILITY_RANGE
 
   public cooldownTimer: CooldownTimer
 
@@ -34,7 +36,7 @@ export class Fireball implements Ability {
         x: this.champion.sprite.x,
         y: this.champion.sprite.y,
       },
-      width: Fireball.ATTACK_RANGE,
+      width: this.abilityRange,
       height: 5,
     })
     this.cooldownTimer = new CooldownTimer(this.game, Fireball.ABILITY_COOLDOWN_TIME_SECONDS)
@@ -86,15 +88,24 @@ export class Fireball implements Ability {
     return this.champion.manaAmount >= Fireball.MANA_COST && !this.isInCooldown
   }
 
-  triggerAbility() {
+  triggerCPUAbility(target?: Champion | undefined): void {
+    if (!target) {
+      return
+    }
+    this.triggerAbilityAtTarget({
+      x: target.sprite.x,
+      y: target.sprite.y,
+    })
+  }
+
+  triggerAbilityAtTarget(targetPosition: { x: number; y: number }): void {
     this.cooldownTimer.startAbilityCooldown()
     this.champion.decreaseMana(Fireball.MANA_COST)
-    const targetPoint = this.targetingArrow.getArrowPositionEnd()
     const angleToTargetPoint = Phaser.Math.Angle.Between(
       this.champion.sprite.x,
       this.champion.sprite.y,
-      targetPoint.x,
-      targetPoint.y
+      targetPosition.x,
+      targetPosition.y
     )
 
     const fireball = new Projectile(this.game, {
@@ -103,7 +114,7 @@ export class Fireball implements Ability {
         y: this.champion.sprite.y,
       },
       texture: 'fireball',
-      staticTarget: targetPoint,
+      staticTarget: targetPosition,
       speed: 150,
       scale: 2,
       rotation: angleToTargetPoint,
@@ -112,13 +123,12 @@ export class Fireball implements Ability {
         scaleY: 0.4,
       },
       onOverlapFn: (target: Minion | Champion) => {
-        const damage = this.getDamageBasedOnChampionLevel()
         if (target.side !== this.champion.side) {
           if (target.getHealth() > 0) {
-            if (target.getHealth() - damage <= 0) {
+            if (target.getHealth() - this.damage <= 0) {
               this.champion.handleLastHit(target)
             }
-            target.takeDamage(damage)
+            target.takeDamage(this.damage)
             fireball.destroy()
           }
         }
@@ -127,7 +137,11 @@ export class Fireball implements Ability {
     this.game.projectileGroup.add(fireball.sprite)
   }
 
-  getDamageBasedOnChampionLevel() {
+  triggerAbility() {
+    this.triggerAbilityAtTarget(this.targetingArrow.getArrowPositionEnd())
+  }
+
+  get damage() {
     return Math.round((450 * this.champion.level) / 17 + 400 / 17)
   }
 

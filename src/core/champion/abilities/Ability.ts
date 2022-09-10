@@ -8,6 +8,9 @@ export interface Ability {
   isInCooldown: boolean
   secondsUntilCooldownExpires: number
   manaCost: number
+  damage: number
+  abilityRange: number
   triggerAbility(): void
   update(): void
+  canTriggerAbility(): boolean
 }

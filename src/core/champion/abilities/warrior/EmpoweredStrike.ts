@@ -19,10 +19,12 @@ export class EmpoweredStrike implements Ability, EmpoweredAbility {
   public empoweredStrikeSprite: Phaser.GameObjects.Sprite
   public cooldownTimer: CooldownTimer
   public manaCost: number = EmpoweredStrike.MANA_COST
+  public abilityRange: number = -1
 
   constructor(game: Game, champion: Champion) {
     this.game = game
     this.champion = champion
+    this.abilityRange = champion.autoAttack.attackRange
     if (this.champion.isPlayerControlled) {
       this.key = this.game.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W)
     }
