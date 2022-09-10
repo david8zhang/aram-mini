@@ -3,14 +3,16 @@ import { ChampionTypes } from '~/utils/ChampionTypes'
 import { Constants } from '~/utils/Constants'
 
 export class SelectCharacter extends Phaser.Scene {
-  public championType!: ChampionTypes
+  public championType: ChampionTypes | null = null
   public champOptions: Phaser.GameObjects.Rectangle[] = []
+  public playButton!: Button
 
   constructor() {
     super('select-character')
   }
 
   create() {
+    this.championType = null
     const selectCharacterText = this.add.text(0, 0, 'Select your character', {
       fontSize: '20px',
       color: 'white',
@@ -20,7 +22,7 @@ export class SelectCharacter extends Phaser.Scene {
       Constants.WINDOW_HEIGHT / 2 - 100
     )
     this.setupCharacterSelectionGrid()
-    new Button(this, {
+    this.playButton = new Button(this, {
       position: {
         x: Constants.WINDOW_WIDTH / 2,
         y: Constants.WINDOW_HEIGHT / 2 + 100,
@@ -37,6 +39,12 @@ export class SelectCharacter extends Phaser.Scene {
       width: 100,
       height: 50,
     })
+  }
+
+  update() {
+    if (this.playButton) {
+      this.playButton.setVisible(this.championType != null)
+    }
   }
 
   setupCharacterSelectionGrid() {

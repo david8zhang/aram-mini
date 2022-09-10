@@ -6,14 +6,11 @@ Miniature version of ARAM in League of Legends
 
 ## Easy Wins
 
-- decrease range / damage of tower
-
 ## Polish
 
 - Make EXP bar a semi-circle
 - Better art for Mage abilities
 - Better art for Warrior "Execution Strike" ability
-- add a red line and icon indicating when user is about to be targeted by tower
 
 ## Bugs
 

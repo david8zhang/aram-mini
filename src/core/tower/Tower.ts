@@ -32,6 +32,7 @@ export class Tower {
   public attackRadius: number = Constants.TOWER_ATTACK_RADIUS
   public attackCircle: Phaser.GameObjects.Arc
   public shouldShowHoverOutline: boolean = true
+  public attackTargetingLine: Phaser.GameObjects.Line
 
   constructor(game: Game, config: TowerConfig) {
     this.game = game
@@ -88,6 +89,8 @@ export class Tower {
     this.game.debug.onDebugToggleHooks.push((isVisible: boolean) => {
       this.attackCircle.setVisible(isVisible)
     })
+
+    this.attackTargetingLine = this.game.add.line(0, 0, 0, 0, 0, 0, 0xff0000)
   }
 
   getDetectedEnemyMinions() {
@@ -123,6 +126,18 @@ export class Tower {
       )
       return !c.isDead && distanceToTower <= this.attackRadius
     })
+  }
+
+  hideAttackTargetingLine() {
+    this.attackTargetingLine.setVisible(false)
+  }
+
+  updateTargetingLineToChampion(champion: Champion) {
+    this.attackTargetingLine
+      .setPosition(0, 0)
+      .setDepth(this.sprite.depth + 1)
+      .setVisible(true)
+      .setTo(this.sprite.x, this.sprite.y, champion.sprite.x, champion.sprite.y)
   }
 
   public get attackRange() {
@@ -182,6 +197,7 @@ export class Tower {
   destroy() {
     this.sprite.setVisible(false)
     this.healthBar.setVisible(false)
+    this.attackTargetingLine.setVisible(false)
     this.stateMachine.transition(TowerStates.DEAD)
     this.checkNexusTargetable()
   }

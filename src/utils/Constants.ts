@@ -19,7 +19,7 @@ export class Constants {
 
   public static readonly TOWER_DAMAGE_MAPPING = {
     Minion: 40,
-    Champion: 160,
+    Champion: 80,
   }
   public static readonly TOWER_ATTACK_DELAY = 2000
   public static readonly TOWER_HEALTH = 500

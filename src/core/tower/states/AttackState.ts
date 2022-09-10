@@ -12,9 +12,13 @@ export class AttackState extends State {
     const attackTarget = tower.attackTarget!
     if (!this.isTargetAttackable(tower, attackTarget)) {
       tower.attackTarget = null
+      tower.hideAttackTargetingLine()
       tower.stateMachine.transition(TowerStates.IDLE)
     } else {
       const currTimestamp = Date.now()
+      if (attackTarget.constructor.name === 'Champion') {
+        tower.updateTargetingLineToChampion(attackTarget as Champion)
+      }
       if (currTimestamp - this.lastAttackedTimestamp > Constants.TOWER_ATTACK_DELAY) {
         this.lastAttackedTimestamp = currTimestamp
         tower.attack(attackTarget)

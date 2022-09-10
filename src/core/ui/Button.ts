@@ -10,9 +10,12 @@ export interface ButtonConfig {
 }
 
 export class Button {
+  public buttonRect: Phaser.GameObjects.Rectangle
+  public buttonText: Phaser.GameObjects.Text
+
   constructor(scene: Phaser.Scene, buttonConfig: ButtonConfig) {
-    const buttonRect = scene.add.rectangle(0, 0, 100, 20, 0x000000).setStrokeStyle(2, 0xffffff)
-    buttonRect
+    this.buttonRect = scene.add.rectangle(0, 0, 100, 20, 0x000000).setStrokeStyle(2, 0xffffff)
+    this.buttonRect
       .setPosition(buttonConfig.position.x, buttonConfig.position.y)
       .setInteractive()
       .on(Phaser.Input.Events.POINTER_OVER, () => {
@@ -25,12 +28,17 @@ export class Button {
         buttonConfig.onPress()
       })
 
-    const playText = scene.add.text(buttonRect.x, buttonRect.y, buttonConfig.text, {
+    this.buttonText = scene.add.text(this.buttonRect.x, this.buttonRect.y, buttonConfig.text, {
       fontSize: '12px',
     })
-    playText.setPosition(
-      buttonRect.x - playText.displayWidth / 2,
-      buttonRect.y - playText.displayHeight / 2
+    this.buttonText.setPosition(
+      this.buttonRect.x - this.buttonText.displayWidth / 2,
+      this.buttonRect.y - this.buttonText.displayHeight / 2
     )
+  }
+
+  setVisible(isVisible: boolean) {
+    this.buttonText.setVisible(isVisible)
+    this.buttonRect.setVisible(isVisible)
   }
 }
