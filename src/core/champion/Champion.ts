@@ -100,11 +100,17 @@ export class Champion {
             thickness: 2,
             outlineColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
           })
+          if (this.side !== this.game.player.side) {
+            this.game.player.clickTarget['champion'] = this
+          }
         }
       })
       .on('pointerout', () => {
         if (this.shouldShowHoverOutline && !this.isDead) {
           this.game.postFxPlugin.remove(this.sprite)
+          if (this.side !== this.game.player.side) {
+            this.game.player.clickTarget['champion'] = null
+          }
         }
       })
 
@@ -276,7 +282,6 @@ export class Champion {
               Constants.getLevelDiffExpAdjuster(this.level, (attackTarget as Champion).level)
           )
         )
-        console.log('Went here!')
         this.numKills++
         break
       }

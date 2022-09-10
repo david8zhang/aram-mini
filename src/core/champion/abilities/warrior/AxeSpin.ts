@@ -22,6 +22,7 @@ export class AxeSpin implements Ability {
   public axeSprite: Phaser.GameObjects.Sprite
   public slashArc: Phaser.GameObjects.Arc
   public slashArcInner: Phaser.GameObjects.Arc
+  public manaCost: number = AxeSpin.MANA_COST
 
   public isHitboxActive = false
   public isTriggeringAbility: boolean = false

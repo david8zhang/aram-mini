@@ -25,6 +25,7 @@ export class FireBlastAOE implements Ability, AbilityWithRange {
   public targetingCircle: Phaser.GameObjects.Arc
   public rangeCircle: Phaser.GameObjects.Arc
   public iconTexture: string = 'fire-blast'
+  public manaCost: number = FireBlastAOE.MANA_COST
 
   public abilityRange: number = FireBlastAOE.ABILITY_RANGE
   public abilityTarget: { x: number; y: number } | null = null

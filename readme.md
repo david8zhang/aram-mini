@@ -6,8 +6,6 @@ Miniature version of ARAM in League of Legends
 
 ## Easy Wins
 
-- Add blue highlight on abilities that cannot be cast due to insufficient mana
-- Add a character selection screen (which user goes back to after they win/losee)
 - decrease range / damage of tower
 
 ## Polish

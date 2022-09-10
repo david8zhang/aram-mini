@@ -7,6 +7,7 @@ export interface Ability {
   iconTexture: string
   isInCooldown: boolean
   secondsUntilCooldownExpires: number
+  manaCost: number
   triggerAbility(): void
   update(): void
 }

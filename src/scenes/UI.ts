@@ -344,8 +344,13 @@ export class UI extends Phaser.Scene {
             boundingRect.x - cooldownText.displayWidth / 2,
             boundingRect.y - cooldownText.displayHeight / 2
           )
+      } else if (player.champion.manaAmount < ability.manaCost) {
+        boundingRect.setDepth(sprite.depth + 1)
+        boundingRect.setFillStyle(0x0000ff, 0.5)
+        cooldownText.setVisible(false)
       } else {
         boundingRect.setDepth(sprite.depth - 1)
+        boundingRect.setFillStyle(0x000000, 0.5)
         cooldownText.setVisible(false)
       }
     }

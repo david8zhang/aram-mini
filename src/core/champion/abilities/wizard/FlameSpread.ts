@@ -23,6 +23,7 @@ export class FlameSpread implements Ability, AbilityWithRange {
   public isTargetingMode: boolean = false
   public targetingCursor: Phaser.GameObjects.Sprite
   public rangeCircle: Phaser.GameObjects.Arc
+  public manaCost: number = FlameSpread.MANA_COST
 
   public abilityRange: number = FlameSpread.ABILITY_RANGE
   public abilityTarget: { x: number; y: number } | null = null

@@ -19,6 +19,7 @@ export class Fireball implements Ability {
   public key!: Phaser.Input.Keyboard.Key | null
   public targetingArrow: TargetingArrow
   public iconTexture: string = 'fireball'
+  public manaCost = Fireball.MANA_COST
 
   public cooldownTimer: CooldownTimer
 

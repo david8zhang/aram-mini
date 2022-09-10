@@ -24,6 +24,7 @@ export class AxePull implements Ability {
   public mouseTriggered: boolean = false
   public targetingRectangle: Phaser.GameObjects.Rectangle
   public cooldownTimer: CooldownTimer
+  public manaCost: number = AxePull.MANA_COST
 
   constructor(game: Game, champion: Champion) {
     this.game = game

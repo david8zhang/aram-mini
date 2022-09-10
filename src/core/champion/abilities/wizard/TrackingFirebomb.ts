@@ -25,6 +25,7 @@ export class TrackingFirebomb implements Ability, TrackingAbility {
   public mouseTriggered: boolean = false
   public isTargetingMode: boolean = false
   public targetingCursor: Phaser.GameObjects.Sprite
+  public manaCost: number = TrackingFirebomb.MANA_COST
 
   public abilityRange: number = TrackingFirebomb.ABILITY_RANGE
   public abilityTargetEntity: Champion | Minion | null = null

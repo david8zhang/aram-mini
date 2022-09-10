@@ -50,11 +50,17 @@ export class Tower {
             thickness: 2,
             outlineColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
           })
+          if (this.side !== this.game.player.side) {
+            this.game.player.clickTarget['tower'] = this
+          }
         }
       })
       .on('pointerout', () => {
         if (this.shouldShowHoverOutline) {
           this.game.postFxPlugin.remove(this.sprite)
+          if (this.side !== this.game.player.side) {
+            this.game.player.clickTarget['tower'] = null
+          }
         }
       })
 

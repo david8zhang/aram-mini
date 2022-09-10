@@ -58,11 +58,17 @@ export class Minion {
             thickness: 2,
             outlineColor: this.side === Side.LEFT ? Constants.LEFT_COLOR : Constants.RIGHT_COLOR,
           })
+          if (this.side !== this.game.player.side) {
+            this.game.player.clickTarget['minion'] = this
+          }
         }
       })
       .on('pointerout', () => {
         if (this.shouldShowHoverOutline) {
           this.game.postFxPlugin.remove(this.sprite)
+          if (this.side !== this.game.player.side) {
+            this.game.player.clickTarget['minion'] = null
+          }
         }
       })
 

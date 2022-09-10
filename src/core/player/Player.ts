@@ -27,6 +27,9 @@ export class Player {
   public attackCursorImage: Phaser.GameObjects.Image
   public attackRangeCircle: Phaser.GameObjects.Arc
   public targetToHighlight: Minion | Champion | Tower | Nexus | null = null
+  public clickTarget: {
+    [key: string]: Minion | Champion | Tower | Nexus | null
+  } = {}
 
   constructor(game: Game, championType: ChampionTypes | undefined) {
     this.game = game
@@ -104,21 +107,16 @@ export class Player {
         return
       }
       if (pointer.rightButtonDown()) {
-        const minion = this.game.getMinionAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
-        const tower = this.game.getTowerAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
-        const nexus = this.game.getNexusAtPosition(Side.RIGHT, pointer.worldX, pointer.worldY, 15)
-        const champion = this.game.getChampionAtPosition(
-          Side.RIGHT,
-          pointer.worldX,
-          pointer.worldY,
-          15
-        )
+        const minion = this.getClickTarget('minion')
+        const tower = this.getClickTarget('tower')
+        const nexus = this.getClickTarget('nexus')
+        const champion = this.getClickTarget('champion')
         if (champion) {
           this.setChampionAttackTarget(champion)
         } else if (tower) {
           this.setChampionAttackTarget(tower)
         } else if (minion) {
-          this.setChampionAttackTarget(minion.getData('ref') as Minion)
+          this.setChampionAttackTarget(minion)
         } else if (nexus) {
           this.setChampionAttackTarget(nexus)
         } else {
@@ -134,6 +132,15 @@ export class Player {
       }
       this.disableAttackTargeting()
     })
+  }
+
+  getClickTarget(key: string) {
+    const target = this.clickTarget[key]
+    if (!target || !target.sprite.active || target.getHealth() <= 0) {
+      this.clickTarget[key] = null
+      return null
+    }
+    return target
   }
 
   getNearestTargetToCursor(pointerX: number, pointerY: number) {

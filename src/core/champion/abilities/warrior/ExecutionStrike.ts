@@ -22,6 +22,7 @@ export class ExecutionStrike implements Ability, TrackingAbility {
   public key!: Phaser.Input.Keyboard.Key | null
   public mouseTriggered: boolean = false
   public isTargetingMode: boolean = false
+  public manaCost: number = ExecutionStrike.MANA_COST
 
   public targetingCursor: Phaser.GameObjects.Sprite
   public rangeCircle: Phaser.GameObjects.Arc

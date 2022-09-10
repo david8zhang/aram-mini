@@ -18,6 +18,7 @@ export class EmpoweredStrike implements Ability, EmpoweredAbility {
   public spriteTint: Phaser.Physics.Arcade.Sprite
   public empoweredStrikeSprite: Phaser.GameObjects.Sprite
   public cooldownTimer: CooldownTimer
+  public manaCost: number = EmpoweredStrike.MANA_COST
 
   constructor(game: Game, champion: Champion) {
     this.game = game
