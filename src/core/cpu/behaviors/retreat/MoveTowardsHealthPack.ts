@@ -1,34 +1,36 @@
 import { Champion } from '~/core/champion/Champion'
 import { ChampionStates } from '~/core/champion/states/ChampionStates'
-import { Constants } from '~/utils/Constants'
-import { Side } from '~/utils/Side'
+import { HealthRelic } from '~/core/HealthRelic'
 import { BehaviorStatus } from '../../behavior-tree/BehaviorStatus'
 import { BehaviorTreeNode } from '../../behavior-tree/BehaviorTreeNode'
 import { Blackboard } from '../../behavior-tree/Blackboard'
 import { BlackboardKeys } from '../BlackboardKeys'
 
-export class MoveTowardsBase extends BehaviorTreeNode {
+export class MoveTowardsHealthPack extends BehaviorTreeNode {
   constructor(blackboard: Blackboard) {
-    super('MoveTowardsBase', blackboard)
+    super('MoveTowardsHealthPack', blackboard)
   }
 
   public process(): BehaviorStatus {
+    const targetHealthPack = this.blackboard.getData(
+      BlackboardKeys.TARGET_HEALTH_PACK
+    ) as HealthRelic
     const champion = this.blackboard.getData(BlackboardKeys.CHAMPION) as Champion
-    const baseLocation =
-      this.blackboard.getData(BlackboardKeys.SIDE) == Side.LEFT
-        ? Constants.LEFT_NEXUS_SPAWN
-        : Constants.RIGHT_NEXUS_SPAWN
-    if (champion.isAtMoveTarget(baseLocation)) {
+    if (!targetHealthPack) {
+      return BehaviorStatus.FAILURE
+    }
+    if (targetHealthPack.isInCooldown) {
+      this.blackboard.setData(BlackboardKeys.TARGET_HEALTH_PACK, null)
       return BehaviorStatus.SUCCESS
     } else if (
       champion.moveTarget &&
-      champion.moveTarget.x == baseLocation.x &&
-      champion.moveTarget.y == baseLocation.y &&
+      champion.moveTarget.x == targetHealthPack.sprite.x &&
+      champion.moveTarget.y == targetHealthPack.sprite.y &&
       champion.stateMachine.getState() === ChampionStates.MOVE
     ) {
       return BehaviorStatus.RUNNING
     } else {
-      champion.setMoveTarget(baseLocation.x, baseLocation.y)
+      champion.setMoveTarget(targetHealthPack.sprite.x, targetHealthPack.sprite.y)
       champion.stateMachine.transition(ChampionStates.MOVE)
       return BehaviorStatus.SUCCESS
     }

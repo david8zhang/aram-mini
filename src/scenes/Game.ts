@@ -263,21 +263,26 @@ export class Game extends Phaser.Scene {
   }
 
   initHealthRelics() {
-    const coordinates = [
+    const leftCoordinates = [
       [16, 5],
       [12, 9],
+    ]
+    const rightCoordinates = [
       [5, 16],
       [9, 12],
     ]
-    coordinates.forEach((coordinate) => {
+    const fn = (coordinate, side: Side) => {
       const worldPosition = this.debug.getWorldPositionForCoordinates(coordinate[0], coordinate[1])
       const healthRelic = new HealthRelic(this, {
         position: worldPosition,
         healAmount: Constants.HEALTH_RELIC_HEAL_AMOUNT,
         manaRegenAmount: Constants.HEALTH_RELIC_MANA_REGEN_AMOUNT,
+        side,
       })
       this.healthRelics.push(healthRelic)
-    })
+    }
+    leftCoordinates.forEach((coordinate: number[]) => fn(coordinate, Side.LEFT))
+    rightCoordinates.forEach((coordinate: number[]) => fn(coordinate, Side.RIGHT))
   }
 
   playAnimationFrames(

@@ -4,6 +4,7 @@ export enum BlackboardKeys {
   TARGET_CHAMPION_CANDIDATES = 'targetChampionCandidates',
   TARGET_CHAMPION = 'targetChampion',
   TARGET_TOWER = 'targetTower',
+  TARGET_HEALTH_PACK = 'targetHealthPack',
   NEXUS = 'nexus',
   ENEMY_NEXUS = 'enemyNexus',
   ENEMY_MINIONS = 'enemyMinions',

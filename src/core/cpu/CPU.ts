@@ -40,6 +40,9 @@ import { PopulateBlackboard } from './behaviors/PopulateBlackboard'
 import { Idle } from './behaviors/retreat/Idle'
 import { IsInDanger } from './behaviors/retreat/IsInDanger'
 import { MoveTowardsBase } from './behaviors/retreat/MoveTowardsBase'
+import { MoveTowardsHealthPack } from './behaviors/retreat/MoveTowardsHealthPack'
+import { SelectAvailableHealthPack } from './behaviors/retreat/SelectAvailableHealthPack'
+import { ShouldGetHealthPack } from './behaviors/retreat/ShouldGetHealthPack'
 
 export class CPU {
   public game: Game
@@ -175,12 +178,21 @@ export class CPU {
       isInDanger,
       moveTowardsBase,
     ])
-    const idle = new Idle(blackboard)
+    const getHealthPackSequence = new SequenceNode('GetHealthPackSequence', blackboard, [
+      new ShouldGetHealthPack(blackboard),
+      new SelectAvailableHealthPack(blackboard),
+      new MoveTowardsHealthPack(blackboard),
+    ])
     const defensiveBehaviorSelector = new SelectorNode(
       'DefensiveSelector',
       blackboard,
-      moveOutOfDangerSequence,
-      idle
+      getHealthPackSequence,
+      new SelectorNode(
+        'MoveOutOfDangerBehavior',
+        blackboard,
+        moveOutOfDangerSequence,
+        new Idle(blackboard)
+      )
     )
 
     // Configure selector for what behavior to follow after reaching initial position in lane

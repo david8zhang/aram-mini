@@ -1,4 +1,5 @@
 import { Game } from '~/scenes/Game'
+import { Side } from '~/utils/Side'
 import { CooldownTimer } from './champion/abilities/CooldownTimer'
 import { Champion } from './champion/Champion'
 
@@ -9,12 +10,14 @@ export interface HealthRelicConfig {
     x: number
     y: number
   }
+  side: Side
 }
 
 export class HealthRelic {
   private game: Game
   public static readonly HEALTH_RELIC_COOLDOWN_SECONDS = 90
 
+  public side: Side
   public healAmount: number
   public manaRegenAmount: number
   public sprite: Phaser.Physics.Arcade.Sprite
@@ -24,6 +27,7 @@ export class HealthRelic {
 
   constructor(game: Game, config: HealthRelicConfig) {
     this.game = game
+    this.side = config.side
     this.manaRegenAmount = config.manaRegenAmount
     this.healAmount = config.healAmount
     this.sprite = this.game.physics.add.sprite(config.position.x, config.position.y, 'health-relic')
@@ -71,6 +75,10 @@ export class HealthRelic {
       champion.heal(this.healAmount)
       this.cooldownTimer.startAbilityCooldown()
     }
+  }
+
+  public get isInCooldown() {
+    return this.cooldownTimer.isInCooldown
   }
 
   update() {
