@@ -15,7 +15,7 @@ export class TrackingFirebomb implements Ability, TrackingAbility, CPUAbility {
   champion: Champion
 
   private static readonly MANA_COST = 100
-  private static readonly ABILITY_RANGE = 100
+  private static readonly ABILITY_RANGE = 200
   private static readonly ABILITY_COOLDOWN_TIME_SECONDS = 60
   private static readonly EXPLOSION_CIRCLE_COLOR = 0xfe7817
   private static readonly EXPLOSION_CIRCLE_OUTLINE_COLOR = 0xfed874
@@ -34,6 +34,7 @@ export class TrackingFirebomb implements Ability, TrackingAbility, CPUAbility {
 
   public iconTexture: string = 'tracking-fireball'
   public cooldownTimer: CooldownTimer
+  public explosionSprite: Phaser.GameObjects.Sprite
 
   constructor(game: Game, champion: Champion) {
     this.game = game
@@ -54,6 +55,14 @@ export class TrackingFirebomb implements Ability, TrackingAbility, CPUAbility {
       this.game,
       TrackingFirebomb.ABILITY_COOLDOWN_TIME_SECONDS
     )
+    this.explosionSprite = this.game.add
+      .sprite(0, 0, 'explosion')
+      .setVisible(false)
+      .setScale(2)
+      .setDepth(1000)
+    this.explosionSprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+      this.explosionSprite.setVisible(false)
+    })
     this.setupMouseClickListener()
   }
 
@@ -108,6 +117,8 @@ export class TrackingFirebomb implements Ability, TrackingAbility, CPUAbility {
             if (target.getHealth() - this.damage <= 0) {
               this.champion.handleLastHit(target)
             }
+            this.explosionSprite.setVisible(true).setPosition(target.sprite.x, target.sprite.y)
+            this.explosionSprite.play('explosion')
             target.takeDamage(this.damage)
             fireball.destroy()
             this.handleSplashDamage(target, onCompleteCallback)

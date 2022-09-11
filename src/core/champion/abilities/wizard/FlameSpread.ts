@@ -31,6 +31,7 @@ export class FlameSpread implements Ability, AbilityWithRange, CPUAbility {
 
   public iconTexture: string = 'flame-spread'
   public cooldownTimer: CooldownTimer
+  public flameSpreadSprite: Phaser.GameObjects.Sprite
 
   constructor(game: Game, champion: Champion) {
     this.game = game
@@ -48,6 +49,13 @@ export class FlameSpread implements Ability, AbilityWithRange, CPUAbility {
       .setStrokeStyle(2, Constants.UI_HIGHLIGHT_COLOR, 1)
       .setVisible(false)
     this.cooldownTimer = new CooldownTimer(this.game, FlameSpread.ABILITY_COOLDOWN_TIME_SECONDS)
+    this.flameSpreadSprite = this.game.add
+      .sprite(0, 0, 'flame-spread-explosion')
+      .setVisible(false)
+      .setDepth(1000)
+    this.flameSpreadSprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+      this.flameSpreadSprite.setVisible(false)
+    })
     this.setupMouseClickListener()
   }
 
@@ -202,6 +210,8 @@ export class FlameSpread implements Ability, AbilityWithRange, CPUAbility {
         to: FlameSpread.EXPLOSION_CIRCLE_OUTLINE_COLOR,
       },
       onStart: () => {
+        this.flameSpreadSprite.setVisible(true).setPosition(entity.sprite.x, entity.sprite.y - 10)
+        this.flameSpreadSprite.play('flame-spread-explosion')
         explosionCircle.setVisible(true)
         if (entity.getHealth() > 0) {
           if (entity.getHealth() - this.damage <= 0) {

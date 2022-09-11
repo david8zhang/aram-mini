@@ -21,6 +21,11 @@ export class Preload extends Scene {
     this.load.image('fire-blast', 'fire-blast.png')
     this.load.image('flame-spread', 'flame-spread.png')
     this.load.image('tracking-fireball', 'tracking-fireball.png')
+    this.load.atlas(
+      'flame-spread-explosion',
+      'animations/flame-spread-explosion.png',
+      'animations/flame-spread-explosion.json'
+    )
     this.load.atlas('slash', 'animations/slash.png', 'animations/slash.json')
     this.load.atlas(
       'empowered-strike',
@@ -31,6 +36,17 @@ export class Preload extends Scene {
       'execution-strike',
       'animations/execution-strike.png',
       'animations/execution-strike.json'
+    )
+    this.load.atlas(
+      'fire-aoe-explosion',
+      'animations/fire-aoe-explosion.png',
+      'animations/fire-aoe-explosion.json'
+    )
+    this.load.atlas('explosion', 'animations/explosion.png', 'animations/explosion.json')
+    this.load.atlas(
+      'fireball-explosion',
+      'animations/fireball-explosion.png',
+      'animations/fireball-explosion.json'
     )
     this.load.image('empowered-strike-icon', 'empowered-strike-icon.png')
     this.load.image('axe', 'axe.png')

@@ -30,7 +30,7 @@ export class FireBlastAOE implements Ability, AbilityWithRange, CPUAbility {
 
   public abilityRange: number = FireBlastAOE.ABILITY_RANGE
   public abilityTarget: { x: number; y: number } | null = null
-
+  public fireAOEAnimationSprite: Phaser.GameObjects.Sprite
   public cooldownTimer: CooldownTimer
 
   constructor(game: Game, champion: Champion) {
@@ -49,7 +49,13 @@ export class FireBlastAOE implements Ability, AbilityWithRange, CPUAbility {
       .setDepth(1000)
       .setStrokeStyle(2, Constants.UI_HIGHLIGHT_COLOR, 1)
       .setVisible(false)
-
+    this.fireAOEAnimationSprite = this.game.add
+      .sprite(0, 0, 'fire-aoe-explosion')
+      .setVisible(false)
+      .setScale(2)
+    this.fireAOEAnimationSprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+      this.fireAOEAnimationSprite.setVisible(false)
+    })
     this.cooldownTimer = new CooldownTimer(this.game, FireBlastAOE.ABILITY_COOLDOWN_TIME_SECONDS)
     this.setupMouseClickListener()
   }
@@ -85,11 +91,16 @@ export class FireBlastAOE implements Ability, AbilityWithRange, CPUAbility {
       duration: 1000,
       onComplete: () => {
         this.handleDamageToEnemiesWithinExplosionRadius(explosionCircleOutline)
+        this.fireAOEAnimationSprite
+          .setVisible(true)
+          .setPosition(position.x, position.y - 10)
+          .setDepth(1000)
+        this.fireAOEAnimationSprite.play('fire-aoe-explosion')
         this.game.tweens.add({
           targets: explosionCircle,
           radius: { from: 0, to: FireBlastAOE.TARGETING_CIRCLE_RADIUS * 2 },
           alpha: { from: 1, to: 0 },
-          duration: 250,
+          duration: 500,
           onComplete: () => {
             explosionCircle.destroy()
             explosionCircleOutline.destroy()

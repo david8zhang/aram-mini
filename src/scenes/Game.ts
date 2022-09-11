@@ -1,6 +1,10 @@
 import Phaser from 'phaser'
 import { createEmpoweredStrikeAnims } from '~/core/anims/empoweredStrikeAnims'
 import { createExecutionStrikeAnims } from '~/core/anims/executionStrikeAnims'
+import { createExplosionAnims } from '~/core/anims/explosionAnims'
+import { createFireAOEExplosionAnims } from '~/core/anims/fireAOEExplosionAnims'
+import { createFireballExplosionAnims } from '~/core/anims/fireballExplosionAnims'
+import { createFlameSpreadAnims } from '~/core/anims/flameSpreadAnims'
 import { createSlashAnims } from '~/core/anims/slashAnims'
 import { Champion } from '~/core/champion/Champion'
 import { CPU } from '~/core/cpu/CPU'
@@ -111,8 +115,12 @@ export class Game extends Phaser.Scene {
 
   initAnimations() {
     createSlashAnims(this.anims)
+    createFireAOEExplosionAnims(this.anims)
     createEmpoweredStrikeAnims(this.anims)
     createExecutionStrikeAnims(this.anims)
+    createExplosionAnims(this.anims)
+    createFlameSpreadAnims(this.anims)
+    createFireballExplosionAnims(this.anims)
   }
 
   initColliders() {

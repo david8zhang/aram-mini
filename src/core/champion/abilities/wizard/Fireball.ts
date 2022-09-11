@@ -13,7 +13,7 @@ export class Fireball implements Ability, CPUAbility {
 
   public static readonly MANA_COST = 50
   public static readonly ABILITY_RANGE = 100
-  public static readonly ABILITY_COOLDOWN_TIME_SECONDS = 10
+  public static readonly ABILITY_COOLDOWN_TIME_SECONDS = 1
 
   public isTargetingMode: boolean = false
   public mouseTriggered: boolean = false
@@ -24,6 +24,7 @@ export class Fireball implements Ability, CPUAbility {
   public abilityRange: number = Fireball.ABILITY_RANGE
 
   public cooldownTimer: CooldownTimer
+  public fireballExplosionSprite: Phaser.GameObjects.Sprite
 
   constructor(game: Game, champion: Champion) {
     this.game = game
@@ -40,6 +41,14 @@ export class Fireball implements Ability, CPUAbility {
       height: 5,
     })
     this.cooldownTimer = new CooldownTimer(this.game, Fireball.ABILITY_COOLDOWN_TIME_SECONDS)
+    this.fireballExplosionSprite = this.game.add
+      .sprite(0, 0, 'fireball-explosion')
+      .setVisible(false)
+      .setDepth(1000)
+      .setScale(2)
+    this.fireballExplosionSprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+      this.fireballExplosionSprite.setVisible(false)
+    })
     this.setupMouseClickListener()
   }
 
@@ -129,6 +138,10 @@ export class Fireball implements Ability, CPUAbility {
               this.champion.handleLastHit(target)
             }
             target.takeDamage(this.damage)
+            this.fireballExplosionSprite
+              .setPosition(target.sprite.x, target.sprite.y)
+              .setVisible(true)
+            this.fireballExplosionSprite.play('fireball-explosion')
             fireball.destroy()
           }
         }
